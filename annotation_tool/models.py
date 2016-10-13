@@ -3,8 +3,13 @@ from __future__ import unicode_literals
 from django.db import models
 
 
+class Tier(models.Model):
+    name = models.CharField(max_length=50)
+
+
 class Dataset(models.Model):
     name = models.CharField(max_lenght=50)
+    tiers = models.ManyToManyField(Tier)
 
 
 class Sound(models.Model):
