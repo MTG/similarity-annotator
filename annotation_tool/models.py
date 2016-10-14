@@ -8,7 +8,7 @@ class Tier(models.Model):
 
 
 class Dataset(models.Model):
-    name = models.CharField(max_lenght=50)
+    name = models.CharField(max_length=50)
     tiers = models.ManyToManyField(Tier)
 
 
