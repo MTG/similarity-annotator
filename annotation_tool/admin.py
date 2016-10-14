@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from models import Sound, Tier, Dataset
+
+admin.site.register(Sound)
+admin.site.register(Tier)
+admin.site.register(Dataset)
+
+

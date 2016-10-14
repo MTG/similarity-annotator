@@ -5,7 +5,7 @@ from django.db import models
 
 class Tier(models.Model):
     name = models.CharField(max_length=50)
-    related_tiers = models.ForeignKey('self')
+    related_tiers = models.ForeignKey('self', blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -13,7 +13,7 @@ class Tier(models.Model):
 
 class Dataset(models.Model):
     name = models.CharField(max_length=50)
-    tiers = models.ManyToManyField(Tier)
+    tiers = models.ManyToManyField(Tier, blank=True, null=True)
 
     def __str__(self):
         return self.name
