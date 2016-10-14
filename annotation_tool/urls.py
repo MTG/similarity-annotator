@@ -3,6 +3,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.sound_list, name='index'),
-    url(r'^(?P<sound_id>[0-9]+)/$', views.sound_detail, name='sound_detail'),
+    url(r'^$', views.dataset_list, name='dataset_list'),
+    url(r'^(?P<dataset_id>[0-9]+)/sound_list/$', views.sound_list, name='sound_list'),
+    url(r'^(?P<sound_id>[0-9]+)/sound_detail/$', views.sound_detail, name='sound_detail'),
 ]
