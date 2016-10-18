@@ -24,6 +24,8 @@ class Dataset(models.Model):
 class Sound(models.Model):
     filename = models.CharField(max_length=200)
     dataset = models.ForeignKey(Dataset, related_name='sounds')
+    is_reference = models.BooleanField(default=False)
+    has_annotations = models.BooleanField(default=False)
 
 
 class Annotation(models.Model):
