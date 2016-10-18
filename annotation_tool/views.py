@@ -1,11 +1,12 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from models import Dataset
 
 
 def dataset_list(request):
-    list_of_datasets = Dataset.objects.all()
-    output = ','.join([dataset.name for dataset in list_of_datasets])
-    return HttpResponse("The list of datasets: %s" % output)
+    datasets_list = Dataset.objects.all()
+    context = {'datasets_list': datasets_list}
+    return render(request, 'annotation_tool/datasets_list.html', context)
 
 
 def sound_list(request, dataset_id):
