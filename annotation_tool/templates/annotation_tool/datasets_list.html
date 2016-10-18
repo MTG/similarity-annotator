@@ -1,7 +1,7 @@
 {% if datasets_list %}
     <ul>
     {% for data_set in datasets_list %}
-        <li>{{ data_set.name }}</li>
+        <li><a href="/annotation/{{ data_set.id }}/sound_list/">{{ data_set.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
