@@ -1,0 +1,9 @@
+{% if sounds_list %}
+    <ul>
+    {% for sound in sounds_list %}
+        <li>{{sound.filename }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>There is no sounds</p>
+{% endif %}
