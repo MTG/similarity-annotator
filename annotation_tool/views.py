@@ -15,7 +15,7 @@ def sound_list(request, dataset_id):
         context = dataset
     else:
         sounds_list = dataset.sounds.all()
-        context = {'sounds_list': sounds_list}
+        context = {'sounds_list': sounds_list, 'dataset_id': dataset_id}
     return render(request, 'annotation_tool/sounds_list.html', context)
 
 
