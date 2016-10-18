@@ -6,16 +6,15 @@ from django.contrib.auth.models import User
 
 class Tier(models.Model):
     name = models.CharField(max_length=50)
-    related_tiers = models.ForeignKey('self', blank=True, null=True)
+    parent_tier = models.ForeignKey('self', blank=True, null=True, related_name='child_tiers')
 
     def __str__(self):
         return self.name
 
 
-class Dataset(models.Model):
+class Exercise(models.Model):
     name = models.CharField(max_length=50)
     tiers = models.ManyToManyField(Tier, blank=True)
-    users = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.name
@@ -23,7 +22,7 @@ class Dataset(models.Model):
 
 class Sound(models.Model):
     filename = models.CharField(max_length=200)
-    dataset = models.ForeignKey(Dataset, related_name='sounds')
+    exercise = models.ForeignKey(Exercise, related_name='sounds')
     is_reference = models.BooleanField(default=False)
     has_annotations = models.BooleanField(default=False)
 
@@ -32,4 +31,10 @@ class Annotation(models.Model):
     start_time = models.IntegerField("start_time")
     end_time = models.IntegerField("end_time", blank=True, null=True)
     sound = models.ForeignKey(Sound, related_name='annotations')
-    related_annotation = models.ForeignKey('self', blank=True, null=True)
+    tier = models.ForeignKey(Tier, related_name='annotations')
+
+
+class AnnotationSimilarity(models.Model):
+    reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
+    other_sound = models.ForeignKey(Annotation)
+    similarity_measure = models.IntegerField("similarity_measure")
