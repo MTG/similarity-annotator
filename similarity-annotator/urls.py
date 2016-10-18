@@ -18,5 +18,5 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^annotation/', include('annotation_tool.urls')),
+    url(r'^annotation-app/', include('annotation-app.urls')),
 ]

@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('similarity_measure', models.IntegerField(verbose_name='similarity_measure')),
-                ('other_sound', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='annotation_tool.Annotation')),
-                ('reference', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotationsimilarity_related', to='annotation_tool.Annotation')),
+                ('other_sound', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='annotation-app.Annotation')),
+                ('reference', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotationsimilarity_related', to='annotation-app.Annotation')),
             ],
         ),
         migrations.CreateModel(
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('filename', models.CharField(max_length=200)),
                 ('is_reference', models.BooleanField(default=False)),
                 ('has_annotations', models.BooleanField(default=False)),
-                ('exercise', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sounds', to='annotation_tool.Exercise')),
+                ('exercise', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sounds', to='annotation-app.Exercise')),
             ],
         ),
         migrations.CreateModel(
@@ -53,22 +53,22 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=50)),
-                ('parent_tier', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_tiers', to='annotation_tool.Tier')),
+                ('parent_tier', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_tiers', to='annotation-app.Tier')),
             ],
         ),
         migrations.AddField(
             model_name='exercise',
             name='tiers',
-            field=models.ManyToManyField(blank=True, to='annotation_tool.Tier'),
+            field=models.ManyToManyField(blank=True, to='annotation-app.Tier'),
         ),
         migrations.AddField(
             model_name='annotation',
             name='sound',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotations', to='annotation_tool.Sound'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotations', to='annotation-app.Sound'),
         ),
         migrations.AddField(
             model_name='annotation',
             name='tier',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotations', to='annotation_tool.Tier'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='annotations', to='annotation-app.Tier'),
         ),
     ]

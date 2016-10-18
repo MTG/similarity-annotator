@@ -35,7 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'annotation_tool.apps.AnnotationToolConfig',
+    'annotation-app.apps.AnnotationToolConfig',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Annotation.urls'
+ROOT_URLCONF = 'similarity-annotator.urls'
 
 TEMPLATES = [
     {
@@ -73,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Annotation.wsgi.application'
+WSGI_APPLICATION = 'similarity-annotator.wsgi.application'
 
 
 # Password validation

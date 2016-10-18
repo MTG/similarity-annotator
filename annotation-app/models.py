@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class Tier(models.Model):
@@ -15,6 +14,7 @@ class Tier(models.Model):
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
     tiers = models.ManyToManyField(Tier, blank=True)
+    reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
 
     def __str__(self):
         return self.name
