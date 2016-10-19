@@ -13,7 +13,7 @@ class Tier(models.Model):
 
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
-    tiers = models.ManyToManyField(Tier, blank=True)
+    tiers = models.ManyToManyField(Tier, blank=True, related_name='exercise')
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
 
     def __str__(self):
