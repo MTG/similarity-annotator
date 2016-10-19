@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
-from models import Exercise, Sound
+from .models import Exercise, Sound
 
 
 def exercise_list(request):

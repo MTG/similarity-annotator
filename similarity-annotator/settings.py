@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     pass
 
