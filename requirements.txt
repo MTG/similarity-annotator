@@ -1,0 +1,5 @@
+Django==1.10.2
+django-extensions==1.7.4
+prompt-toolkit==1.0.8
+psycopg2==2.6.2
+
