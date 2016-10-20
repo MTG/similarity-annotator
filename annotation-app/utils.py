@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Exercise, Annotation, AnnotationSimilarity
+import json
 
 
 def exercise_annotations_to_json(exercise_id):
@@ -21,7 +22,7 @@ def exercise_annotations_to_json(exercise_id):
 
             annotations = {}
             for annotation in Annotation.objects.filter(sound=sound, tier=tier).all():
-                # check if there is an annotation similarity 
+                # check if there is an annotation similarity
                 try:
                     annotation_similarity = AnnotationSimilarity.objects.get(other_sound=annotation)
                     similarity = {'reference_annotation': annotation_similarity.reference.id,
@@ -38,3 +39,5 @@ def exercise_annotations_to_json(exercise_id):
             tiers[tier.name] = annotations
 
         sounds_annotations[sound.filename] = tiers
+
+    return json.dumps(sounds_annotations)
