@@ -26,8 +26,12 @@ class Sound(models.Model):
     is_reference = models.BooleanField(default=False)
     has_annotations = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.filename
+
 
 class Annotation(models.Model):
+    name = models.CharField(max_length=200)
     start_time = models.IntegerField("start_time")
     end_time = models.IntegerField("end_time", blank=True, null=True)
     sound = models.ForeignKey(Sound, related_name='annotations')
