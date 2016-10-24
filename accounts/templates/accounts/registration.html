@@ -1,0 +1,55 @@
+
+{% load i18n %}
+
+{% block title %}{% trans "Register" %}{% endblock %}
+
+{% block content %}
+  <br>
+
+  <div id="registration-form" class="registration-content col-xs-12">
+
+    <form method="post" action="" class>{% csrf_token %}
+      <div class="form-group">
+
+              <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' {% if form.username.value %}value='{{ form.username.value }}' {% else %}placeholder='{% trans "Username" %}'{% endif %}>
+              {{form.errors.username}}
+      </div>
+      <div class="form-group">
+              <input type="email"  class="form-control" id="{{form.email.auto_id}}" name='{{form.email.name}}'  {% if form.email.value %}value='{{ form.email.value }}' {% else %}placeholder='{% trans "Email" %}'{% endif %}>
+              {{form.errors.email}}
+      </div>
+      <div class="form-group">
+              <input type="password"  class="form-control" id="{{form.password1.auto_id}}" name='{{form.password1.name}}' placeholder='{% trans "Choose a password" %}'>
+              {{form.errors.password}}
+      </div>
+      <div class="form-group">
+              <input type="password"  class="form-control" id="{{form.password2.auto_id}}" name='{{form.password2.name}}' placeholder='{% trans "Please confirm your password" %}'>
+              {{form.errors.password2}}
+      </div>
+
+
+      <div class="col-xs-12" style="margin-bottom:10px; text-align:center; float: none">
+        <button id="registration-form-submit" type="submit" class="btn btn-success">
+          {% trans "Register" %}
+        </button>
+      </div>
+
+    </form>
+
+    <script>
+      document.getElementById("{{form.username.auto_id}}").focus();
+      $(function(){
+        $('#registration-form-submit').click(function(event){
+          event.preventDefault();
+          $('#registration-form form').submit();
+        });
+      });
+    </script>
+  </div>
+{% endblock %}
+
+{% block bodyend %}
+<script>
+  $("#register-navbar-button").addClass('active');
+</script>
+{% endblock %}
