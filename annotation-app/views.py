@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from .models import Exercise, Sound
 
 
+@login_required
 def exercise_list(request):
     exercises_list = Exercise.objects.all()
     context = {'exercises_list': exercises_list}
