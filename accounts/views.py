@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
+from django.contrib import auth
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from accounts import forms
 from django.conf import settings
 from django.contrib.auth import views as authviews
@@ -14,6 +15,12 @@ def login(request):
                            template_name="accounts/login.html",
                            redirect_field_name='next',
                            extra_context={'redirect_url': redirect_url})
+
+
+def logout(request):
+    nxt = request.GET.get('next', settings.LOGIN_REDIRECT_URL)
+    auth.logout(request)
+    return redirect(nxt)
 
 
 def registration(request):
