@@ -12,9 +12,6 @@
 {% url 'accounts-register' as register_url %}
 
   <div id="login-form" class="registration-content col-xs-12"> 
-  {% blocktrans %}
-    <p>Don't have an account yet? Why not <a href="{{ register_url }}?next={{request.path}}">register</a>?</p>
-  {% endblocktrans %} <br>
     <form method="post" action="{% url "accounts-login" %}?next={{ redirect_url }} ">{% csrf_token %}
       <div class="form-group">
         <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' placeholder='{% trans "Username" %}'>
