@@ -1,7 +1,7 @@
 {% if exercises_list %}
     <ul>
     {% for exercise in exercises_list %}
-        <li><a href="/annotation-app/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></li>
+        <li><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

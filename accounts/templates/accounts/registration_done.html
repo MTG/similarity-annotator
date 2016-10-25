@@ -1,0 +1,12 @@
+
+{% load i18n %}
+
+{% block title %}{% trans "Registration Done" %}{% endblock %}
+
+{% block content %}
+  <div class="col-xs-12 sound-detail-content">
+  <p>
+    <li><a href="{% url "exercise_list" %}">{% trans "Start annotating" %}</a></li>
+  </p>
+  </div>
+{% endblock %}
