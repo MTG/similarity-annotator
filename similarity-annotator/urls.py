@@ -15,8 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+import django.views
+import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^annotation-app/', include('annotation-app.urls')),
+]
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += [
+    url(r'^%s/(?P<path>.*)$' % settings.MEDIA_URL.strip('/'), django.views.static.serve,
+        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    url(r'^%s/(?P<path>.*)$' % settings.DATA_URL.strip('/'), django.views.static.serve,
+        {'document_root': settings.DATA_PATH, 'show_indexes': True}),
 ]

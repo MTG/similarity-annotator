@@ -1,0 +1,22 @@
+DEBUG = True
+
+ADMINS = (
+    # ('Your Name', 'your_email@example.com'),
+)
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
+    }
+}
+
+# If ALLOWED emails is not empty, only emails going to these destinations will be actually sent
+ALLOWED_EMAILS = []
+
+MEDIA_ROOT = "/.../media"
+TEMP_ROOT = "/tmp"
+
+#EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+#EMAIL_FILE_PATH = "/tmp/goodsounds-messages"
+
