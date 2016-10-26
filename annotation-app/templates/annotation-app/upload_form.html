@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Upload Form</title>
+    </head>
+    <body>
+
+    <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>{{ form.non_field_errors }}</p>
+        <p>{{ form.zip_file.label_tag }} {{ form.zip_file.help_text }}</p>
+        <p>
+            {{ form.zip_file.errors }}
+            {{ form.zip_file }}
+        </p>
+        <p><input type="submit" value="Upload" /></p>
+    </form>
+    </body>
+</html>
