@@ -8,24 +8,17 @@
     <meta name="description" content="{% block meta_description %}{% endblock %}">
 
     <title>{% block title %}{% endblock %}</title>
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
     <style>
       #titles {
         font-family: 'Helvetica neue', Helvetica, Arial, sans-serif;
       }
 
-      #titles, [id*="waveform-visualiser"] {
+      #titles, [class*="waveform-visualiser"] {
         margin: 24px auto;
         width: 1000px;
       }
 
-      [id*="waveform-visualiser"] [class*="-container"] {
+      [class*="waveform-visualiser"] [class*="-container"] {
         box-shadow: 3px 3px 20px #919191;
         margin: 0 0 24px 0;
         -moz-box-shadow: 3px 3px 20px #919191;
@@ -35,10 +28,6 @@
 
       .overview-container {
         height: 85px;
-      }
-
-      #second-waveform-visualiser-container [class*="-container"] {
-        background: #9f1f1f;
       }
 
       #demo-controls {
@@ -55,7 +44,7 @@
         border: 1px solid #919191;
         cursor: pointer;
       }
-      #first-waveform-visualiser-container .overview-container{
+      .waveform-visualiser-container:not(.last) .overview-container{
         display: none;
       }
     </style>
@@ -70,105 +59,76 @@
     {{sound.filename }}
 </ul>
 
-    <script src="{% static 'node_modules/peaks.js/peaks.js' %}"></script>
+  <script src="{% static 'node_modules/peaks.js/peaks.js' %}"></script>
 
   <div id="titles">
-        <h1>Peaks.js Demo</h1>
-
-        <p>Peaks.js is a modular client-side JavaScript component designed for
-        the display of and interaction with audio waveform material in the
-        browser.</p>
-
-        <p>Peaks.js was developed by <a href="http://www.bbc.co.uk/rd">BBC R&amp;D</a>
-        to allow users to make accurate clippings of audio data over a timeline
-        in the browser.</p>
-
-        <p>Peaks.js uses HTML5 canvas technology to display the audio waveform at
-        different zoom levels and provides some basic convenience methods for
-        interacting with waveforms and creating time-based visual sections for
-        denoting content to be clipped or for reference eg: distinguishing music
-        from speech or identifying different music tracks.</p>
-      </div>
-
-      <div id="first-waveform-visualiser-container"></div>
-      <div id="second-waveform-visualiser-container"></div>
+    {% for tier in sound.exercise.tiers.all %}
+    <div class='tier' data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}' data-segments='{{tier.id}}'>
+      <div class="waveform-visualiser-container {% if forloop.last %}last{% endif %}"></div>
+      <button class="add-segment">Add a Segment to Tier</button>
+      <button class="add-point">Add a Point to Tier</button>
+      <button class="remove-point">Remove Segment</button>
+    </div>
+    {% endfor %}
       
       <div id="demo-controls">
         <audio controls=controls>
-           <source src="{% static 'test_data/sample.mp3' %}" type="audio/mpeg">
-           <source src="{% static 'test_data/sample.ogg' %}" type="audio/ogg">
+          <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
-        
-        <button data-action="add-segment-2">Add a Segment to first Tier</button>
-        <button data-action="add-point-2">Add a Point to first Tier</button>
-        
-        <button data-action="add-segment-1">Add a Segment to second Tier</button>
-        <button data-action="add-point-1">Add a Poin to second Tier</button>
-
      </div>
 
       <script>
         (function(Peaks){
-          var options2 = {
-            container: document.getElementById('second-waveform-visualiser-container'),
-            mediaElement: document.querySelector('audio'),
-            dataUri: {
-              arraybuffer: '{% static "test_data/sample.dat"%}',
-              json: '{% static "test_data/sample.json" %}'
-            },
-            keyboard: false
-          };
+          var tiers = document.getElementsByClassName('tier');
+          for (var i = 0; i < tiers.length; i++) {
+            var container = tiers[i];
+            
+            var options = {
+              container: container.getElementsByClassName('waveform-visualiser-container')[0], 
+              mediaElement: document.querySelector('audio'),
+              dataUri: {
+                arraybuffer: container.getAttribute('data-waveform'),
+              },
+              height: 120,
+              keyboard: false
+            };
 
-          var peaksInstance2 = Peaks.init(options2);
+            var peaksInstance = Peaks.init(options);
 
 
-          document.querySelector('button[data-action="add-segment-2"]').addEventListener("click", function () {
-            peaksInstance2.segments.add({
-              startTime: peaksInstance2.time.getCurrentTime(),
-              endTime: peaksInstance2.time.getCurrentTime() + 10,
-              editable: true
-            });
-          });
+            container.getElementsByClassName("add-segment")[0].addEventListener("click", function (tier) {
+              return function(){
+                tier.segments.add({
+                  startTime: tier.time.getCurrentTime(),
+                  endTime: tier.time.getCurrentTime() + 1,
+                  editable: true
+                });
+              }
+            }(peaksInstance));
 
-          document.querySelector('button[data-action="add-point-2"]').addEventListener("click", function () {
-            peaksInstance2.points.add({
-              timestamp: peaksInstance2.time.getCurrentTime(),
-              editable: true
-            });
-          });
-
-          var options = {
-            container: document.getElementById('first-waveform-visualiser-container'),
-            mediaElement: document.querySelector('audio'),
-            dataUri: {
-              arraybuffer: '{% static "test_data/sample.dat"%}',
-              json: '{% static "test_data/sample.json" %}'
-            },
-            keyboard: false
-          };
-
-          var peaksInstance = Peaks.init(options);
-
-          document.querySelector('button[data-action="add-segment-1"]').addEventListener("click", function () {
-            peaksInstance.segments.add({
-              startTime: peaksInstance.time.getCurrentTime(),
-              endTime: peaksInstance.time.getCurrentTime() + 10,
-              editable: true
-            });
-          });
-
-          document.querySelector('button[data-action="add-point-1"]').addEventListener("click", function () {
-            peaksInstance.points.add({
-              timestamp: peaksInstance.time.getCurrentTime(),
-              editable: true
-            });
-          });
-
-          /*document.querySelector('button[data-action="log-data-1"]').addEventListener("click", function (event) {
-            console.log('Segments', peaksInstance.segments.getSegments());
-            console.log('Points', peaksInstance.points.getPoints());
-          });*/
+            container.getElementsByClassName("add-point")[0].addEventListener("click", function (tier) {
+              return function(){
+                tier.points.add({
+                  timestamp: tier.time.getCurrentTime(),
+                  editable: true
+                });
+              }
+            }(peaksInstance));
+          
+            container.getElementsByClassName("remove-point")[0].addEventListener("click", function (tier) {
+              return function(){
+                var segments = tier.segments.getSegments();
+                console.log(segments);
+                var currTime = tier.time.getCurrentTime();
+                for (var i = 0; i < segments.length; i++) {
+                  if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
+                    tier.segments.removeByTime(segments[i].startTime);
+                  }
+                }
+              }
+            }(peaksInstance));
+          }
         })(peaks);
       </script>
 </body>

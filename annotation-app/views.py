@@ -25,5 +25,4 @@ def sound_list(request, exercise_id):
 def sound_detail(request, exercise_id, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
     context = {'sound': sound}
-    context={}
     return render(request, 'annotation-app/sound_detail.html', context)
