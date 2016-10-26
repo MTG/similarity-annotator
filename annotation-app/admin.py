@@ -8,7 +8,13 @@ class AnnotationAdmin(admin.ModelAdmin):
     list_filter = ('id', 'sound')
 
 
-admin.site.register(Sound)
+class SoundAdmin(admin.ModelAdmin):
+    list_display = ('filename', 'exercise')
+    list_display_links = ('filename', 'exercise')
+    list_filter = ('exercise',)
+
+
+admin.site.register(Sound, SoundAdmin)
 admin.site.register(Tier)
 admin.site.register(Exercise)
 admin.site.register(Annotation, AnnotationAdmin)
