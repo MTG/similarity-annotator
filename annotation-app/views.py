@@ -12,6 +12,7 @@ def exercise_list(request):
     return render(request, 'annotation-app/exercises_list.html', context)
 
 
+@login_required
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
     if exercise is Http404:
@@ -22,7 +23,10 @@ def sound_list(request, exercise_id):
     return render(request, 'annotation-app/sounds_list.html', context)
 
 
+@login_required
 def sound_detail(request, exercise_id, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
     context = {'sound': sound}
     return render(request, 'annotation-app/sound_detail.html', context)
+
+
