@@ -14,10 +14,14 @@ class SoundAdmin(admin.ModelAdmin):
     list_filter = ('exercise',)
 
 
+class AnnotationSimilarityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'reference', 'similar_sound', 'similarity_measure')
+    list_display_links = ('id', 'reference', 'similar_sound')
+
 admin.site.register(Sound, SoundAdmin)
 admin.site.register(Tier)
 admin.site.register(Exercise)
 admin.site.register(Annotation, AnnotationAdmin)
-admin.site.register(AnnotationSimilarity)
+admin.site.register(AnnotationSimilarity, AnnotationSimilarityAdmin)
 
 
