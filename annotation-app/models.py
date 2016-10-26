@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Tier(models.Model):
@@ -37,9 +38,13 @@ class Annotation(models.Model):
     end_time = models.IntegerField("end_time", blank=True, null=True)
     sound = models.ForeignKey(Sound, related_name='annotations')
     tier = models.ForeignKey(Tier, related_name='annotations')
+    user = models.ForeignKey(User, related_name='annotations')
+
+    def __str__(self):
+        return self.name
 
 
 class AnnotationSimilarity(models.Model):
     reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
-    other_sound = models.ForeignKey(Annotation)
+    similar_sound = models.ForeignKey(Annotation)
     similarity_measure = models.IntegerField("similarity_measure")

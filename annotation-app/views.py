@@ -4,6 +4,7 @@ from django.http import Http404
 from .models import Exercise, Sound
 from django.conf import settings
 
+
 @login_required
 def exercise_list(request):
     exercises_list = Exercise.objects.all()
@@ -21,8 +22,8 @@ def sound_list(request, exercise_id):
     return render(request, 'annotation-app/sounds_list.html', context)
 
 
-def sound_detail(request):
-    #sound = get_object_or_404(Sound, id=sound_id)
-    #context = {'sound': sound}
+def sound_detail(request, exercise_id, sound_id):
+    sound = get_object_or_404(Sound, id=sound_id)
+    context = {'sound': sound}
     context={}
     return render(request, 'annotation-app/sound_detail.html', context)
