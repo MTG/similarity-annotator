@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^(?P<exercise_id>[0-9]+)/sound_detail/(?P<sound_id>[0-9]+)$', views.sound_detail, name='sound_detail'),
     url(r'^annotation_action/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',
         views.annotation_action, name='annotation-action'),
+    url(r'^upload/', views.upload, name='upload')
 ]
