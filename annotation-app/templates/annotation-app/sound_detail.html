@@ -63,7 +63,10 @@
 
   <div id="titles">
     {% for tier in sound.exercise.tiers.all %}
-    <div class='tier' data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}' data-segments='{{tier.id}}'>
+    <div class='tier' 
+          data-action-url='{% url "annotation-action" sound.id tier.id %}'
+          data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}' 
+          data-segments='{{tier.id}}'>
       <div class="waveform-visualiser-container {% if forloop.last %}last{% endif %}"></div>
       <button class="add-segment">Add a Segment to Tier</button>
       <button class="add-point">Add a Point to Tier</button>
@@ -79,11 +82,33 @@
      </div>
 
       <script>
+        var lastId=0;
+        function newId(){ return lastId++;}
+        function callServer(action, segment, url, cb){
+          var xhr = new XMLHttpRequest();
+          xhr.responseType = 'json';
+          xhr.onreadystatechange = function() {
+              if (xhr.readyState == XMLHttpRequest.DONE ) {
+                 if (xhr.status == 200) {
+                     cb(xhr.response);
+                 }
+                 else if (xhr.status == 400) {
+                    alert('There was an error 400');
+                 }
+              }
+          };
+
+          xhr.open("POST", url, true);
+          data = segment;
+          data.action = action;
+          xhr.send(JSON.stringify(data));
+        }
         (function(Peaks){
           var tiers = document.getElementsByClassName('tier');
           for (var i = 0; i < tiers.length; i++) {
             var container = tiers[i];
-            
+            var url = container.getAttribute('data-action-url');            
+
             var options = {
               container: container.getElementsByClassName('waveform-visualiser-container')[0], 
               mediaElement: document.querySelector('audio'),
@@ -97,24 +122,29 @@
             var peaksInstance = Peaks.init(options);
 
 
-            container.getElementsByClassName("add-segment")[0].addEventListener("click", function (tier) {
+            container.getElementsByClassName("add-segment")[0].addEventListener("click", function (tier, actionUrl) {
               return function(){
-                tier.segments.add({
-                  startTime: tier.time.getCurrentTime(),
-                  endTime: tier.time.getCurrentTime() + 1,
-                  editable: true
+                var currTime = tier.time.getCurrentTime()
+                var id = newId();
+                var segment = {
+                  startTime: currTime,
+                  endTime: currTime + 1,
+                  editable: true,
+                  id: id
+                };
+                tier.segments.add(segment);
+                callServer('add', segment, actionUrl, function(response){
+                  if (response.status == 'success'){
+                    var segments = tier.segments.getSegments();
+                      for (var i = 0; i < segments.length; i++) {
+                        if (segments[i].id == id){
+                          segments[i].id = response.annotation_id;
+                        }
+                      }
+                  }
                 });
               }
-            }(peaksInstance));
-
-            container.getElementsByClassName("add-point")[0].addEventListener("click", function (tier) {
-              return function(){
-                tier.points.add({
-                  timestamp: tier.time.getCurrentTime(),
-                  editable: true
-                });
-              }
-            }(peaksInstance));
+            }(peaksInstance, url));
           
             container.getElementsByClassName("remove-point")[0].addEventListener("click", function (tier) {
               return function(){
