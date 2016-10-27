@@ -13,7 +13,7 @@ class Exercise(models.Model):
 class Tier(models.Model):
     name = models.CharField(max_length=50)
     parent_tier = models.ForeignKey('self', blank=True, null=True, related_name='child_tiers')
-    tier = models.ForeignKey(Exercise, blank=True, null=True, related_name='tiers')
+    exercise = models.ForeignKey(Exercise, blank=True, null=True, related_name='tiers')
 
     def __str__(self):
         return self.name
