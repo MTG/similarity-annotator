@@ -37,35 +37,37 @@ def sound_detail(request, exercise_id, sound_id):
 @csrf_exempt
 def annotation_action(request, sound_id, tier_id):
     post_body = json.loads(request.body)
-    name = post_body.get('name', '')
-    start = post_body['startTime']
-    end = post_body['endTime']
     action = post_body['action']
     sound = get_object_or_404(Sound, id=sound_id)
     tier = get_object_or_404(Tier, id=tier_id)
 
     out = {'status': 'error'}
-    if action == 'add':
-        annotation = Annotation()
-        annotation.name = name
-        annotation.start_time = start
-        annotation.end_time = end
-        annotation.submitted_by = request.user
-        annotation.sound = sound
-        annotation.tier = tier
-        annotation.save()
-        out = {'status': 'success', 'annotation_id': annotation.id}
-    else:
+    if action == 'remove':
         annotation_id = post_body['annotation_id']
         annotation = get_object_or_404(Annotation, id=annotation_id)
-        if action == 'remove':
-            annotation.remove()
-            out = {'status': 'success'}
-        elif action == 'edit':
+        annotation.delete()
+        out = {'status': 'success'}
+    else:
+        name = post_body.get('name', '')
+        start = post_body['startTime']
+        end = post_body['endTime']
+        if action == 'add':
+            annotation = Annotation()
             annotation.name = name
             annotation.start_time = start
             annotation.end_time = end
-            annotation.submitted_by = request.user
+            annotation.user = request.user
+            annotation.sound = sound
+            annotation.tier = tier
+            annotation.save()
+            out = {'status': 'success', 'annotation_id': annotation.id}
+        elif action == 'edit':
+            annotation_id = post_body['annotation_id']
+            annotation = get_object_or_404(Annotation, id=annotation_id)
+            annotation.name = name
+            annotation.start_time = start
+            annotation.end_time = end
+            annotation.user = request.user
             annotation.save()
             out = {'status': 'success', 'annotation_id': annotation.id}
     return JsonResponse(out)
