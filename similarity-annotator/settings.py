@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'annotation-app.apps.AnnotationToolConfig',
+    'annotationapp.apps.AnnotationToolConfig',
     'accounts.apps.AccountsConfig',
     'django_extensions',
     'django.contrib.admin',
