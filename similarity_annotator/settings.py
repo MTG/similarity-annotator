@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'similarity-annotator.urls'
+ROOT_URLCONF = 'similarity_annotator.urls'
 
 TEMPLATES = [
     {
@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'similarity-annotator.wsgi.application'
+WSGI_APPLICATION = 'similarity_annotator.wsgi.application'
 
 
 # Password validation

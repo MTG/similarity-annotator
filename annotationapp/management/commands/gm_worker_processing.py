@@ -1,6 +1,6 @@
 import os
 import json
-import gearman
+import py3gearman
 import logging
 import zipfile
 
@@ -43,10 +43,10 @@ class Command(BaseCommand):
 
         # create sound objects for each sound file in the directory
         for audio_file in os.listdir(exercise_files_path):
-            print audio_file
+            print (audio_file)
 
     def handle(self, *args, **options):
-        gm_worker = gearman.GearmanWorker(settings.GEARMAN_JOB_SERVERS)
+        gm_worker = py3gearman.GearmanWorker(settings.GEARMAN_JOB_SERVERS)
         self.write_log("Starting worker\n")
 
         gm_worker.work()  # infinite loop (never exits)
