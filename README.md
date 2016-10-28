@@ -21,11 +21,11 @@ Having cloned this repository, use python's `pip` tool to install all the requir
 You need to install [node.js and npm] (https://docs.npmjs.com/getting-started/installing-node).
 Then go you'll need to install npm in /similarity-annotator/static:
 
-    - cd /similarity-annotator/static
+    - cd /similarity_annotator/static
     - npm install
 
 ### Step 5: Local configurations
-Inside `similarity-annotator` directoy, rename `local_settings.py.dist` to `local_settings.py`
+Inside `similarity_annotator` directoy, rename `local_settings.py.dist` to `local_settings.py`
 
 ### Step 6: Database setup
 On default, we are using a light-weight sqlite database but you are welcome to experiment with any database format that is compatibile with django. The database settings are configured in the `local_settings.py` file. Regardless if you change the database settings or not, you need to synchorinize your database with django models:
