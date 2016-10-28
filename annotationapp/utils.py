@@ -1,6 +1,9 @@
+import os
+import json
+
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Exercise, Annotation, AnnotationSimilarity
-import json
 
 
 def exercise_annotations_to_json(exercise_id):
@@ -41,3 +44,18 @@ def exercise_annotations_to_json(exercise_id):
         sounds_annotations[sound.filename] = tiers
 
     return json.dumps(sounds_annotations)
+
+
+def store_tmp_file(uploaded_file):
+    """Stores the uploaded file to the TEMP folder
+    :param uploaded_file: an instance of InMemoryUploadedFile
+    :return: path to newly saved-to-disk file
+    """
+    try:
+        path = os.path.join(settings.TEMP_ROOT, uploaded_file.name)
+        destination = open(path, 'w+b')
+        for chunk in uploaded_file.chunks():
+            destination.write(chunk)
+    finally:
+        destination.close()
+    return path

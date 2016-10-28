@@ -2,11 +2,12 @@ import json
 
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.management import call_command
 from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Annotation, Exercise, Sound, Tier
-from django.conf import settings
 from .forms import UploadForm
+from .utils import store_tmp_file
 
 
 @login_required
@@ -32,6 +33,7 @@ def sound_detail(request, exercise_id, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
     context = {'sound': sound}
     return render(request, 'annotationapp/sound_detail.html', context)
+
 
 @login_required
 @csrf_exempt
@@ -72,6 +74,7 @@ def annotation_action(request, sound_id, tier_id):
             out = {'status': 'success', 'annotation_id': annotation.id}
     return JsonResponse(out)
 
+
 @login_required
 def get_annotations(request, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
@@ -89,8 +92,10 @@ def get_annotations(request, sound_id, tier_id):
 @login_required
 def upload(request):
     if request.method == 'POST':
-        form = UploadForm(request.POST, request.FILES)
+        form = UploadForm(files=request.FILES)
         if form.is_valid():
+            tmp_path = store_tmp_file(request.FILES['zip_file'])
+            call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name='movidas')
             return render(request, "annotationapp/exercises_list.html")
     else:
         form = UploadForm()

@@ -3,3 +3,5 @@ similarity_annotator/local_settings.py
 *.pyc
 similarity_annotator/static/node_modules/
 similarity_annotator/static/test_data/
+similarity_annotator/media/
+similarity_annotator/tmp/
