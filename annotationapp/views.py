@@ -76,6 +76,20 @@ def annotation_action(request, sound_id, tier_id):
 
 
 @login_required
+def get_annotations(request, sound_id, tier_id):
+    sound = get_object_or_404(Sound, id=sound_id)
+    tier = get_object_or_404(Tier, id=tier_id)
+    annotations = Annotation.objects.filter(sound=sound, tier=tier)
+    ret = []
+    for i in annotations.all():
+        ret.append({
+            'annotation_id': i.id,
+            'startTime': i.start_time,
+            'endTime': i.end_time
+            })
+    return JsonResponse({'status': 'success', 'annotations': ret})
+
+@login_required
 def upload(request):
     if request.method == 'POST':
         form = UploadForm(files=request.FILES)
