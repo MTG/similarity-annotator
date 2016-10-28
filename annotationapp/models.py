@@ -14,6 +14,7 @@ class Tier(models.Model):
     name = models.CharField(max_length=50)
     parent_tier = models.ForeignKey('self', blank=True, null=True, related_name='child_tiers')
     exercise = models.ForeignKey(Exercise, related_name='tiers')
+    entire_sound = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

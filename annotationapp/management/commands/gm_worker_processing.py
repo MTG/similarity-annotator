@@ -8,7 +8,7 @@ import subprocess
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from annotationapp.models import Sound, Exercise
+from annotationapp.models import Sound, Exercise, Tier
 
 logger = logging.getLogger("gearman_worker_processing")
 
@@ -58,6 +58,8 @@ class Command(BaseCommand):
         # TODO: check if exercise name exists and act accordingly
         # create Exercise object and Sound objects for each sound file
         exercise = Exercise.objects.create(name=exercise_name)
+        # create initial tier "whole sound"
+        Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
         for sound_file in os.listdir(exercise_files_path):
             # create wave form data with audiowaveform
             waveform_data_filename = os.path.splitext(sound_file)[0] + '.dat'
