@@ -4,9 +4,12 @@ import py3gearman
 import logging
 import zipfile
 import shutil
+import subprocess
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from annotationapp.models import Sound, Exercise
+
 logger = logging.getLogger("gearman_worker_processing")
 
 
@@ -31,6 +34,8 @@ class Command(BaseCommand):
 
         self.write_log("Decompressing file for exercise %s" % exercise_name)
 
+        # TODO: split tasks in util functions
+
         # create directory for exercise audio files
         exercise_files_path = os.path.join(settings.MEDIA_ROOT, exercise_name)
         if not os.path.exists(exercise_files_path):
@@ -49,6 +54,21 @@ class Command(BaseCommand):
                 shutil.copyfileobj(source, target)
 
         zip_ref.close()
+
+        # TODO: check if exercise name exists and act accordingly
+        # create Exercise object and Sound objects for each sound file
+        exercise = Exercise.objects.create(name=exercise_name)
+        for sound_file in os.listdir(exercise_files_path):
+            # create wave form data with audiowaveform
+            waveform_data_filename = os.path.splitext(sound_file)[0] + '.dat'
+            waveform_data_file_path = os.path.join(exercise_files_path, waveform_data_filename)
+            subprocess_result = subprocess.call(["audiowaveform", "-i", os.path.join(exercise_files_path, sound_file),
+                                                 "-o", waveform_data_file_path])
+            if not subprocess_result:
+                sound = Sound.objects.create(filename=sound_file,
+                                             waveform_data=waveform_data_file_path,
+                                             exercise=exercise)
+                self.write_log("Created sound object %s for sound file %s" % (str(sound.id), sound_file))
 
         return "Done"
 
