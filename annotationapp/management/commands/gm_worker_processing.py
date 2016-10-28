@@ -65,9 +65,10 @@ class Command(BaseCommand):
             subprocess_result = subprocess.call(["audiowaveform", "-i", os.path.join(exercise_files_path, sound_file),
                                                  "-o", waveform_data_file_path])
             if not subprocess_result:
-                sound = Sound.objects.create(filename=sound_file,
-                                             waveform_data=waveform_data_file_path,
-                                             exercise=exercise)
+                sound_filename = os.path.join(exercise_name, sound_file)
+                waveform_data_filename = os.path.join(exercise_name, os.path.basename(waveform_data_file_path))
+                sound = Sound.objects.create(filename=sound_filename, exercise=exercise,
+                                             waveform_data=waveform_data_filename)
                 self.write_log("Created sound object %s for sound file %s" % (str(sound.id), sound_file))
 
         return "Done"
