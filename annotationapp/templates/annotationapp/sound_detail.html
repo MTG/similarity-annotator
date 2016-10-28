@@ -65,6 +65,7 @@
     {% for tier in sound.exercise.tiers.all %}
     <div class='tier' 
           data-action-url='{% url "annotation-action" sound.id tier.id %}'
+          data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
           data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}' 
           data-segments='{{tier.id}}'>
       <div class="waveform-visualiser-container {% if forloop.last %}last{% endif %}"></div>
@@ -102,12 +103,21 @@
           data.action = action;
           xhr.send(JSON.stringify(data));
         }
+        function getAnnotations(theUrl){
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+            xmlHttp.send( null );
+            return JSON.parse(xmlHttp.responseText);
+        }
+        var delayedEdit = [];
         (function(Peaks){
           var tiers = document.getElementsByClassName('tier');
           for (var i = 0; i < tiers.length; i++) {
             var container = tiers[i];
             var url = container.getAttribute('data-action-url');            
+            var urlAnnotations = container.getAttribute('data-annotations-url');            
 
+            // parameters to create new waveform for annotation tier
             var options = {
               container: container.getElementsByClassName('waveform-visualiser-container')[0], 
               mediaElement: document.querySelector('audio'),
@@ -115,12 +125,38 @@
                 arraybuffer: container.getAttribute('data-waveform'),
               },
               height: 120,
-              keyboard: false
+              keyboard: false,
+              segments: []
             };
 
+
+            var rsp = getAnnotations(urlAnnotations);
+            if (rsp.status == 'success') {
+              for (var j = 0; j < rsp.annotations.length; j++){
+                options.segments.push({
+                  id: rsp.annotations[j].annotation_id,
+                  startTime: rsp.annotations[j].startTime,
+                  endTime: rsp.annotations[j].endTime,
+                  editable: true
+                });
+              }
+            }
             var peaksInstance = Peaks.init(options);
 
+            // By ajax update data of edited segment annotation
+            peaksInstance.on('segments.dragged', function(segment){
+              segment.annotation_id = segment.id;
+              for (var i = 0; i < delayedEdit.length; i++) {
+                window.clearTimeout(delayedEdit[i]);
+                delayedEdit.splice(i, 1);
+              }
+              delayedEdit.push(setTimeout(function(){
+                  callServer('edit', segment, url, function(response){});
+              }, 1000));
 
+            });
+
+            // Add new segment to the current tier, also store the annoation in the database
             container.getElementsByClassName("add-segment")[0].addEventListener("click", function (tier, actionUrl) {
               return function(){
                 var currTime = tier.time.getCurrentTime()
@@ -145,10 +181,10 @@
               }
             }(peaksInstance, url));
           
+            // Remove a segment, also remove it from the database
             container.getElementsByClassName("remove-point")[0].addEventListener("click", function (tier, actionUrl) {
               return function(){
                 var segments = tier.segments.getSegments();
-                console.log(segments);
                 var currTime = tier.time.getCurrentTime();
                 for (var i = 0; i < segments.length; i++) {
                   if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
