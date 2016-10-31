@@ -1,0 +1,16 @@
+Select the reference sound of the exercise
+
+{% if sounds_list %}
+    <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <select name="reference sound">
+        {% for sound in sounds_list %}
+            <option value={{ sound.id }}>{{ sound.filename }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Submit">
+    </form>
+{% else %}
+    <p>There is no sounds</p>
+{% endif %}
+
