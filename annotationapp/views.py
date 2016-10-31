@@ -1,12 +1,12 @@
 import json
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Annotation, Exercise, Sound, Tier
-from .forms import UploadForm
+from .forms import UploadForm, ExerciseForm
 from .utils import store_tmp_file
 
 
@@ -89,15 +89,18 @@ def get_annotations(request, sound_id, tier_id):
             })
     return JsonResponse({'status': 'success', 'annotations': ret})
 
+
 @login_required
 def upload(request):
     if request.method == 'POST':
-        form = UploadForm(files=request.FILES)
-        if form.is_valid():
+        file_form = UploadForm(files=request.FILES)
+        exercise_form = ExerciseForm(request.POST)
+        forms = {'file': file_form, 'exercise': exercise_form}
+        if file_form.is_valid() and exercise_form.is_valid():
             tmp_path = store_tmp_file(request.FILES['zip_file'])
-            call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name='movidas')
-            return render(request, "annotationapp/exercises_list.html")
+            call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=request.POST['name'])
+            return redirect('exercise_list')
     else:
-        form = UploadForm()
-    context = {'form': form}
+        forms = {'file_form': UploadForm(), 'exercise_form': ExerciseForm()}
+    context = {'forms': forms}
     return render(request, 'annotationapp/upload_form.html', context)

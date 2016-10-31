@@ -7,11 +7,12 @@
 
     <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <p>{{ form.non_field_errors }}</p>
-        <p>{{ form.zip_file.label_tag }} {{ form.zip_file.help_text }}</p>
+        <p>{{ forms.exercise_form }}</p>
+        <p>{{ forms.file_form.non_field_errors }}</p>
+        <p>{{ forms.file_form.zip_file.label_tag }} </p>
         <p>
-            {{ form.zip_file.errors }}
-            {{ form.zip_file }}
+            {{ forms.file_form.zip_file.errors }}
+            {{ forms.file_form.zip_file }}
         </p>
         <p><input type="submit" value="Upload" /></p>
     </form>

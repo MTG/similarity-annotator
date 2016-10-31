@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from .models import Exercise
 
 import zipfile
 
@@ -11,6 +12,13 @@ class UploadForm(forms.Form):
             raise ValidationError("The file type is not correct")
 
     zip_file = forms.FileField(
-        label='Select a file',
-        help_text='Zip file with the sounds'
+        label='Select a zip file with the sounds',
     )
+
+
+class ExerciseForm(forms.ModelForm):
+    class Meta:
+        model = Exercise
+        fields = ['name']
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', })}
+
