@@ -160,6 +160,12 @@
             container.getElementsByClassName("add-segment")[0].addEventListener("click", function (tier, actionUrl) {
               return function(){
                 var currTime = tier.time.getCurrentTime()
+                var segments = tier.segments.getSegments();
+                for (var i = 0; i < segments.length; i++) {
+                  if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
+                    currTime = segments[i].endTime;
+                  }
+                }
                 var auxId = getTempId();
                 var segment = {
                   startTime: currTime,
