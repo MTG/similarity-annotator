@@ -38,7 +38,8 @@ def sound_detail(request, exercise_id, sound_id):
 @login_required
 @csrf_exempt
 def annotation_action(request, sound_id, tier_id):
-    post_body = json.loads(request.body)
+    body_unicode = request.body.decode('utf-8')
+    post_body = json.loads(body_unicode)
     action = post_body['action']
     sound = get_object_or_404(Sound, id=sound_id)
     tier = get_object_or_404(Tier, id=tier_id)
