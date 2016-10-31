@@ -25,11 +25,18 @@ def exercise_list(request):
 @login_required
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
+    sounds_list = exercise.sounds.all()
+    context = {'sounds_list': sounds_list, 'exercise_id': exercise_id}
     if exercise is Http404:
-        context = exercise
+        return render(request, exercise)
+    if request.method == 'POST':
+        reference_sound_id = request.POST['reference sound']
+        sound = Sound.objects.get(id=reference_sound_id)
+        exercise.reference_sound = sound
+        exercise.save()
     else:
-        sounds_list = exercise.sounds.all()
-        context = {'sounds_list': sounds_list, 'exercise_id': exercise_id}
+        if not exercise.reference_sound:
+            return render(request, 'annotationapp/select_reference.html', context)
     return render(request, 'annotationapp/sounds_list.html', context)
 
 
@@ -152,7 +159,7 @@ def upload(request):
         if file_form.is_valid() and exercise_form.is_valid():
             tmp_path = store_tmp_file(request.FILES['zip_file'])
             call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=request.POST['name'])
-            return redirect('exercise_list')
+            return render(request, 'annotationapp/upload_success.html')
     else:
         forms = {'file_form': UploadForm(), 'exercise_form': ExerciseForm()}
     context = {'forms': forms}

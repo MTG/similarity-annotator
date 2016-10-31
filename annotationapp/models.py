@@ -24,7 +24,6 @@ class Sound(models.Model):
     filename = models.CharField(max_length=200)
     waveform_data = models.CharField(max_length=200)
     exercise = models.ForeignKey(Exercise, related_name='sounds')
-    is_reference = models.BooleanField(default=False)
     has_annotations = models.BooleanField(default=False)
 
     def __str__(self):
