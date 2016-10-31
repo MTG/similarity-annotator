@@ -65,7 +65,7 @@ class Command(BaseCommand):
             waveform_data_filename = os.path.splitext(sound_file)[0] + '.dat'
             waveform_data_file_path = os.path.join(exercise_files_path, waveform_data_filename)
             subprocess_result = subprocess.call(["audiowaveform", "-i", os.path.join(exercise_files_path, sound_file),
-                                                 "-o", waveform_data_file_path])
+                                                 "-o", waveform_data_file_path, "-b", "8"])
             if not subprocess_result:
                 sound_filename = os.path.join(exercise_name, sound_file)
                 waveform_data_filename = os.path.join(exercise_name, os.path.basename(waveform_data_file_path))
