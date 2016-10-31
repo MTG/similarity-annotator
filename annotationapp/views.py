@@ -1,9 +1,14 @@
+import os
+import io
 import json
+import zipfile
+import tempfile
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
-from django.http import Http404, JsonResponse
+from django.core import serializers
+from django.http import HttpResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Annotation, Exercise, Sound, Tier
 from .forms import UploadForm, ExerciseForm
@@ -89,6 +94,53 @@ def get_annotations(request, sound_id, tier_id):
             'endTime': i.end_time
             })
     return JsonResponse({'status': 'success', 'annotations': ret})
+
+@login_required
+def download_annotations(request, sound_id):
+    sound = get_object_or_404(Sound, id=sound_id)
+
+    s = io.BytesIO()
+    zf = zipfile.ZipFile(s, "w")
+    zip_subdir = "sound_%d" % sound.id
+    zip_filename = "%s.zip" % zip_subdir
+    for tier in sound.exercise.tiers.all():
+        annotations = Annotation.objects.filter(sound=sound, tier=tier)
+
+        ret = []
+        for i in annotations.all():
+            ret.append({
+                'annotation_id': i.id,
+                'startTime': i.start_time,
+                'endTime': i.end_time
+                })
+        # Generate XML version of annotations
+        XMLSerializer = serializers.get_serializer("xml")
+        xml_serializer = XMLSerializer()
+        fp, temp_file = tempfile.mkstemp(".xml")
+        print("---------------")
+        print(temp_file)
+        print("---------------")
+        xml_serializer.serialize(ret, strem=fp)
+
+        zip_path = os.path.join(zip_subdir, "tier_%s.xml" % tier.id)
+        zf.write(temp_file, zip_path)
+
+        # Generate JSON version of annotations
+        fp, temp_file = tempfile.mkstemp(".json")
+        json.dump(ret, open(temp_file, 'w'))
+
+        zip_path = os.path.join(zip_subdir, "tier_%s.json" % tier.id)
+        zf.write(temp_file, zip_path)
+
+    zf.close()
+
+    # Grab ZIP file from in-memory, make response with correct MIME-type
+    resp = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
+    # ..and correct content-disposition
+    resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+
+    return resp
+
 
 
 @login_required
