@@ -60,26 +60,50 @@
 </ul>
 
   <script src="{% static 'node_modules/peaks.js/peaks.js' %}"></script>
-
   <div id="titles">
+  
+    <div class="ref-sound">
+    {% for tier in sound.exercise.reference_sound.exercise.tiers.all %}
+      {% if tier.entire_sound %}
+      <div class='tier' 
+          data-action-url='{% url "annotation-action" sound.exercise.reference_sound.id tier.id %}'
+          data-audio="audio-ref-controls"
+          data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
+          data-waveform='{{ MEDIA_URL }}{{sound.exercise.reference_sound.waveform_data }}' >
+       <div class="waveform-visualiser-container"></div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  
+       <div id="audio-ref-controls">
+        <audio controls=controls>
+          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_sound.filename }}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+       </div>
+     </div>
+  
     {% for tier in sound.exercise.tiers.all %}
     <div class='tier' 
           data-action-url='{% url "annotation-action" sound.id tier.id %}'
+          data-audio='audio-controls'
           data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
-          data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}' 
-          data-segments='{{tier.id}}'>
+          data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}'>
       <div class="waveform-visualiser-container {% if forloop.last %}last{% endif %}"></div>
-      <button class="add-segment">Add a Segment to Tier</button>
-      <button class="remove-point">Remove Segment</button>
+      {% if not tier.entire_sound %}
+        <button class="add-segment">Add a Segment to Tier</button>
+        <button class="remove-point">Remove Segment</button>
+      {% endif %}
     </div>
     {% endfor %}
       
-      <div id="demo-controls">
-        <audio controls=controls>
-          <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-     </div>
+    <div id="audio-controls">
+      <audio controls=controls>
+        <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
 
       <script>
         var tempId = 0;
@@ -120,7 +144,7 @@
             // parameters to create new waveform for annotation tier
             var options = {
               container: container.getElementsByClassName('waveform-visualiser-container')[0], 
-              mediaElement: document.querySelector('audio'),
+              mediaElement: document.querySelector("#"+container.getAttribute('data-audio')).querySelector('audio'),
               dataUri: {
                 arraybuffer: container.getAttribute('data-waveform'),
               },
@@ -157,55 +181,61 @@
             });
 
             // Add new segment to the current tier, also store the annoation in the database
-            container.getElementsByClassName("add-segment")[0].addEventListener("click", function (tier, actionUrl) {
-              return function(){
-                var currTime = tier.time.getCurrentTime()
-                var segments = tier.segments.getSegments();
-                for (var i = 0; i < segments.length; i++) {
-                  if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
-                    currTime = segments[i].endTime;
-                  }
-                }
-                var auxId = getTempId();
-                var segment = {
-                  startTime: currTime,
-                  endTime: currTime + 1,
-                  editable: true,
-                  id: auxId
-                };
-                tier.segments.add(segment);
-                callServer('add', segment, actionUrl, function(response){
-                  if (response.status == 'success'){
-                    var segments = tier.segments.getSegments();
-                    for (var i = 0; i< segments.length; i++){
-                      if (segments[i].id == auxId){
-                        segments[i].id = response.annotation_id;
-                      }
+            var addBtn = container.querySelectorAll(".add-segment");
+            if (addBtn.length > 0) {
+              addBtn[0].addEventListener("click", function (tier, actionUrl) {
+                return function(){
+                  var currTime = tier.time.getCurrentTime()
+                  var segments = tier.segments.getSegments();
+                  for (var i = 0; i < segments.length; i++) {
+                    if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
+                      currTime = segments[i].endTime;
                     }
                   }
-                });
-              }
-            }(peaksInstance, url));
-          
-            // Remove a segment, also remove it from the database
-            container.getElementsByClassName("remove-point")[0].addEventListener("click", function (tier, actionUrl) {
-              return function(){
-                var segments = tier.segments.getSegments();
-                var currTime = tier.time.getCurrentTime();
-                for (var i = 0; i < segments.length; i++) {
-                  if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
-                    var id = segments[i].id;
-                    callServer('remove', {annotation_id: id}, actionUrl, (function(remove_id){
-                      return function(response){
-                        if (response.status == 'success' ){
-                          tier.segments.removeById(remove_id);
+                  var auxId = getTempId();
+                  var segment = {
+                    startTime: currTime,
+                    endTime: currTime + 1,
+                    editable: true,
+                    id: auxId
+                  };
+                  tier.segments.add(segment);
+                  callServer('add', segment, actionUrl, function(response){
+                    if (response.status == 'success'){
+                      var segments = tier.segments.getSegments();
+                      for (var i = 0; i< segments.length; i++){
+                        if (segments[i].id == auxId){
+                          segments[i].id = response.annotation_id;
                         }
                       }
-                    })(id));
+                    }
+                  });
+                }
+              }(peaksInstance, url));
+            }
+
+            // Remove a segment, also remove it from the database
+            var removeBtn  = container.querySelectorAll(".remove-point");
+            if (removeBtn.length > 0) {
+              removeBtn[0].addEventListener("click", function (tier, actionUrl) {
+                return function(){
+                  var segments = tier.segments.getSegments();
+                  var currTime = tier.time.getCurrentTime();
+                  for (var i = 0; i < segments.length; i++) {
+                    if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
+                      var id = segments[i].id;
+                      callServer('remove', {annotation_id: id}, actionUrl, (function(remove_id){
+                        return function(response){
+                          if (response.status == 'success' ){
+                            tier.segments.removeById(remove_id);
+                          }
+                        }
+                      })(id));
+                    }
                   }
                 }
-              }
-            }(peaksInstance, url));
+              }(peaksInstance, url));
+            }
           }
         })(peaks);
       </script>
