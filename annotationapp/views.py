@@ -100,7 +100,7 @@ def upload(request):
         if file_form.is_valid() and exercise_form.is_valid():
             tmp_path = store_tmp_file(request.FILES['zip_file'])
             call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=request.POST['name'])
-            return redirect('exercise_list')
+            return render(request, 'annotationapp/upload_success.html')
     else:
         forms = {'file_form': UploadForm(), 'exercise_form': ExerciseForm()}
     context = {'forms': forms}
