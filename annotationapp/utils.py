@@ -15,13 +15,13 @@ def exercise_annotations_to_json(exercise_id):
         annotations: json serialisation of the annotations
     """
     exercise = Exercise.objects.get(id=exercise_id)
-    exercise_sounds = exercise.sounds
+    exercise_sounds = exercise.sounds.all()
 
     sounds_annotations = {}
 
     for sound in exercise_sounds:
         tiers = {}
-        for tier in exercise.tiers:
+        for tier in exercise.tiers.all():
 
             annotations = {}
             for annotation in Annotation.objects.filter(sound=sound, tier=tier).all():

@@ -1,13 +1,13 @@
 import json
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Annotation, Exercise, Sound, Tier
 from .forms import UploadForm, ExerciseForm
-from .utils import store_tmp_file
+from .utils import store_tmp_file, exercise_annotations_to_json
 
 
 @login_required
@@ -112,3 +112,12 @@ def upload(request):
         forms = {'file_form': UploadForm(), 'exercise_form': ExerciseForm()}
     context = {'forms': forms}
     return render(request, 'annotationapp/upload_form.html', context)
+
+
+@login_required
+def download(request, exercise_id):
+    annotations_json = exercise_annotations_to_json(exercise_id)
+    exercise = Exercise.objects.get(id=exercise_id)
+    response = HttpResponse(annotations_json, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename=' + exercise.name + '.json'
+    return response
