@@ -2,7 +2,7 @@
 {% block content %}
     {% if exercises_list %}
         {% for exercise in exercises_list %}
-            <h4><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></h4>
+            <li><h4><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></h4></li>
         {% endfor %}
     {% else %}
         <p>No exercises available.</p>
