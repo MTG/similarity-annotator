@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block title %}{% trans "Login" %}{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
 
@@ -20,7 +20,7 @@
       {{form.non_field_errors}}
 
       <input type="hidden" name="next" value="{{ next }}"/>
-      <div class="col-xs-12" style="margin-bottom:10px; text-align:center">
+      <div>
         <button id="login-form-submit" type="submit" class="btn btn-success">
          {% trans "Log in" %}
         </button>
@@ -29,11 +29,11 @@
 
   </div>
 
-  <div id="registration-link" class="registration-content col-xs-12">
-  <a href="/accounts/register/">Sign up</a>
-  </div>
-
-
 {% endblock %}
 
-	
+{% block links %}
+Don't have an account yet?
+<div>
+<a href="/accounts/register/">Register</a>
+</div>
+{% endblock %}

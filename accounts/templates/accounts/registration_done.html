@@ -1,12 +1,9 @@
+{% extends 'annotationapp/annotationapp_base.html' %}
 
-{% load i18n %}
-
-{% block title %}{% trans "Registration Done" %}{% endblock %}
+{% block title %}Registration{% endblock %}
 
 {% block content %}
-  <div class="col-xs-12 sound-detail-content">
-  <p>
-    <li><a href="{% url "exercise_list" %}">{% trans "Start annotating" %}</a></li>
-  </p>
+  <div>
+    <h4>Registration successful, please <a href="{% url "exercise_list" %}">log in</a></h4>
   </div>
 {% endblock %}

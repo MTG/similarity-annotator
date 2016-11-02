@@ -1,71 +1,18 @@
+{% extends 'annotationapp/annotationapp_base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{% block meta_description %}{% endblock %}">
+{% block title %} {{ sound.filename }} annotation page {% endblock %}
 
-    <title>{% block title %}{% endblock %}</title>
-    <style>
-      #titles {
-        font-family: 'Helvetica neue', Helvetica, Arial, sans-serif;
-      }
-
-      #titles, [class*="waveform-visualiser"] {
-        margin: 24px auto;
-        width: 1000px;
-      }
-
-      [class*="waveform-visualiser"] [class*="-container"] {
-        box-shadow: 3px 3px 20px #919191;
-        margin: 0 0 24px 0;
-        -moz-box-shadow: 3px 3px 20px #919191;
-        -webkit-box-shadow: 3px 3px 20px #919191;
-        line-height: 0;
-      }
-
-      .overview-container {
-        height: 85px;
-      }
-
-      #demo-controls {
-        margin: 0 auto 24px auto;
-        width: 1000px;
-      }
-
-      #demo-controls > * {
-        vertical-align: middle;
-      }
-
-      #demo-controls button {
-        background: #fff;
-        border: 1px solid #919191;
-        cursor: pointer;
-      }
-      .waveform-visualiser-container:not(.last) .overview-container{
-        display: none;
-      }
-    </style>
- 
-</head>
-
-<body>
-
-
-<ul>
-    <li><p> Annotation page for sound:</p></li>
-    {{sound.filename }}
-</ul>
+{% block content %}
 
   <script src="{% static 'node_modules/peaks.js/peaks.js' %}"></script>
   <div id="titles">
-  
+
     <div class="ref-sound">
     {% for tier in sound.exercise.reference_sound.exercise.tiers.all %}
       {% if tier.entire_sound %}
-      <div class='tier' 
+      <div class='tier'
           data-action-url='{% url "annotation-action" sound.exercise.reference_sound.id tier.id %}'
           data-audio="audio-ref-controls"
           data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
@@ -74,7 +21,7 @@
       </div>
       {% endif %}
     {% endfor %}
-  
+
        <div id="audio-ref-controls">
         <audio controls=controls>
           <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_sound.filename }}" type="audio/mpeg">
@@ -82,9 +29,9 @@
         </audio>
        </div>
      </div>
-  
+
     {% for tier in sound.exercise.tiers.all %}
-    <div class='tier' 
+    <div class='tier'
           data-action-url='{% url "annotation-action" sound.id tier.id %}'
           data-audio='audio-controls'
           data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
@@ -96,7 +43,7 @@
       {% endif %}
     </div>
     {% endfor %}
-      
+
     <div id="audio-controls">
       <audio controls=controls>
         <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
@@ -138,12 +85,12 @@
           var tiers = document.getElementsByClassName('tier');
           for (var i = 0; i < tiers.length; i++) {
             var container = tiers[i];
-            var url = container.getAttribute('data-action-url');            
-            var urlAnnotations = container.getAttribute('data-annotations-url');            
+            var url = container.getAttribute('data-action-url');
+            var urlAnnotations = container.getAttribute('data-annotations-url');
 
             // parameters to create new waveform for annotation tier
             var options = {
-              container: container.getElementsByClassName('waveform-visualiser-container')[0], 
+              container: container.getElementsByClassName('waveform-visualiser-container')[0],
               mediaElement: document.querySelector("#"+container.getAttribute('data-audio')).querySelector('audio'),
               dataUri: {
                 arraybuffer: container.getAttribute('data-waveform'),
@@ -239,5 +186,5 @@
           }
         })(peaks);
       </script>
-</body>
+{% endblock %}
 </html>

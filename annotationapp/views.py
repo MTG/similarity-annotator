@@ -4,7 +4,7 @@ import json
 import zipfile
 import tempfile
 
-from django.shortcuts import render, get_object_or_404, HttpResponse
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.core import serializers
@@ -26,7 +26,7 @@ def exercise_list(request):
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
     sounds_list = exercise.sounds.all()
-    context = {'sounds_list': sounds_list, 'exercise_id': exercise_id}
+    context = {'sounds_list': sounds_list, 'exercise': exercise}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
@@ -102,6 +102,7 @@ def get_annotations(request, sound_id, tier_id):
             })
     return JsonResponse({'status': 'success', 'annotations': ret})
 
+
 @login_required
 def download_annotations(request, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
@@ -147,7 +148,6 @@ def download_annotations(request, sound_id):
     resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
 
     return resp
-
 
 
 @login_required

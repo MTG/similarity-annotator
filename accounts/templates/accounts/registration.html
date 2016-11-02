@@ -1,7 +1,7 @@
 
-{% load i18n %}
+{% extends 'annotationapp/annotationapp_base.html' %}
 
-{% block title %}{% trans "Register" %}{% endblock %}
+{% block title %}Registration{% endblock %}
 
 {% block content %}
   <br>
@@ -11,26 +11,26 @@
     <form method="post" action="" class>{% csrf_token %}
       <div class="form-group">
 
-              <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' {% if form.username.value %}value='{{ form.username.value }}' {% else %}placeholder='{% trans "Username" %}'{% endif %}>
+              <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' {% if form.username.value %}value='{{ form.username.value }}' {% else %}placeholder="Username"{% endif %}>
               {{form.errors.username}}
       </div>
       <div class="form-group">
-              <input type="email"  class="form-control" id="{{form.email.auto_id}}" name='{{form.email.name}}'  {% if form.email.value %}value='{{ form.email.value }}' {% else %}placeholder='{% trans "Email" %}'{% endif %}>
+              <input type="email"  class="form-control" id="{{form.email.auto_id}}" name='{{form.email.name}}'  {% if form.email.value %}value='{{ form.email.value }}' {% else %}placeholder="Email" {% endif %}>
               {{form.errors.email}}
       </div>
       <div class="form-group">
-              <input type="password"  class="form-control" id="{{form.password1.auto_id}}" name='{{form.password1.name}}' placeholder='{% trans "Choose a password" %}'>
+              <input type="password"  class="form-control" id="{{form.password1.auto_id}}" name='{{form.password1.name}}' placeholder="Choose a password">
               {{form.errors.password}}
       </div>
       <div class="form-group">
-              <input type="password"  class="form-control" id="{{form.password2.auto_id}}" name='{{form.password2.name}}' placeholder='{% trans "Please confirm your password" %}'>
+              <input type="password"  class="form-control" id="{{form.password2.auto_id}}" name='{{form.password2.name}}' placeholder="Please confirm your password">
               {{form.errors.password2}}
       </div>
 
 
-      <div class="col-xs-12" style="margin-bottom:10px; text-align:center; float: none">
+      <div >
         <button id="registration-form-submit" type="submit" class="btn btn-success">
-          {% trans "Register" %}
+          "Register"
         </button>
       </div>
 

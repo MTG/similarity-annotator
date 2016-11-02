@@ -1,10 +1,12 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
 
+{% block title %} List of {{ exercise.name }} sounds {% endblock %}
+
 {% block content %}
 {% if sounds_list %}
     <ul>
     {% for sound in sounds_list %}
-        <li><a href="/{{ exercise_id }}/sound_detail/{{ sound.id }}">{{ sound.filename }}</a></li>
+        <li><a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}">{{ sound.filename }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
