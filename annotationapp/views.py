@@ -63,7 +63,7 @@ def annotation_action(request, sound_id, tier_id):
         annotation.delete()
         out = {'status': 'success'}
     else:
-        name = post_body.get('name', '')
+        name = post_body.get('labelText', '')
         start = post_body['startTime']
         end = post_body['endTime']
         if action == 'add':
@@ -98,7 +98,8 @@ def get_annotations(request, sound_id, tier_id):
         ret.append({
             'annotation_id': i.id,
             'startTime': i.start_time,
-            'endTime': i.end_time
+            'endTime': i.end_time,
+            'name': i.name
             })
     return JsonResponse({'status': 'success', 'annotations': ret})
 
