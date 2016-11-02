@@ -3,15 +3,10 @@
 
 {% block title %}{% trans "Login" %}{% endblock %}
 
-{% block heading %}
-{% trans "Log in" %}
-{% endblock %}
-
 {% block content %}
 
-{% url 'accounts-register' as register_url %}
 
-  <div id="login-form" class="registration-content col-xs-12"> 
+  <div id="login-form" class="registration-content col-xs-12">
     <form method="post" action="{% url "accounts-login" %}?next={{ redirect_url }} ">{% csrf_token %}
       <div class="form-group">
         <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' placeholder='{% trans "Username" %}'>
@@ -32,24 +27,12 @@
     </form>
 
   </div>
-<script>
 
-  document.getElementById("{{form.username.auto_id}}").focus();
-  
-  $(function(){
-    $('#login-form-submit').click(function(event){
-      event.preventDefault();
-      $('#login-form form').submit();
-    });
-  });
-</script>
-  
+  <div id="registration-link" class="registration-content col-xs-12">
+  <a href="/accounts/register/">Sign up</a>
+  </div>
+
 
 {% endblock %}
 
-{% block bodyend %}
-<script>
-  $("#login-navbar-button").addClass('active');
-</script>
-{% endblock %}
 	

@@ -36,20 +36,6 @@
 
     </form>
 
-    <script>
-      document.getElementById("{{form.username.auto_id}}").focus();
-      $(function(){
-        $('#registration-form-submit').click(function(event){
-          event.preventDefault();
-          $('#registration-form form').submit();
-        });
-      });
-    </script>
-  </div>
+ </div>
 {% endblock %}
 
-{% block bodyend %}
-<script>
-  $("#register-navbar-button").addClass('active');
-</script>
-{% endblock %}
