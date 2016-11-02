@@ -1,6 +1,7 @@
 similarity_annotator/local_settings.py
 .idea/
 *.pyc
-similarity_annotator/static
+similarity_annotator/static/node_modules/
+similarity_annotator/static/bootstrap/
 similarity_annotator/media/
 similarity_annotator/tmp/

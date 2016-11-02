@@ -23,6 +23,8 @@ Then go you'll need to install npm in /similarity-annotator/static:
 
     - cd /similarity_annotator/static
     - npm install
+    
+You also need to download [bootstrap] (http://getbootstrap.com/getting-started/#download) and decompress it into static as well 
 
 ### Step 5: Local configurations
 Inside `similarity_annotator` directoy, rename `local_settings.py.dist` to `local_settings.py`
