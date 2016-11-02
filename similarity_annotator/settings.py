@@ -111,10 +111,6 @@ USE_TZ = True
 
 MEDIA_URL = "/media/"
 
-# location and url of Data files
-#DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static/'))
-#UPLOADS_PATH = os.path.join(DATA_PATH, "uploads/")
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 STATICFILES_DIRS = [

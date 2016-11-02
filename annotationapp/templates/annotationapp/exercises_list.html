@@ -1,11 +1,14 @@
-{% if exercises_list %}
-    <ul>
-    {% for exercise in exercises_list %}
-        <li><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No exercises available.</p>
+{% extends 'annotationapp/annotationapp_base.html' %}
+{% block content %}
+    {% if exercises_list %}
+        {% for exercise in exercises_list %}
+            <h4><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></h4>
+        {% endfor %}
+    {% else %}
+        <p>No exercises available.</p>
+    {% endif %}
+{% endblock %}
 
-{% endif %}
-<a href="/upload/"> Create a new exercise </a>
+{% block links %}
+    <a href="/upload/"> Create a new exercise </a>
+{% endblock %}
