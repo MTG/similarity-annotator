@@ -27,7 +27,7 @@ def exercise_annotations_to_json(exercise_id):
             for annotation in Annotation.objects.filter(sound=sound, tier=tier).all():
                 # check if there is an annotation similarity
                 try:
-                    annotation_similarity = AnnotationSimilarity.objects.get(other_sound=annotation)
+                    annotation_similarity = AnnotationSimilarity.objects.get(similar_sound=annotation)
                     similarity = {'reference_annotation': annotation_similarity.reference.id,
                                   'similarity_value': annotation_similarity.similarity_measure
                                   }
