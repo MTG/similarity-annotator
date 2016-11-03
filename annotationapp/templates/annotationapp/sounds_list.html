@@ -15,5 +15,5 @@
 {% endblock %}
 
 {% block links %}
-<a href="/{{ exercise_id }}/download/">Download annotations</a>
+    <input type="button" onclick="location.href='/{{ exercise_id }}/download/';" value="Download annotations" />
 {% endblock %}
