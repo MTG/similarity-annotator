@@ -1,7 +1,9 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
 
+{% block title %} Select reference sound{% endblock %}
+
 {% block content %}
-<h5> Please select the reference sound of the exercise </h5>
+<h5> Please select the reference sound for the {{ exercise.name }} exercise </h5>
 
 {% if sounds_list %}
     <form action="" method="post" enctype="multipart/form-data">

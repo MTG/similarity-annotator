@@ -45,4 +45,7 @@ To run the app simply run the following:
 
 The we application will run on http://localhost:8000/
 
+## License
+All the software is distributed with the [Affero GPL license] (http://www.gnu.org/licenses/agpl-3.0.en.html)
+
 

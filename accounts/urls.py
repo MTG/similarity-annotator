@@ -6,4 +6,5 @@ urlpatterns = [
     # have a user with one of these names
     url(r'^login/?', views.login, name="accounts-login"),
     url(r'^register/?', views.registration, name="accounts-register"),
+    url(r'^logout/?$', views.logout, name="accounts-logout"),
 ]
