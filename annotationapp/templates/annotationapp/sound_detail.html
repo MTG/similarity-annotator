@@ -10,6 +10,9 @@
   <div id="titles">
 
     <div class="ref-sound">
+    <div>
+        <h4> Reference sound <small> {{ sound.exercise.reference_sound.filename }} </small></h4>
+    </div>
     {% for tier in sound.exercise.reference_sound.exercise.tiers.all %}
       {% if tier.entire_sound %}
       <div class='tier'
@@ -29,8 +32,13 @@
         </audio>
        </div>
      </div>
-
+    <div>
+        <h4> {{ sound.filename }} </h4>
+    </div>
     {% for tier in sound.exercise.tiers.all %}
+    <div>
+        <h5>tier: {{ tier.name }}</h5>
+    </div>
     <div class='tier'
           data-action-url='{% url "annotation-action" sound.id tier.id %}'
           data-audio='audio-controls'
