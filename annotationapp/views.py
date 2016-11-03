@@ -11,7 +11,7 @@ from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Annotation, Exercise, Sound, Tier
-from .forms import UploadForm, ExerciseForm
+from .forms import UploadForm, ExerciseForm, TierForm
 from .utils import store_tmp_file, exercise_annotations_to_json
 
 
@@ -42,8 +42,17 @@ def sound_list(request, exercise_id):
 
 @login_required
 def sound_detail(request, exercise_id, sound_id):
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            exercise = Exercise.objects.get(id=exercise_id)
+            Tier.objects.create(name=tier_name, exercise=exercise)
+    else:
+        tier_form = TierForm()
+    context = {'form': tier_form}
     sound = get_object_or_404(Sound, id=sound_id)
-    context = {'sound': sound}
+    context['sound'] = sound
     return render(request, 'annotationapp/sound_detail.html', context)
 
 

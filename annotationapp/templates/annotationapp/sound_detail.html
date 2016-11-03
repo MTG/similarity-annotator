@@ -4,6 +4,18 @@
 <html lang="en">
 {% block title %} {{ sound.filename }} annotation page {% endblock %}
 
+{% block links %}
+    <div class="form-group">
+      <div class="col-xs-1">
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{ form }} </p>
+        <p><input type="submit" value="Create tier" /></p>
+        </form>
+      </div>
+    </div>
+{% endblock %}
+
 {% block content %}
 
   <script src="{% static 'node_modules/peaks.js/peaks.js' %}"></script>

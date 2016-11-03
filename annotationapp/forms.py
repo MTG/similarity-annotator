@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Exercise
+from .models import Exercise, Tier
 
 import zipfile
 
@@ -22,3 +22,9 @@ class ExerciseForm(forms.ModelForm):
         fields = ['name']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', })}
 
+
+class TierForm(forms.ModelForm):
+    class Meta:
+        model = Tier
+        fields = ['name']
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'size': '1'})}
