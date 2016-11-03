@@ -18,9 +18,8 @@ def login(request):
 
 
 def logout(request):
-    nxt = request.GET.get('next', settings.LOGIN_REDIRECT_URL)
     auth.logout(request)
-    return redirect(nxt)
+    return redirect('/')
 
 
 def registration(request):

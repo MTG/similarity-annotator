@@ -17,17 +17,24 @@
 <body>
 <div class="container-fluid" >
     <div class="page-header">
-        <h3><a href="/">{% block title %}{% endblock %}</a></h3>
+        <div class="row-fluid">
+            <div class="span10">
+                <h3><a href="/">{% block title %}{% endblock %}</a></h3>
+            </div>
+            <div class="span2">
+                {% block logout %}<a href="/accounts/logout/">Logout</a>{% endblock %}
+            </div>
+        </div>
     </div>
     <div class="row-fluid">
-    <div class="span2">
-        {% block links %}
-        {% endblock %}
-    </div>
-    <div class="span10">
-        {% block content %}
-        {% endblock %}
-    </div>
+        <div class="span2">
+            {% block links %}
+            {% endblock %}
+        </div>
+        <div class="span10">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 </div>
 
