@@ -128,8 +128,8 @@
             
             peaksInstance.on('user_seek.overview', function(currTime){
                 var segments = this.segments.getSegments();
+                var shown = false;
                 for (var i = 0; i < segments.length; i++) {
-                  var shown = false;
                   if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
                       var inp = container.querySelectorAll(".name-txt");
                       inp[0].value = segments[i].labelText;
@@ -183,6 +183,7 @@
                       for (var i = 0; i< segments.length; i++){
                         if (segments[i].id == auxId){
                           segments[i].id = response.annotation_id;
+                          container.setAttribute("data-selected", segments[i].id);
                         }
                       }
                     }
