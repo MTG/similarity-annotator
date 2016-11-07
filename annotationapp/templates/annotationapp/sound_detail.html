@@ -46,7 +46,8 @@
     <div>
         <h5>tier: {{ tier.name }}</h5>
     </div>
-     <div class='tier'
+     <div class='tier reference'
+        data-tier-id='{{tier.id}}'
         data-action-url='{% url "annotation-action" sound.exercise.reference_sound.id tier.id %}'
         data-audio="audio-ref-controls"
         data-annotations-url='{% url "get-annotations" sound.exercise.reference_sound.id tier.id %}'
@@ -54,16 +55,21 @@
      <div class="waveform-visualiser-container"></div>
     </div>
     <div class='tier'
+          data-tier-id='{{tier.id}}'
           data-action-url='{% url "annotation-action" sound.id tier.id %}'
           data-audio='audio-controls'
           data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
+          data-action-url='{% url "annotation-action" sound.id tier.id %}'
           data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}'>
       <div class="waveform-visualiser-container"></div>
       {% if not tier.entire_sound %}
         <button class="add-segment">Add a Segment to Tier</button>
         <button class="remove-point">Remove Segment</button>
-        <input class="name-txt" type="text" />
+      {% else %}
+        <button class="add-simil-segment">Add a Similarity Segment</button>
       {% endif %}
+      <button class="remove-point">Remove Segment</button>
+      <input class="name-txt" type="text" />
     </div>
     {% endfor %}
 
@@ -78,6 +84,10 @@
       <script>
         var tempId = 0;
         function getTempId(){ return tempId++;}
+        // function to generate random colors
+        function g() {
+          return Math.floor(Math.random() * 255);
+        }
         function callServer(action, segment, url, cb){
           var xhr = new XMLHttpRequest();
           xhr.responseType = 'json';
@@ -105,6 +115,8 @@
         }
         var delayedEdit = [];
         var delayedTextEdit = [];
+        var reference = {};
+        var reference_colors = {};
         (function(Peaks){
           var tiers = document.getElementsByClassName('tier');
           for (var i = 0; i < tiers.length; i++) {
@@ -127,35 +139,62 @@
 
             var rsp = getAnnotations(urlAnnotations);
             if (rsp.status == 'success') {
+              var tId = container.getAttribute('data-tier-id')
               for (var j = 0; j < rsp.annotations.length; j++){
-                options.segments.push({
+                var segment = {
                   id: rsp.annotations[j].annotation_id,
                   startTime: rsp.annotations[j].startTime,
                   endTime: rsp.annotations[j].endTime,
                   labelText: rsp.annotations[j].name,
-                  editable: true
-                });
+                  editable: true,
+                  color: 'rgba(' + g() + ', ' + g() + ', ' + g() + ', 1)'
+                }
+                
+                if (container.classList.contains('reference')) {
+                  if  (!(tId in reference_colors)) {
+                    reference_colors[tId] = {};
+                  }
+                  reference_colors[tId][rsp.annotations[j].annotation_id] = segment['color']; 
+                }
+                if (rsp.annotations[j].referenceId != null) {
+                    segment['color'] = reference_colors[tId][rsp.annotations[j].referenceId]; 
+                    segment['referenceId'] = rsp.annotations[j].referenceId; 
+                }
+                options.segments.push(segment);
               }
             }
+            // instantiate Peaks.js annotator
             var peaksInstance = Peaks.init(options);
-
             
             peaksInstance.on('user_seek.*', (function(container, tier){
               return function(currTime){
+                var tId = container.getAttribute('data-tier-id')
                 var segments = tier.segments.getSegments();
                 var shown = false;
                 for (var i = 0; i < segments.length; i++) {
                   if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
                       var inp = container.querySelectorAll(".name-txt");
-                      inp[0].value = segments[i].labelText;
+                      if (inp.length > 0) {
+                        inp[0].value = segments[i].labelText;
+                      }
                       container.setAttribute("data-selected", segments[i].id);
                       shown = true;
+                      // If we are in a reference tier, then save the object to access from the events of the other element
+                      if (container.classList.contains('reference')) {
+                        reference[tId] = segments[i];
+                      }
                   }
                 }
                 if (!shown) {
                     var inp = container.querySelectorAll(".name-txt");
-                    inp[0].value = '';
+                    if (inp.length > 0) {
+                      inp[0].value = '';
+                    }
                     container.setAttribute("data-selected", null);
+                    // If we are in a reference tier, then reset the saved element
+                    if (container.classList.contains('reference')) {
+                      reference[tId] = null;
+                    }
                 }
               }
             })(container, peaksInstance));
@@ -172,6 +211,53 @@
               }, 1000));
 
             });
+
+            // Add new similarity segment to the current tier, also store the annotation in the database
+            var addBtn = container.querySelectorAll(".add-simil-segment");
+            if (addBtn.length > 0) {
+              addBtn[0].addEventListener("click", function (container, tier, actionUrl) {
+                return function(){
+                  var tId = container.getAttribute('data-tier-id')
+                  var otherSegment = reference[tId];
+                  var has_reference = false;
+                  var segments = tier.segments.getSegments();
+                  if (otherSegment != null){
+                    for (var i = 0; i< segments.length; i++){
+                      if (segments[i].referenceId == otherSegment.id) {
+                        has_reference = true;
+                      }
+                    }
+                    if (!has_reference){
+                      var startTime = otherSegment.startTime;
+                      var endTime = otherSegment.endTime;
+                      var auxId = getTempId();
+                      var segment = {
+                        startTime: startTime,
+                        endTime: endTime,
+                        editable: true,
+                        id: auxId,
+                        referenceId: otherSegment.id,
+                        color: otherSegment.color
+                      };
+                      tier.segments.add(segment);
+                      callServer('add', segment, actionUrl, function(response){
+                        if (response.status == 'success'){
+                          var segments = tier.segments.getSegments();
+                          for (var i = 0; i< segments.length; i++){
+                            if (segments[i].id == auxId){
+                              segments[i].id = response.annotation_id;
+                              segments[i].referenceId = otherSegment.id;
+                              container.setAttribute("data-selected", segments[i].id);
+                            }
+                          }
+                        }
+                      });
+                    }
+                  }
+                }
+              }(container, peaksInstance, url));
+            }
+
 
             // Add new segment to the current tier, also store the annotation in the database
             var addBtn = container.querySelectorAll(".add-segment");

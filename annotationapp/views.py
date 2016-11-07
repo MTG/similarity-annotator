@@ -10,7 +10,7 @@ from django.core.management import call_command
 from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Annotation, Exercise, Sound, Tier
+from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
 from .forms import UploadForm, ExerciseForm, TierForm
 from .utils import store_tmp_file, exercise_annotations_to_json
 
@@ -72,7 +72,17 @@ def annotation_action(request, sound_id, tier_id):
         annotation.delete()
         out = {'status': 'success'}
     else:
+        reference = post_body.get('referenceId', None)
+        ref_obj = None
         name = post_body.get('labelText', '')
+
+        if reference:
+            ref_obj = get_object_or_404(Annotation, id=reference)
+            if name:
+                name = float(name)
+            else:
+                name = 0
+
         start = post_body['startTime']
         end = post_body['endTime']
         if action == 'add':
@@ -84,6 +94,12 @@ def annotation_action(request, sound_id, tier_id):
             annotation.sound = sound
             annotation.tier = tier
             annotation.save()
+            if ref_obj:
+                simil = AnnotationSimilarity()
+                simil.similar_sound = annotation
+                simil.reference = ref_obj
+                simil.similarity_measure = name
+                simil.save()
             out = {'status': 'success', 'annotation_id': annotation.id}
         elif action == 'edit':
             annotation_id = post_body['annotation_id']
@@ -104,12 +120,17 @@ def get_annotations(request, sound_id, tier_id):
     annotations = Annotation.objects.filter(sound=sound, tier=tier)
     ret = []
     for i in annotations.all():
-        ret.append({
+        references = i.annotationsimilarity_set.all()
+        annotation = {
             'annotation_id': i.id,
             'startTime': i.start_time,
             'endTime': i.end_time,
             'name': i.name
-            })
+            }
+        if len(references):
+            reference = references[0]
+            annotation['referenceId'] = reference.reference_id
+        ret.append(annotation)
     return JsonResponse({'status': 'success', 'annotations': ret})
 
 
