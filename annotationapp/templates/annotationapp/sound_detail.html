@@ -319,7 +319,7 @@
             
             var nameInp  = container.querySelectorAll(".name-txt");
             if (nameInp.length > 0) {
-              nameInp[0].oninput = (function(tier){
+              nameInp[0].oninput = (function(container, tier){
                 return function(event) {
 
                   for (var i = 0; i < delayedTextEdit.length; i++) {
@@ -343,7 +343,7 @@
                     })(url, segment), 1000));
                   }
                 }
-              })(peaksInstance);
+              })(container, peaksInstance);
               nameInp[0].onpropertychange = nameInp[0].oninput; // for IE8
             
             }
