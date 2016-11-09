@@ -70,6 +70,16 @@
       {% endif %}
       <button class="remove-point">Remove Segment</button>
       <input class="name-txt" type="text" />
+      <div class="selected-section" style="display: none">
+        <span>Selected Section: </span>
+        <span class="sel-name"></span>
+      </div>
+      {% if tier.entire_sound %}
+      <div id="selected-section-ref-{{tier.id}}" style="display: none">
+          <span>Selected section on reference tier: </span>
+          <span class="sel-name"></span>
+        </div>
+      {% endif %}
     </div>
     {% endfor %}
 
@@ -112,6 +122,32 @@
             xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
             xmlHttp.send( null );
             return JSON.parse(xmlHttp.responseText);
+        }
+        function selectSegment(container, tId, segment, sId, sName){
+          var inp = container.querySelectorAll(".name-txt");
+          if (inp.length > 0) {
+            inp[0].value = sName;
+          }
+          container.setAttribute("data-selected", sId);
+          // If we are in a reference tier, then save the object to access from the events of the other element
+          if (container.classList.contains('reference')) {
+            reference[tId] = segment;
+            var display = document.getElementById('selected-section-ref-'+tId);
+            if (segment != null){
+              display.style.display = "block";
+            } else {
+              display.style.display = "none";
+            }
+            display.querySelector('.sel-name').innerHTML = sName;
+          }else{
+            var display = container.querySelectorAll('.selected-section')[0];
+            if (segment != null){
+              display.style.display = "block";
+            } else {
+              display.style.display = "none";
+            }
+            display.querySelector('.sel-name').innerHTML = sName;
+          }
         }
         var delayedEdit = [];
         var delayedTextEdit = [];
@@ -173,28 +209,12 @@
                 var shown = false;
                 for (var i = 0; i < segments.length; i++) {
                   if (currTime >= segments[i].startTime && currTime <= segments[i].endTime){
-                      var inp = container.querySelectorAll(".name-txt");
-                      if (inp.length > 0) {
-                        inp[0].value = segments[i].labelText;
-                      }
-                      container.setAttribute("data-selected", segments[i].id);
-                      shown = true;
-                      // If we are in a reference tier, then save the object to access from the events of the other element
-                      if (container.classList.contains('reference')) {
-                        reference[tId] = segments[i];
-                      }
+                    selectSegment(container, tId, segments[i], segments[i].id, segments[i].labelText);
+                    shown = true;
                   }
                 }
                 if (!shown) {
-                    var inp = container.querySelectorAll(".name-txt");
-                    if (inp.length > 0) {
-                      inp[0].value = '';
-                    }
-                    container.setAttribute("data-selected", null);
-                    // If we are in a reference tier, then reset the saved element
-                    if (container.classList.contains('reference')) {
-                      reference[tId] = null;
-                    }
+                  selectSegment(container, tId, null, '', '');
                 }
               }
             })(container, peaksInstance));
