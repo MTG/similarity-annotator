@@ -29,16 +29,30 @@
   <div id="titles">
 
     <div class="ref-sound">
-    <div>
+      {% if sound.exercise.reference_pitch_sound %}
+      <div>
+        <h4> Reference Pitch sound</h4>
+      </div>
+      
+      <div>
+        <audio controls=controls>
+          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      {% endif %}
+      
+      <div>
         <h4> Reference sound <small> {{ sound.exercise.reference_sound.filename }} </small></h4>
-    </div>
-       <div id="audio-ref-controls">
+      </div>
+      
+      <div id="audio-ref-controls">
         <audio controls=controls>
           <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_sound.filename }}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
-       </div>
-     </div>
+      </div>
+    </div>
     <div>
         <h4> {{ sound.filename }} </h4>
     </div>
@@ -62,14 +76,6 @@
           data-action-url='{% url "annotation-action" sound.id tier.id %}'
           data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}'>
       <div class="waveform-visualiser-container"></div>
-      {% if not tier.entire_sound %}
-        <button class="add-segment">Add a Segment to Tier</button>
-        <button class="remove-point">Remove Segment</button>
-      {% else %}
-        <button class="add-simil-segment">Add a Similarity Segment</button>
-      {% endif %}
-      <button class="remove-point">Remove Segment</button>
-      <input class="name-txt" type="text" />
       <div class="selected-section" style="display: none">
         <span>Selected Section: </span>
         <span class="sel-name"></span>
@@ -80,6 +86,14 @@
           <span class="sel-name"></span>
         </div>
       {% endif %}
+      {% if not tier.entire_sound %}
+        <button class="add-segment">Add a Segment to Tier</button>
+        <button class="remove-point">Remove Segment</button>
+      {% else %}
+        <button class="add-simil-segment">Add a Similarity Segment</button>
+      {% endif %}
+      <button class="remove-point">Remove Segment</button>
+      <input class="name-txt" type="text" />
     </div>
     {% endfor %}
 
@@ -133,12 +147,14 @@
           if (container.classList.contains('reference')) {
             reference[tId] = segment;
             var display = document.getElementById('selected-section-ref-'+tId);
-            if (segment != null){
-              display.style.display = "block";
-            } else {
-              display.style.display = "none";
+            if (display != null) {
+              if (segment != null){
+                display.style.display = "block";
+              } else {
+                display.style.display = "none";
+              }
+              display.querySelector('.sel-name').innerHTML = sName;
             }
-            display.querySelector('.sel-name').innerHTML = sName;
           }else{
             var display = container.querySelectorAll('.selected-section')[0];
             if (segment != null){
@@ -167,7 +183,7 @@
               dataUri: {
                 arraybuffer: container.getAttribute('data-waveform'),
               },
-              height: 120,
+              height: 40,
               keyboard: false,
               segments: []
             };
@@ -187,6 +203,7 @@
                 }
                 
                 if (container.classList.contains('reference')) {
+                  segment['editable'] = false;
                   if  (!(tId in reference_colors)) {
                     reference_colors[tId] = {};
                   }

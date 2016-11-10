@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
+    reference_pitch_sound = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -32,8 +33,8 @@ class Sound(models.Model):
 
 class Annotation(models.Model):
     name = models.CharField(max_length=200)
-    start_time = models.IntegerField("start_time")
-    end_time = models.IntegerField("end_time", blank=True, null=True)
+    start_time = models.DecimalField(max_digits=6, decimal_places=3)
+    end_time = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     sound = models.ForeignKey(Sound, related_name='annotations')
     tier = models.ForeignKey(Tier, related_name='annotations')
     user = models.ForeignKey(User, related_name='annotations')
