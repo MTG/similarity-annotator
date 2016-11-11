@@ -80,19 +80,14 @@
         <span>Selected Section: </span>
         <span class="sel-name"></span>
       </div>
-      {% if tier.entire_sound %}
       <div id="selected-section-ref-{{tier.id}}" style="display: none">
           <span>Selected section on reference tier: </span>
           <span class="sel-name"></span>
         </div>
-      {% endif %}
-      <div class="col-md-4">
-      {% if not tier.entire_sound %}
+      <div class="col-md-6">
         <button class="btn btn-default add-segment">Add a Segment to Tier</button>
-      {% else %}
-        <button class="btn btn-default add-simil-segment">Add a Similarity Segment</button>
-      {% endif %}
-      <button class="btn btn-danger remove-point">Remove Segment</button>
+        <button class="btn btn-default add-simil-segment">Add a Similarity measure</button>
+        <button class="btn btn-danger remove-point">Remove Segment</button>
       </div>
       <div class="form-group form-inline col-xs-6">
         <label >Segment value:</label>

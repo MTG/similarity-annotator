@@ -75,6 +75,7 @@ var reference_colors = {};
       dataUri: {
         arraybuffer: container.getAttribute('data-waveform'),
       },
+      zoomAdapter: 'animated',
       height: 40,
       keyboard: false,
       segments: []
