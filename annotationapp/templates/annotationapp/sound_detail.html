@@ -88,7 +88,9 @@
           <span class="sel-name"></span>
         </div>
       <div class="col-md-6">
+        {% if not tier.entire_sound %}
         <button class="btn btn-default add-segment">Add a Segment to Tier</button>
+        {% endif %}
         <button class="btn btn-default add-simil-segment">Add a Similarity measure</button>
         <button class="btn btn-danger remove-point">Remove Segment</button>
       </div>
