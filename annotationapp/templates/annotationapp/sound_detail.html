@@ -100,6 +100,11 @@
     {% endfor %}
 
     <div id="audio-controls">
+      <div>
+        <h4> Sound to be annotated <small> {{ sound.filename }} </small></h4>
+      </div>
+      
+
       <audio controls=controls>
         <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
         Your browser does not support the audio element.

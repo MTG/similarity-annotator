@@ -166,8 +166,8 @@ def download_annotations(request, sound_id):
         for i in annotations.all():
             ret.append({
                 'annotation_id': i.id,
-                'startTime': i.start_time,
-                'endTime': i.end_time
+                'startTime': str(i.start_time),
+                'endTime': str(i.end_time)
                 })
         # Generate XML version of annotations
         XMLSerializer = serializers.get_serializer("xml")
@@ -176,7 +176,7 @@ def download_annotations(request, sound_id):
         print("---------------")
         print(temp_file)
         print("---------------")
-        xml_serializer.serialize(ret, strem=fp)
+        xml_serializer.serialize(annotations.all(), strem=fp)
 
         zip_path = os.path.join(zip_subdir, "tier_%s.xml" % tier.id)
         zf.write(temp_file, zip_path)
