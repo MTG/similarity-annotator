@@ -87,8 +87,8 @@ var reference_colors = {};
       for (var j = 0; j < rsp.annotations.length; j++){
         var segment = {
           id: rsp.annotations[j].annotation_id,
-          startTime: rsp.annotations[j].startTime,
-          endTime: rsp.annotations[j].endTime,
+          startTime: parseFloat(rsp.annotations[j].startTime),
+          endTime: parseFloat(rsp.annotations[j].endTime),
           labelText: rsp.annotations[j].name,
           editable: true,
           color: 'rgba(' + g() + ', ' + g() + ', ' + g() + ', 1)'
