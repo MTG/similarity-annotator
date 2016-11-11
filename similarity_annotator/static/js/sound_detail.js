@@ -103,7 +103,9 @@ var reference_colors = {};
           reference_colors[tId][rsp.annotations[j].annotation_id] = segment['color']; 
         }
         if (rsp.annotations[j].referenceId != null) {
-            segment['color'] = reference_colors[tId][rsp.annotations[j].referenceId]; 
+            if (tId in reference_colors){
+              segment['color'] = reference_colors[tId][rsp.annotations[j].referenceId]; 
+            }
             segment['referenceId'] = rsp.annotations[j].referenceId; 
         }
         options.segments.push(segment);

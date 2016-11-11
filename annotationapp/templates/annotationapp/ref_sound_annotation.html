@@ -45,16 +45,6 @@
       </div>
       {% endif %}
       
-      <div>
-        <h4> Reference sound <small> {{ sound.exercise.reference_sound.filename }} </small></h4>
-      </div>
-      
-      <div id="audio-ref-controls">
-        <audio controls=controls>
-          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_sound.filename }}" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-      </div>
     </div>
     <div>
         <h4> {{ sound.filename }} </h4>
@@ -62,14 +52,6 @@
     {% for tier in sound.exercise.tiers.all %}
     <div>
         <h5>tier: {{ tier.name }}</h5>
-    </div>
-     <div class='row tier reference'
-        data-tier-id='{{tier.id}}'
-        data-action-url='{% url "annotation-action" sound.exercise.reference_sound.id tier.id %}'
-        data-audio="audio-ref-controls"
-        data-annotations-url='{% url "get-annotations" sound.exercise.reference_sound.id tier.id %}'
-        data-waveform='{{ MEDIA_URL }}{{sound.exercise.reference_sound.waveform_data }}' >
-     <div class="waveform-visualiser-container"></div>
     </div>
     <div class='row tier'
           data-tier-id='{{tier.id}}'
@@ -89,7 +71,6 @@
         </div>
       <div class="col-md-6">
         <button class="btn btn-default add-segment">Add a Segment to Tier</button>
-        <button class="btn btn-default add-simil-segment">Add a Similarity measure</button>
         <button class="btn btn-danger remove-point">Remove Segment</button>
       </div>
       <div class="form-group form-inline col-xs-6">

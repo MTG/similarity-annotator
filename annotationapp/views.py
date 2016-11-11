@@ -55,6 +55,23 @@ def sound_detail(request, exercise_id, sound_id):
     context['sound'] = sound
     return render(request, 'annotationapp/sound_detail.html', context)
 
+@login_required
+def ref_sound_detail(request, exercise_id, sound_id):
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            exercise = Exercise.objects.get(id=exercise_id)
+            Tier.objects.create(name=tier_name, exercise=exercise)
+    else:
+        tier_form = TierForm()
+    context = {'form': tier_form}
+    sound = get_object_or_404(Sound, id=sound_id)
+    context['sound'] = sound
+    return render(request, 'annotationapp/ref_sound_annotation.html', context)
+
+
+
 
 @login_required
 @csrf_exempt
