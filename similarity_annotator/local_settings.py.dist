@@ -17,6 +17,5 @@ ALLOWED_EMAILS = []
 MEDIA_ROOT = "/.../media"
 TEMP_ROOT = "/tmp"
 
-#EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-#EMAIL_FILE_PATH = "/tmp/goodsounds-messages"
+GEARMAN_JOB_SERVERS = ["localhost:4730"]
 
