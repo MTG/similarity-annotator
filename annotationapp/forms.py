@@ -27,4 +27,4 @@ class TierForm(forms.ModelForm):
     class Meta:
         model = Tier
         fields = ['name']
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'size': '1'})}
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'style': 'width: 8em;'})}
