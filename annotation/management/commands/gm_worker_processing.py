@@ -8,7 +8,7 @@ import subprocess
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from annotationapp.models import Sound, Exercise, Tier
+from annotation.models import Sound, Exercise, Tier
 
 logger = logging.getLogger("gearman_worker_processing")
 

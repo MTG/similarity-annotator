@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "similarity_annotator.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "simannotator.settings")
 
 application = get_wsgi_application()

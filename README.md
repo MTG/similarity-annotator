@@ -27,7 +27,7 @@ Then go you'll need to install npm in /similarity-annotator/static:
 You also need to download [bootstrap] (http://getbootstrap.com/getting-started/#download) and decompress it into static as well 
 
 ### Step 5: Local configurations
-Inside `similarity_annotator` directoy, rename `local_settings.py.dist` to `local_settings.py`
+Inside `simannotator` directoy, rename `local_settings.py.dist` to `local_settings.py`
 
 ### Step 6: Database setup
 On default, we are using a light-weight sqlite database but you are welcome to experiment with any database format that is compatibile with django. The database settings are configured in the `local_settings.py` file. Regardless if you change the database settings or not, you need to synchorinize your database with django models:

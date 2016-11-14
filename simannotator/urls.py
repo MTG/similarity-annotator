@@ -21,7 +21,7 @@ from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include('annotationapp.urls')),
+    url(r'', include('annotation.urls')),
     url(r'^accounts/', include('accounts.urls')),
 ]
 urlpatterns += staticfiles_urlpatterns()

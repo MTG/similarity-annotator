@@ -4,4 +4,4 @@ from django.apps import AppConfig
 
 
 class AnnotationToolConfig(AppConfig):
-    name = 'annotationapp'
+    name = 'annotation'
