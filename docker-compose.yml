@@ -2,8 +2,15 @@ version: '2'
 services:
  db:
   image: postgres
-  ports:
-   - "8543:5432"
+ gearman:
+  image: kendu/gearman
+ gearman-worker:
+  build: .
+  command: python manage.py gm_worker_processing
+  depends_on:
+    - gearman
+  volumes_from:
+   - web
  web:
   build: .
   command: python manage.py runserver 0.0.0.0:8000
@@ -13,3 +20,4 @@ services:
    - "8000:8000"
   depends_on:
    - db
+

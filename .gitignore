@@ -1,4 +1,4 @@
-similarity_annotator/local_settings.py
+simannotator/local_settings.py
 .idea/
 *.pyc
 simannotator/static/node_modules/
