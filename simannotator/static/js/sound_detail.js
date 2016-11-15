@@ -75,7 +75,7 @@ var reference_colors = {};
       dataUri: {
         arraybuffer: container.getAttribute('data-waveform'),
       },
-      zoomAdapter: 'animated',
+      zoomAdapter: 'static',
       height: 40,
       keyboard: false,
       segments: []
@@ -132,17 +132,19 @@ var reference_colors = {};
     })(container, peaksInstance));
 
     // By ajax update data of edited segment annotation
-    peaksInstance.on('segments.dragged', function(segment){
-      segment.annotation_id = segment.id;
-      for (var i = 0; i < delayedEdit.length; i++) {
-        window.clearTimeout(delayedEdit[i]);
-        delayedEdit.splice(i, 1);
+    peaksInstance.on('segments.dragged', (function(tier){
+      return function(segment){
+        segment.annotation_id = segment.id;
+        for (var i = 0; i < delayedEdit.length; i++) {
+          window.clearTimeout(delayedEdit[i]);
+          delayedEdit.splice(i, 1);
+        }
+        delayedEdit.push(setTimeout(function(){
+            callServer('edit', segment, url, function(response){});
+            tier.zoom.reset(); // Hack while I dont't find a better way to fix colors on segments
+        }, 1000));
       }
-      delayedEdit.push(setTimeout(function(){
-          callServer('edit', segment, url, function(response){});
-      }, 1000));
-
-    });
+    })(peaksInstance));
 
     // Add new similarity segment to the current tier, also store the annotation in the database
     var addBtn = container.querySelectorAll(".add-simil-segment");
@@ -208,7 +210,8 @@ var reference_colors = {};
             startTime: currTime,
             endTime: currTime + 1,
             editable: true,
-            id: auxId
+            id: auxId,
+            color: 'rgba(' + g() + ', ' + g() + ', ' + g() + ', 1)'
           };
           tier.segments.add(segment);
           callServer('add', segment, actionUrl, function(response){
