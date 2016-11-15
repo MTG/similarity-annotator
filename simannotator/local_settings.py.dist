@@ -1,8 +1,3 @@
-DEBUG = True
-
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
 
 DATABASES = {
     'default': {
@@ -18,8 +13,8 @@ DATABASES = {
 # If ALLOWED emails is not empty, only emails going to these destinations will be actually sent
 ALLOWED_EMAILS = []
 
-MEDIA_ROOT = "/.../media"
-TEMP_ROOT = "/tmp"
+MEDIA_ROOT = "/code/media"
+TEMP_ROOT = "/code/tmp"
 
-GEARMAN_JOB_SERVERS = ["localhost:4730"]
+GEARMAN_JOB_SERVERS = ["gearman:4730"]
 

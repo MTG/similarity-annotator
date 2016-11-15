@@ -3,5 +3,5 @@ simannotator/local_settings.py
 *.pyc
 simannotator/static/node_modules/
 simannotator/static/bootstrap/
-simannotator/media/
-simannotator/tmp/
+media/
+tmp/
