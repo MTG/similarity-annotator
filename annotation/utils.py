@@ -51,8 +51,13 @@ def store_tmp_file(uploaded_file):
     :param uploaded_file: an instance of InMemoryUploadedFile
     :return: path to newly saved-to-disk file
     """
+    path = os.path.join(settings.TEMP_ROOT, uploaded_file.name)
+    # if file name already exists in path, create new filename with increasing counter
+    repeated_name_counter = 0
+    while os.path.isfile(path):
+        path = path + '_' + str(repeated_name_counter)
+        repeated_name_counter += 1
     try:
-        path = os.path.join(settings.TEMP_ROOT, uploaded_file.name)
         destination = open(path, 'w+b')
         for chunk in uploaded_file.chunks():
             destination.write(chunk)
