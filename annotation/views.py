@@ -11,7 +11,7 @@ from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
-from .forms import UploadForm, ExerciseForm, TierForm
+from .forms import ExerciseForm, TierForm
 from .utils import store_tmp_file, exercise_annotations_to_json
 
 
@@ -55,6 +55,7 @@ def sound_detail(request, exercise_id, sound_id):
     context['sound'] = sound
     return render(request, 'annotationapp/sound_detail.html', context)
 
+
 @login_required
 def ref_sound_detail(request, exercise_id, sound_id):
     if request.method == 'POST':
@@ -69,8 +70,6 @@ def ref_sound_detail(request, exercise_id, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
     context['sound'] = sound
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
-
-
 
 
 @login_required
@@ -201,16 +200,16 @@ def download_annotations(request, sound_id):
 @login_required
 def upload(request):
     if request.method == 'POST':
-        file_form = UploadForm(files=request.FILES)
-        exercise_form = ExerciseForm(request.POST)
-        forms = {'file': file_form, 'exercise': exercise_form}
-        if file_form.is_valid() and exercise_form.is_valid():
+        exercise_form = ExerciseForm(request.POST, files=request.FILES)
+        if exercise_form.is_valid():
+            exercise_form.save()
+            exercise_name = request.POST['name']
             tmp_path = store_tmp_file(request.FILES['zip_file'])
-            call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=request.POST['name'])
+            call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=exercise_name)
             return render(request, 'annotationapp/upload_success.html')
     else:
-        forms = {'file_form': UploadForm(), 'exercise_form': ExerciseForm()}
-    context = {'forms': forms}
+        exercise_form = ExerciseForm()
+    context = {'form': exercise_form}
     return render(request, 'annotationapp/upload_form.html', context)
 
 

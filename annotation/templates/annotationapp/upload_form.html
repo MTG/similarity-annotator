@@ -5,13 +5,9 @@
 {% block content %}
     <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <p>{{ forms.exercise_form }}</p>
-        <p>{{ forms.file_form.non_field_errors }}</p>
-        <p>{{ forms.file_form.zip_file.label_tag }} </p>
-        <p>
-            {{ forms.file_form.zip_file.errors }}
-            {{ forms.file_form.zip_file }}
-        </p>
+        <p>{{ form }}</p>
+        <p>{{ form.non_field_errors }}</p>
+        <p>{{ form.zip_file.errors }}</p>
         <p><input type="submit" value="Create and upload" /></p>
     </form>
 {% endblock %}

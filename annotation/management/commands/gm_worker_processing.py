@@ -55,9 +55,7 @@ class Command(BaseCommand):
 
         zip_ref.close()
 
-        # TODO: check if exercise name exists and act accordingly
-        # create Exercise object and Sound objects for each sound file
-        exercise = Exercise.objects.create(name=exercise_name)
+        exercise = Exercise.objects.get(name=exercise_name)
         # create initial tier "whole sound"
         Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
         for sound_file in os.listdir(exercise_files_path):
