@@ -55,7 +55,8 @@ def store_tmp_file(uploaded_file):
     # if file name already exists in path, create new filename with increasing counter
     repeated_name_counter = 0
     while os.path.isfile(path):
-        path = path + '_' + str(repeated_name_counter)
+        file_path, file_extension = os.path.splitext(path)
+        path = file_path + '_' + str(repeated_name_counter) + file_extension
         repeated_name_counter += 1
     try:
         destination = open(path, 'w+b')
