@@ -1,5 +1,7 @@
 import os
 import json
+import shutil
+import zipfile
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -63,3 +65,34 @@ def store_tmp_file(uploaded_file, exercise_name):
     finally:
         destination.close()
     return path
+
+
+def decompress_files(exercise_name, zip_file_path):
+    """
+    Create directory for exercise audio files and decompress zip file into directory
+    Args:
+        exercise_name:
+        zip_file_path:
+    Return:
+        exercise_files_path: path of files directory
+    """
+    # create directory for exercise audio files
+    exercise_files_path = os.path.join(settings.MEDIA_ROOT, exercise_name)
+    if not os.path.exists(exercise_files_path):
+        os.makedirs(exercise_files_path)
+
+    # decompress zip file into directory
+    zip_ref = zipfile.ZipFile(zip_file_path, 'r')
+    for member in zip_ref.namelist():
+        filename = os.path.basename(member)
+        # skip directory
+        if not filename:
+            continue
+        source = zip_ref.open(member)
+        target = open(os.path.join(exercise_files_path, filename), 'wb')
+        with source, target:
+            shutil.copyfileobj(source, target)
+
+    zip_ref.close()
+
+    return exercise_files_path

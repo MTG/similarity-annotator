@@ -2,13 +2,12 @@ import os
 import json
 import py3gearman
 import logging
-import zipfile
-import shutil
 import subprocess
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from annotation.models import Sound, Exercise, Tier
+import annotation.utils
 
 logger = logging.getLogger("gearman_worker_processing")
 
@@ -34,26 +33,7 @@ class Command(BaseCommand):
 
         self.write_log("Decompressing file for exercise %s" % exercise_name)
 
-        # TODO: split tasks in util functions
-
-        # create directory for exercise audio files
-        exercise_files_path = os.path.join(settings.MEDIA_ROOT, exercise_name)
-        if not os.path.exists(exercise_files_path):
-            os.makedirs(exercise_files_path)
-
-        # decompress zip file into directory
-        zip_ref = zipfile.ZipFile(zip_file_path, 'r')
-        for member in zip_ref.namelist():
-            filename = os.path.basename(member)
-            # skip directory
-            if not filename:
-                continue
-            source = zip_ref.open(member)
-            target = open(os.path.join(exercise_files_path, filename), 'wb')
-            with source, target:
-                shutil.copyfileobj(source, target)
-
-        zip_ref.close()
+        exercise_files_path = annotation.utils.decompress_files(exercise_name, zip_file_path)
 
         exercise = Exercise.objects.get(name=exercise_name)
         # create initial tier "whole sound"
