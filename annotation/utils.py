@@ -46,18 +46,16 @@ def exercise_annotations_to_json(exercise_id):
     return json.dumps(sounds_annotations)
 
 
-def store_tmp_file(uploaded_file):
-    """Stores the uploaded file to the TEMP folder
-    :param uploaded_file: an instance of InMemoryUploadedFile
-    :return: path to newly saved-to-disk file
+def store_tmp_file(uploaded_file, exercise_name):
     """
-    path = os.path.join(settings.TEMP_ROOT, uploaded_file.name)
-    # if file name already exists in path, create new filename with increasing counter
-    repeated_name_counter = 0
-    while os.path.isfile(path):
-        file_path, file_extension = os.path.splitext(path)
-        path = file_path + '_' + str(repeated_name_counter) + file_extension
-        repeated_name_counter += 1
+    Stores the uploaded file to the TEMP folder
+    Args:
+        uploaded_file: an instance of InMemoryUploadedFile
+        exercise_name: name of the Exercise object
+    Return:
+        path: path to newly saved-to-disk file
+    """
+    path = os.path.join(settings.TEMP_ROOT, exercise_name + '.zip')
     try:
         destination = open(path, 'w+b')
         for chunk in uploaded_file.chunks():
