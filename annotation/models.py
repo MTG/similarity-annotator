@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
-    reference_pitch_sound = models.CharField(max_length=200, blank=True, null=True)
+    reference_pitch_sound = models.FileField(blank=True, null=True)
 
     def __str__(self):
         return self.name

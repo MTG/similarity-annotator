@@ -14,7 +14,7 @@ class ExerciseForm(forms.ModelForm):
 
     class Meta:
         model = Exercise
-        fields = ['name']
+        fields = ['name', 'reference_pitch_sound']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', })}
 
     def clean_name(self):

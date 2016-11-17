@@ -203,7 +203,7 @@ def upload(request):
     if request.method == 'POST':
         exercise_form = ExerciseForm(request.POST, files=request.FILES)
         if exercise_form.is_valid():
-            exercise_form.save()
+            exercise = exercise_form.save()
             exercise_name = request.POST['name']
             tmp_path = store_tmp_file(request.FILES['zip_file'], exercise_name)
             call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=exercise_name)
