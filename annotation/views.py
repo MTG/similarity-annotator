@@ -25,8 +25,9 @@ def exercise_list(request):
 @login_required
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
-    sounds_list = exercise.sounds.all()
-    context = {'sounds_list': sounds_list, 'exercise': exercise}
+    reference_sound = exercise.reference_sound
+    sounds_list = exercise.sounds.all().exclude(id=reference_sound.id)
+    context = {'sounds_list': sounds_list, 'exercise': exercise, 'reference_sound': reference_sound}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
