@@ -1,0 +1,14 @@
+version: '2'
+services:
+  nginx:
+    build: ./docker/nginx/
+    ports:
+      - "80:80"
+    volumes_from:
+      - web
+  web:
+    volumes:
+      - /static/
+      - ./media:/media/
+      - ./tmp:/tmp/
+    command: bash -c "/usr/local/bin/gunicorn simannotator.wsgi:application -w 1 -b :8000"

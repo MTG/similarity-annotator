@@ -1,7 +1,8 @@
 simannotator/local_settings.py
 .idea/
 *.pyc
-simannotator/static/node_modules/
+node_modules/
 simannotator/static/bootstrap/
 media/
 tmp/
+*.swp
