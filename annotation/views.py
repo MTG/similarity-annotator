@@ -25,9 +25,8 @@ def exercise_list(request):
 @login_required
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
-    reference_sound = exercise.reference_sound
-    sounds_list = exercise.sounds.all().exclude(id=reference_sound.id)
-    context = {'sounds_list': sounds_list, 'exercise': exercise, 'reference_sound': reference_sound}
+    sounds_list = exercise.sounds.all()
+    context = {'exercise': exercise, 'sounds_list': sounds_list}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
@@ -38,6 +37,11 @@ def sound_list(request, exercise_id):
     else:
         if not exercise.reference_sound:
             return render(request, 'annotationapp/select_reference.html', context)
+        else:
+            reference_sound = exercise.reference_sound
+            sounds_list = sounds_list.exclude(id=reference_sound.id)
+            context['sounds_list'] = sounds_list
+            context['reference_sound'] = reference_sound
     return render(request, 'annotationapp/sounds_list.html', context)
 
 
