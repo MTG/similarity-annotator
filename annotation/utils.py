@@ -2,10 +2,11 @@ import os
 import json
 import shutil
 import zipfile
+import subprocess
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Exercise, Annotation, AnnotationSimilarity
+from .models import Sound, Exercise, Tier, Annotation, AnnotationSimilarity
 
 
 def exercise_annotations_to_json(exercise_id):
@@ -96,3 +97,18 @@ def decompress_files(exercise_name, zip_file_path):
     zip_ref.close()
 
     return exercise_files_path
+
+
+def create_sound_object(exercise_files_path, exercise, sound_filename):
+    # create wave form data with audiowaveform
+    waveform_data_filename = os.path.splitext(sound_filename)[0] + '.dat'
+    waveform_data_file_path = os.path.join(exercise_files_path, waveform_data_filename)
+    subprocess_result = subprocess.call(["audiowaveform", "-i", os.path.join(exercise_files_path, sound_filename),
+                                         "-o", waveform_data_file_path, "-b", "8"])
+    sound = None
+    if not subprocess_result:
+        sound_filename = os.path.join(exercise.name, sound_filename)
+        waveform_data_filename = os.path.join(exercise.name, os.path.basename(waveform_data_file_path))
+        sound = Sound.objects.create(filename=sound_filename, exercise=exercise,
+                                     waveform_data=waveform_data_filename)
+    return sound
