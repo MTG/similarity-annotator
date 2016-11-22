@@ -15,7 +15,7 @@ class CreateSoundTest(TestCase):
         exercise_name = 'test_exercise'
         self.exercise = Exercise.objects.create(name=exercise_name)
 
-    def sound_creation_test(self):
+    def test_sound_creation(self):
         sound_filename = 'test_sound.wav'
         waveform_data_file_path = '/test/waveform_data_file_path.dat'
 
