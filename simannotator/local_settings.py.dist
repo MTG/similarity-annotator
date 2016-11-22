@@ -9,5 +9,7 @@ DATABASES = {
 MEDIA_ROOT = "/media"
 TEMP_ROOT = "/tmp"
 
+STATIC_ROOT = "/static"
+
 GEARMAN_JOB_SERVERS = ["gearman:4730"]
 
