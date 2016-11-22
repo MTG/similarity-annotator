@@ -68,6 +68,16 @@ def store_tmp_file(uploaded_file, exercise_name):
     return path
 
 
+def create_exercise_directory(exercise_name):
+    """
+    create directory for exercise audio files
+    """
+    exercise_files_path = os.path.join(settings.MEDIA_ROOT, exercise_name)
+    if not os.path.exists(exercise_files_path):
+        os.makedirs(exercise_files_path)
+    return exercise_files_path
+
+
 def decompress_files(exercise_name, zip_file_path):
     """
     Create directory for exercise audio files and decompress zip file into directory
@@ -112,3 +122,15 @@ def create_sound_object(exercise_files_path, exercise, sound_filename):
         sound = Sound.objects.create(filename=sound_filename, exercise=exercise,
                                      waveform_data=waveform_data_filename)
     return sound
+
+
+def copy_sound_into_media(exercise_files_path, sound_filename, dataset_path, reference_sound_file):
+    """
+    Copy files from source to destination
+    """
+    # copy the sound into media
+    dst = os.path.join(exercise_files_path, sound_filename)
+    src = os.path.join(dataset_path, reference_sound_file)
+    shutil.copyfile(src, dst)
+
+    return dst
