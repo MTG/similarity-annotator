@@ -1,16 +1,13 @@
+import dj_database_url
+
+DB_DEFAULT = 'postgres://postgres@db/postgres'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(default=DB_DEFAULT)
 }
 
-MEDIA_ROOT = "/code/media"
-TEMP_ROOT = "/code/tmp"
+MEDIA_ROOT = "/media"
+TEMP_ROOT = "/tmp"
 
 GEARMAN_JOB_SERVERS = ["gearman:4730"]
 

@@ -1,25 +1,28 @@
 version: '2'
 services:
- db:
-  image: postgres
- gearman:
-  image: kendu/gearman
- gearman-worker:
-  build: .
-  command: python manage.py gm_worker_processing
-  depends_on:
-    - gearman
-  volumes_from:
-   - web
- web:
-  build: .
-  command: python manage.py runserver 0.0.0.0:8000
-  volumes:
-   - .:/code
-   - ./media:/media/
-   - ./tmp:/tmp/
-  ports:
-   - "8000:8000"
-  depends_on:
-   - db
+  db:
+    image: postgres
 
+  gearman:
+    extends:
+      file: ./docker-compose.common.yml
+      service: gearman
+
+  gearman-worker:
+    extends:
+      file: ./docker-compose.common.yml
+      service: gearman-worker
+    volumes_from:
+      - web
+    depends_on:
+      - gearman
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+      - ./media:/media/
+      - ./tmp:/tmp/
+    depends_on:
+      - db
