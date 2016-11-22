@@ -40,6 +40,7 @@ class Command(BaseCommand):
                     # copy the sound into media
                     annotation.utils.copy_sound_into_media(exercise_files_path, sound_filename,
                                                            dataset_path, reference_sound_file)
+                    print ("Created sound reference for exercise %s" % exercise_name)
                 except KeyError:
                     print ("The exercise %s does not have reference sound" % exercise_name)
 
@@ -51,9 +52,21 @@ class Command(BaseCommand):
                                                                               dataset_path, reference_pitch_file)
                     exercise.reference_pitch_sound.name = destination_path
                     exercise.save()
+                    print ("Created pitch reference for exercise %s" % exercise_name)
                 except KeyError:
                     print ("The exercise %s does not have a pitch reference")
 
-
+                for sound_description in descriptions[exercise_name]['recs']:
+                    try:
+                        sound_file_path = sound_description['path']
+                        sound_filename = os.path.basename(sound_file_path)
+                        sound_path = os.path.join(dataset_path, os.path.dirname(sound_file_path))
+                        sound = annotation.utils.create_sound_object(sound_path, exercise, sound_filename)
+                        # copy the sound into media
+                        annotation.utils.copy_sound_into_media(exercise_files_path, sound_filename,
+                                                               dataset_path, reference_sound_file)
+                        print ("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise_name))
+                    except Exception as e:
+                        print (e.message)
 
 
