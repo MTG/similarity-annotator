@@ -34,7 +34,9 @@ class Command(BaseCommand):
                     reference_sound_file = descriptions[exercise_name]['ref_media']
                     sound_filename = os.path.basename(reference_sound_file)
                     sound_path = os.path.join(dataset_path, os.path.dirname(reference_sound_file))
-                    reference_sound = annotation.utils.create_sound_object(sound_path, exercise, sound_filename)
+                    waveform_data_file_path = annotation.utils.create_audio_waveform(sound_path, sound_filename)
+                    reference_sound = annotation.utils.create_sound_object(exercise, sound_filename,
+                                                                           waveform_data_file_path)
                     exercise.reference_sound = reference_sound
                     exercise.save()
                     # copy the sound into media
@@ -61,7 +63,8 @@ class Command(BaseCommand):
                         sound_file_path = sound_description['path']
                         sound_filename = os.path.basename(sound_file_path)
                         sound_path = os.path.join(dataset_path, os.path.dirname(sound_file_path))
-                        sound = annotation.utils.create_sound_object(sound_path, exercise, sound_filename)
+                        waveform_data_file_path = annotation.utils.create_audio_waveform(sound_path, sound_filename)
+                        sound = annotation.utils.create_sound_object(exercise, sound_filename, waveform_data_file_path)
                         # copy the sound into media
                         annotation.utils.copy_sound_into_media(exercise_files_path, sound_filename,
                                                                dataset_path, reference_sound_file)

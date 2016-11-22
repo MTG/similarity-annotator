@@ -38,7 +38,8 @@ class Command(BaseCommand):
         # create initial tier "whole sound"
         Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
         for sound_filename in os.listdir(exercise_files_path):
-            sound = annotation.utils.create_sound_object(exercise_files_path, exercise, sound_filename)
+            waveform_data_file_path = annotation.utils.create_audio_waveform(exercise_files_path, sound_filename)
+            sound = annotation.utils.create_sound_object(exercise, sound_filename, waveform_data_file_path)
             self.write_log("Created sound object %s for sound file %s" % (str(sound.id), sound_filename))
         return "Done"
 

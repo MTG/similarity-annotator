@@ -6,7 +6,7 @@ import subprocess
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Sound, Exercise, Tier, Annotation, AnnotationSimilarity
+from .models import Sound, Exercise, Annotation, AnnotationSimilarity
 
 
 def exercise_annotations_to_json(exercise_id):
@@ -118,8 +118,7 @@ def create_audio_waveform(exercise_files_path, sound_filename):
     return waveform_data_file_path
 
 
-def create_sound_object(exercise_files_path, exercise, sound_filename):
-    waveform_data_file_path = create_audio_waveform(exercise_files_path, sound_filename)
+def create_sound_object(exercise, sound_filename, waveform_data_file_path):
     sound_filename = os.path.join(exercise.name, sound_filename)
     waveform_data_filename = os.path.join(exercise.name, os.path.basename(waveform_data_file_path))
     sound = Sound.objects.create(filename=sound_filename, exercise=exercise,
