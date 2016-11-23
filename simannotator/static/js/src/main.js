@@ -155,12 +155,19 @@ UrbanEars.prototype = {
         // Also if the user is suppose to get hidden image feedback, append that component to the page
         this.wavesurfer.on('ready', function () {
             my.playBar.update();
+            my.currentTask.segments.forEach(function(section){
+            
+              var region = my.wavesurfer.addRegion({
+                start: section.start,
+                end: section.end,
+                id: section.id,
+                annotation: section.name,
+              });
+              my.stages.createRegionSwitchToStageThree(region);
+            });
             my.stages.updateStage(1);
             my.updateTaskTime();
             my.workflowBtns.update();
-            if (my.currentTask.feedback === 'hiddenImage') {
-                my.hiddenImage.append(my.currentTask.imgUrl);
-            }
         });
     },
 
