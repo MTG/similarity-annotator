@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from annotation.models import Exercise
 
@@ -11,7 +10,6 @@ class ExerciseListViewTests(TestCase):
         self.exercise = Exercise.objects.create(name=exercise_name)
         self.username = 'test'
         self.password = '1234567'
-        self.user = User.objects.create_user(self.username, '', self.password)
 
     def test_exercise_list(self):
 
