@@ -31,5 +31,5 @@ services:
       - /static/
       - /mnt/asplab-web/asplab-shared/similarity-annotator/media:/media/
       - /mnt/asplab-web/asplab-shared/similarity-annotator/tmp:/tmp/
-    command: bash -c "/usr/local/bin/gunicorn simannotator.wsgi:application -w 1 -b :8000"
+    command: uwsgi uwsgi.ini
     dns: 84.89.128.11
