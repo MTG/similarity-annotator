@@ -70,7 +70,7 @@
         <div class="submit_container"></div>
     </div>    
     <script>
-        var dataUrl = '/static/json/sample_data.json';
+      var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
     </script>   
     <!--<script src="{# static 'js/sound_detail.js' #}"></script>-->
 {% endblock %}
