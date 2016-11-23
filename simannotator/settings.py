@@ -127,8 +127,8 @@ DATABASE_URL_ENV_NAME = 'DATABASE_URL'
 DEBUG = debug
 DATABASES = {'default': dj_database_url.config(DATABASE_URL_ENV_NAME, default=default_url)}
 
-MEDIA_ROOT = "media"
-TEMP_ROOT = "tmp"
+MEDIA_ROOT = "/media"
+TEMP_ROOT = "/tmp"
 
 STATIC_ROOT = "/static"
 
