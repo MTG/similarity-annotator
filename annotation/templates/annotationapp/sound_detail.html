@@ -4,14 +4,24 @@
 <html lang="en">
 {% block title %} {{ sound.filename }} annotation page {% endblock %}
 {% block extra_head %}
-<style>
-  .tier{
-    margin: 0;
-  }
-  .waveform-visualiser-container:not(.last) .overview-container{
-    display: none;
-  }
-</style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/urban-ears.css">
+
+    <script type="text/javascript" src="/static/js/lib/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/materialize.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/wavesurfer.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/wavesurfer.spectrogram.min.js"></script>
+    <script type="text/javascript" src="/static/js/colormap/colormap.min.js"></script>
+
+    <script type="text/javascript" src="/static/js/src/message.js"></script>
+    <script type="text/javascript" src="/static/js/src/wavesurfer.regions.js"></script>
+    <script type="text/javascript" src="/static/js/src/wavesurfer.drawer.extended.js"></script>
+    <script type="text/javascript" src="/static/js/src/wavesurfer.labels.js"></script>
+    <script type="text/javascript" src="/static/js/src/hidden_image.js"></script>
+    <script type="text/javascript" src="/static/js/src/components.js"></script>
+    <script type="text/javascript" src="/static/js/src/annotation_stages.js"></script>
+    <script type="text/javascript" src="/static/js/src/main.js" defer></script>
 {% endblock %}
 
 {% block links %}
@@ -27,93 +37,41 @@
 {% endblock %}
 
 {% block content %}
-
-  <script src="{% static 'node_modules/peaks.js/peaks.js' %}"></script>
-  <div id="titles">
-
-    <div class="ref-sound">
-      {% if sound.exercise.reference_pitch_sound %}
-      <div>
-        <h4> Reference Pitch sound</h4>
-      </div>
-      
-      <div>
-        <audio controls=controls>
-          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-      </div>
-      {% endif %}
-      
-      <div>
-        <h4> Reference sound <small> {{ sound.exercise.reference_sound.filename }} </small></h4>
-      </div>
-      
-      <div id="audio-ref-controls">
-        <audio controls=controls>
-          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_sound.filename }}" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-      </div>
-    </div>
-    <div>
-        <h4> {{ sound.filename }} </h4>
-    </div>
-    {% for tier in sound.exercise.tiers.all %}
-    <div>
-        <h5>tier: {{ tier.name }}</h5>
-    </div>
-     <div class='row tier reference'
-        data-tier-id='{{tier.id}}'
-        data-action-url='{% url "annotation-action" sound.exercise.reference_sound.id tier.id %}'
-        data-audio="audio-ref-controls"
-        data-annotations-url='{% url "get-annotations" sound.exercise.reference_sound.id tier.id %}'
-        data-waveform='{{ MEDIA_URL }}{{sound.exercise.reference_sound.waveform_data }}' >
-     <div class="waveform-visualiser-container"></div>
-    </div>
-    <div class='row tier'
-          data-tier-id='{{tier.id}}'
-          data-action-url='{% url "annotation-action" sound.id tier.id %}'
-          data-audio='audio-controls'
-          data-annotations-url='{% url "get-annotations" sound.id tier.id %}'
-          data-action-url='{% url "annotation-action" sound.id tier.id %}'
-          data-waveform='{{ MEDIA_URL }}{{sound.waveform_data }}'>
-      <div class="waveform-visualiser-container"></div>
-      <div class="selected-section" style="display: none">
-        <span>Selected Section: </span>
-        <span class="sel-name"></span>
-      </div>
-      <div id="selected-section-ref-{{tier.id}}" style="display: none">
-          <span>Selected section on reference tier: </span>
-          <span class="sel-name"></span>
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>Tutorial Video</h4>
+            <div class="videowrapper">
+                <iframe id="tutorial-video" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+            </div>
         </div>
-      <div class="col-md-6">
-        {% if not tier.entire_sound %}
-        <button class="btn btn-default add-segment">Add a Segment to Tier</button>
-        {% endif %}
-        <button class="btn btn-default add-simil-segment">Add a Similarity measure</button>
-        <button class="btn btn-danger remove-point">Remove Segment</button>
-      </div>
-      <div class="form-group form-inline col-xs-6">
-        <label >Segment value:</label>
-        <input class="form-control name-txt" type="text" />
-      </div>
+        <div class="modal-footer">
+            <a href="#!" class=" modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+        </div>
     </div>
-    {% endfor %}
-
-    <div id="audio-controls">
-      <div>
-        <h4> Sound to be annotated <small> {{ sound.filename }} </small></h4>
-      </div>
-      
-
-      <audio controls=controls>
-        <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
+    <div class="row prompt">
+        <h4 class="center">Highlight &amp; Tag Each Sound</h4>
+        <div class="instructions">
+            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9312;</span> &nbsp Familiarize yourself with the list of sound tags under the audio recording.</h6>
+            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9313;</span> &nbsp Click the play button and listen to the recording.</h6>
+            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9314;</span> &nbsp For each sound that you hear click and drag to create a new annotation.</h6>
+            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9315;</span> &nbsp Select the appropriate tag and indicate whether the sound is near or far.</h6>
+        </div>
     </div>
-  </div>
-
-  <script src="{% static 'js/sound_detail.js' %}"></script>
+    <div class="annotation">
+        <div class="labels_ref"></div>
+        <div class="audio_visual_ref"></div>
+        <div class="labels"></div>
+        <div class="play_bar_ref"></div>
+        <div class="audio_visual"></div>
+        <div class="play_bar"></div>
+        <div class="hidden_img"></div>
+        <div class="creation_stage_container"></div>
+        <div class="submit_container"></div>
+    </div>    
+    <script>
+        var dataUrl = '/static/json/sample_data.json';
+    </script>   
+    <!--<script src="{# static 'js/sound_detail.js' #}"></script>-->
 {% endblock %}
 </html>
