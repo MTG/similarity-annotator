@@ -117,14 +117,15 @@ deploy_env = os.environ.get('DEPLOY_ENV')
 import dj_database_url
 if deploy_env == 'prod':
     debug = False
-    db_url = os.environ.get('DATABASE_URL')
-
+    ALLOWED_HOSTS = ['localhost', 'asplab-web1', 'asplab-web1.s.upf.edu']
 else:
     debug = True
-    db_url = 'postgres://postgres@db/postgres'
+
+default_url = 'postgres://postgres@db/postgres'
+DATABASE_URL_ENV_NAME = 'DATABASE_URL'
 
 DEBUG = debug
-DATABASES = {'default': dj_database_url.parse(db_url)}
+DATABASES = {'default': dj_database_url.config(DATABASE_URL_ENV_NAME, default=default_url)}
 
 MEDIA_ROOT = "media"
 TEMP_ROOT = "tmp"
