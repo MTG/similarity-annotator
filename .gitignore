@@ -1,10 +1,6 @@
 simannotator/local_settings.py
 .idea/
 *.pyc
-node_modules/
-simannotator/static/css/
-simannotator/static/img/
-simannotator/static/js/
 media/
 tmp/
 *.swp
