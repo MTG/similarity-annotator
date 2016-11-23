@@ -22,9 +22,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'n*0*g*65p%@be0@(qh1j3gq!&z+hrxb5wbkax8-f+s^(hob=54'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -116,7 +113,22 @@ STATICFILES_DIRS = [
 
 STATIC_URL = '/static/'
 
-try:
-    from .local_settings import *
-except ImportError:
-    pass
+deploy_env = os.environ.get('DEPLOY_ENV')
+import dj_database_url
+if deploy_env == 'prod':
+    debug = False
+    db_url = os.environ.get('DATABASE_URL')
+
+else:
+    debug = True
+    db_url = 'postgres://postgres@db/postgres'
+
+DEBUG = debug
+DATABASES = {'default': dj_database_url.parse(db_url)}
+
+MEDIA_ROOT = "media"
+TEMP_ROOT = "tmp"
+
+STATIC_ROOT = "/static"
+
+GEARMAN_JOB_SERVERS = ["gearman:4730"]

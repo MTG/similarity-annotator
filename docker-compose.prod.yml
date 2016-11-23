@@ -26,6 +26,7 @@ services:
     build: .
     environment:
       DATABASE_URL: "postgres://simannotator:2Fi4l57HR+sWTVSu6BUfREXaHPI2vxjyIIbulzOaEdk=@asplab-db.s.upf.edu/simannotator"
+      DEPLOY_ENV: "prod"
     volumes:
       - /static/
       - /mnt/asplab-web/asplab-shared/similarity-annotator/media:/media/
