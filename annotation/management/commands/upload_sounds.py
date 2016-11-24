@@ -1,6 +1,7 @@
 import os
 import json
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from annotation.models import Exercise, Tier
 import annotation.utils
 
@@ -23,7 +24,7 @@ class Command(BaseCommand):
         if options['description']:
             description_file_path = os.path.join(dataset_path, options['description'])
             descriptions = json.load(open(description_file_path))
-            for exercise_name in descriptions:
+            for exercise_name, exercise_description in descriptions.items():
                 # create exercise
                 exercise = Exercise.objects.create(name=exercise_name)
                 exercise_files_path = annotation.utils.create_exercise_directory(exercise_name)
@@ -31,16 +32,16 @@ class Command(BaseCommand):
                 Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
                 # create reference sound
                 try:
-                    reference_sound_file = descriptions[exercise_name]['ref_media']
-                    sound_filename = os.path.basename(reference_sound_file)
-                    sound_path = os.path.join(dataset_path, os.path.dirname(reference_sound_file))
+                    reference_sound_file_relative_path = exercise_description['ref_media']
+                    source_path = os.path.join(dataset_path, reference_sound_file_relative_path)
+                    reference_sound_filename = os.path.basename(reference_sound_file_relative_path)
 
                     # copy the sound into media
-                    annotation.utils.copy_sound_into_media(exercise_files_path, sound_filename,
-                                                           dataset_path, reference_sound_file)
+                    annotation.utils.copy_sound_into_media(source_path, exercise_name, reference_sound_filename)
 
-                    waveform_data_file_path = annotation.utils.create_audio_waveform(exercise_files_path, sound_filename)
-                    reference_sound = annotation.utils.create_sound_object(exercise, sound_filename,
+                    waveform_data_file_path = annotation.utils.create_audio_waveform(exercise_files_path,
+                                                                                     reference_sound_filename)
+                    reference_sound = annotation.utils.create_sound_object(exercise, reference_sound_filename,
                                                                            waveform_data_file_path)
                     exercise.reference_sound = reference_sound
                     exercise.save()
@@ -50,28 +51,30 @@ class Command(BaseCommand):
 
                 # create pitch reference file
                 try:
-                    reference_pitch_file = descriptions[exercise_name]['tanpura']
-                    # copy the sound into media
-                    destination_path = annotation.utils.copy_sound_into_media(exercise_files_path, sound_filename,
-                                                                              dataset_path, reference_pitch_file)
+                    reference_pitch_file_relative_path = exercise_description['tanpura']
+                    source_path = os.path.join(dataset_path, reference_pitch_file_relative_path)
+                    reference_pitch_filename = os.path.basename(reference_sound_file_relative_path)
+                    # copy the file into media
+                    destination_path = annotation.utils.copy_sound_into_media(source_path, exercise_name,
+                                                                              reference_pitch_filename)
                     exercise.reference_pitch_sound.name = destination_path
                     exercise.save()
                     print ("Created pitch reference for exercise %s" % exercise_name)
                 except KeyError:
                     print ("The exercise %s does not have a pitch reference")
 
-                for sound_description in descriptions[exercise_name]['recs']:
+                for sound_description in exercise_description['recs']:
                     try:
-                        sound_file_path = sound_description['path']
-                        sound_filename = os.path.basename(sound_file_path)
-                        sound_path = os.path.join(dataset_path, os.path.dirname(sound_file_path))
+                        sound_file_relative_path = sound_description['path']
+                        source_path = os.path.join(dataset_path, sound_file_relative_path)
+                        sound_filename = os.path.basename(sound_file_relative_path)
 
-                        sound = annotation.utils.create_sound_object(exercise, sound_filename, waveform_data_file_path)
                         # copy the sound into media
-                        annotation.utils.copy_sound_into_media(exercise_files_path, sound_filename,
-                                                               dataset_path, reference_sound_file)
+                        annotation.utils.copy_sound_into_media(source_path, exercise_name, sound_filename)
 
-                        waveform_data_file_path = annotation.utils.create_audio_waveform(exercise_files_path, sound_filename)
+                        waveform_data_file_path = annotation.utils.create_audio_waveform(exercise_files_path,
+                                                                                         sound_filename)
+                        sound = annotation.utils.create_sound_object(exercise, sound_filename, waveform_data_file_path)
 
                         print ("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise_name))
                     except Exception as e:

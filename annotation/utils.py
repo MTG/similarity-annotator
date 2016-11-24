@@ -126,13 +126,11 @@ def create_sound_object(exercise, sound_filename, waveform_data_file_path):
     return sound
 
 
-def copy_sound_into_media(exercise_files_path, sound_filename, dataset_path, reference_sound_file):
+def copy_sound_into_media(src, exercise_name, sound_filename):
     """
     Copy files from source to destination
     """
-    # copy the sound into media
-    dst = os.path.join(exercise_files_path, sound_filename)
-    src = os.path.join(dataset_path, reference_sound_file)
+    dst = os.path.join(settings.MEDIA_ROOT, exercise_name, sound_filename)
     shutil.copyfile(src, dst)
 
     if dst.startswith("/media/"):
