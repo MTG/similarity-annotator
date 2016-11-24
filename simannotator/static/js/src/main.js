@@ -161,7 +161,7 @@ UrbanEars.prototype = {
                 start: section.start,
                 end: section.end,
                 id: section.id,
-                annotation: section.name,
+                annotation: section.annotation,
               });
               my.stages.createRegionSwitchToStageThree(region);
             });
@@ -196,7 +196,6 @@ UrbanEars.prototype = {
             var annotationType = my.currentTask.annotationType;
             var recordingIndex = my.currentTask.recordingIndex || 1;
             var numRecordings = my.currentTask.numRecordings || 1;
-            var tutorialVideoURL = my.currentTask.tutorialVideoURL;
             var alwaysShowTags = my.currentTask.alwaysShowTags;
             my.stages.reset(
                 [],
@@ -210,32 +209,17 @@ UrbanEars.prototype = {
             $('#recording-index').html(recordingIndex);
             $('#time-remaining').html((numRecordings - recordingIndex) * 1.5 + 5); // e.g. each clip should take 1.5 minutes, and all post-annotation tasks 5 mins.
 
-            // set video url
-            $('#tutorial-video').attr('src', tutorialVideoURL);
-
             // Update the visualization type and the feedback type and load in the new audio clip
             my.wavesurfer.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
             my.wavesurfer.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
             my.wavesurfer.load(my.currentTask.url);
             my.wavesurfer2.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
             my.wavesurfer2.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
-            my.wavesurfer2.load(my.currentTask.url);
+            my.wavesurfer2.load(my.currentTask.url_ref);
         };
 
-        if (this.currentTask.feedback !== 'none') {
-            // If the current task gives the user feedback, load the tasks solutions and then update
-            // interface components
-            $.getJSON(this.currentTask.annotationSolutionsUrl)
-            .done(function(data) {
-                mainUpdate(data);
-            })
-            .fail(function() {
-                alert('Error: Unable to retrieve annotation solution set');
-            });
-        } else {
-            // If not, there is no need to make an additional request. Just update task specific data right away
-            mainUpdate({});
-        }
+        // Just update task specific data right away
+        mainUpdate({});
     },
 
     // Update the interface with the next task's data
@@ -259,17 +243,7 @@ UrbanEars.prototype = {
             this.sendingResponse = true;
             // Get data about the annotations the user has created
             var content = {
-                task_start_time: this.taskStartTime,
-                task_end_time: new Date().getTime(),
-                visualization: this.wavesurfer.params.visualization,
                 annotations: this.stages.getAnnotations(),
-                deleted_annotations: this.stages.getDeletedAnnotations(),
-                // List of the different types of actions they took to create the annotations
-                annotation_events: this.stages.getEvents(),
-                // List of actions the user took to play and pause the audio
-                play_events: this.playBar.getEvents(),
-                // Boolean, if at the end, the user was shown what city the clip was recorded in
-                final_solution_shown: this.stages.aboveThreshold()
             };
 
             if (this.stages.aboveThreshold()) {
@@ -294,9 +268,11 @@ UrbanEars.prototype = {
         var my = this;
         $.ajax({
             type: 'POST',
-            url: '/<post_url>',
-            contentType: 'application/json',
-            data: content
+            url: dataUrl,
+            data: JSON.stringify(content),
+            contentType: "application/json; charset=utf-8",
+            //contentType: 'application/json',
+            //data: content
         })
         .done(function(data) {
             // If the last task had a hiddenImage component, remove it

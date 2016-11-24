@@ -85,7 +85,15 @@ def annotation_action(request, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
     tier = get_object_or_404(Tier, id=tier_id)
     if request.method == 'POST':
-        out = {'status': 'success', 'annotation_id': annotation.id}
+        body_unicode = request.body.decode('utf-8')
+        print(body_unicode)
+        post_body = json.loads(body_unicode)
+        Annotation.objects.filter(sound=sound, tier=tier).delete()
+        for a in post_body['annotations']:
+            Annotation.objects.create(start_time=a['start'], end_time=a['end'],
+                    name=a['annotation'], sound=sound, tier=tier,
+                    user=request.user)
+        out = {'status': 'success'}
         return JsonResponse(out)
     else:
         ref_sound = sound.exercise.reference_sound
@@ -97,7 +105,6 @@ def annotation_action(request, sound_id, tier_id):
             "annotationType": "input",
             "numRecordings": 9,
             "recordingIndex": 1,
-            "tutorialVideoURL": "https://www.youtube.com/embed/Bg8-83heFRM",
             "alwaysShowTags": False
             }
         }
