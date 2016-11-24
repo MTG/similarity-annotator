@@ -1,11 +1,16 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
 
 
+def exercise_upload_to(instance, filename):
+    return os.path.join(instance.name, filename)
+
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
-    reference_pitch_sound = models.FileField(blank=True, null=True)
+    reference_pitch_sound = models.FileField(blank=True, null=True, upload_to=exercise_upload_to)
 
     def __str__(self):
         return self.name

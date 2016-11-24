@@ -135,4 +135,7 @@ def copy_sound_into_media(exercise_files_path, sound_filename, dataset_path, ref
     src = os.path.join(dataset_path, reference_sound_file)
     shutil.copyfile(src, dst)
 
+    if dst.startswith("/media/"):
+        dst = dst[7:]
+
     return dst

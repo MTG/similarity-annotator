@@ -36,19 +36,19 @@
       <div>
         <h4> Reference Pitch sound</h4>
       </div>
-      
+
       <div>
         <audio controls=controls>
-          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
+            <source src="{{MEDIA_URL}}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
       </div>
       {% endif %}
-      
+
       <div>
         <h4> Reference sound <small> {{ sound.exercise.reference_sound.filename }} </small></h4>
       </div>
-      
+
       <div id="audio-ref-controls">
         <audio controls=controls>
           <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_sound.filename }}" type="audio/mpeg">
@@ -105,7 +105,7 @@
       <div>
         <h4> Sound to be annotated <small> {{ sound.filename }} </small></h4>
       </div>
-      
+
 
       <audio controls=controls>
         <source src="{{ MEDIA_URL }}{{ sound.filename }}" type="audio/mpeg">
