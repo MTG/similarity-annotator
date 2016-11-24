@@ -4,14 +4,11 @@ services:
     image: postgres
 
   gearman:
-    extends:
-      file: ./docker-compose.common.yml
-      service: gearman
+    image: kendu/gearman
 
   gearman-worker:
-    extends:
-      file: ./docker-compose.common.yml
-      service: gearman-worker
+    build: .
+    command: python manage.py gm_worker_processing
     volumes_from:
       - web
     depends_on:
