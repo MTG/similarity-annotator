@@ -9,7 +9,7 @@ The web application is written in django framework and the interface for annotat
 Install [audiowaveform] (https://github.com/bbc/audiowaveform)
 
 ### Step 2
-Install [docker-compose] (https://docs.docker.com/compose/install/). The just run:
+Install [docker-compose] (https://docs.docker.com/compose/install/) and then just run:
 
     docker-compose build
     docker-compose run
