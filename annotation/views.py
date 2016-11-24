@@ -86,13 +86,18 @@ def annotation_action(request, sound_id, tier_id):
     tier = get_object_or_404(Tier, id=tier_id)
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
-        print(body_unicode)
         post_body = json.loads(body_unicode)
         Annotation.objects.filter(sound=sound, tier=tier).delete()
         for a in post_body['annotations']:
-            Annotation.objects.create(start_time=a['start'], end_time=a['end'],
-                    name=a['annotation'], sound=sound, tier=tier,
-                    user=request.user)
+            new_annotation = Annotation.objects.create(start_time=a['start'],
+                    end_time=a['end'], name=a['annotation'], sound=sound,
+                    tier=tier, user=request.user)
+            if a['similarity'] == 'yes':
+                print(a['reference'])
+                ref = Annotation.objects.get(id=int(a['reference']))
+                AnnotationSimilarity.objects.create(reference=ref,
+                        similar_sound=new_annotation,
+                        similarity_measure=float(a['annotation']))
         out = {'status': 'success'}
         return JsonResponse(out)
     else:
@@ -116,15 +121,21 @@ def annotation_action(request, sound_id, tier_id):
                 "annotation": a.name,
                 "id": a.id,
                 })
-
         out['task']['segments'] = []
         for a in Annotation.objects.filter(sound=sound, tier=tier).all():
-            out['task']['segments'].append({
+            references = a.annotationsimilarity_set.all()
+            annotation = {
                 "start": a.start_time,
                 "end": a.end_time,
                 "annotation": a.name,
                 "id": a.id,
-                })
+                "similarity": 'no'
+                }
+            if len(references):
+                reference = references[0]
+                annotation['similarity'] = "yes"
+                annotation['reference'] = reference.reference_id
+            out['task']['segments'].append(annotation)
 
         out['task']['url'] = '%s%s' % (settings.MEDIA_URL, sound.filename)
         out['task']['url_ref'] = '%s%s' % (settings.MEDIA_URL, ref_sound.filename)

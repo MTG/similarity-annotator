@@ -25,6 +25,8 @@ function UrbanEars() {
     this.currentTask;
     this.taskStartTime;
     this.hiddenImage;
+    this.soundReady = false;
+    this.refReady = false;
     // Boolean, true if currently sending http post request 
     this.sendingResponse = false;
 
@@ -133,42 +135,58 @@ UrbanEars.prototype = {
         // annotation stages back to stage 1, update when the user started the task, update the workflow buttons.
         // Also if the user is suppose to get hidden image feedback, append that component to the page
         this.wavesurfer2.on('ready', function () {
-            my.playBar2.update();
-            my.stages2.updateStage(1);
-            
-            my.currentTask.segments_ref.forEach(function(section){
-            
-              var region = my.wavesurfer2.addRegion({
-                start: section.start,
-                end: section.end,
-                id: section.id,
-                drag: false,
-                resize: false,
-                canDelete: false,
-              });
-              my.stages2.createRegionSwitchToStageThree(region);
-            });
+            my.refReady = true;
+            my.loadSegments();
         });
- 
+        
         // When a new sound file is loaded into the wavesurfer update the  play bar, update the 
         // annotation stages back to stage 1, update when the user started the task, update the workflow buttons.
         // Also if the user is suppose to get hidden image feedback, append that component to the page
         this.wavesurfer.on('ready', function () {
-            my.playBar.update();
-            my.currentTask.segments.forEach(function(section){
-            
-              var region = my.wavesurfer.addRegion({
-                start: section.start,
-                end: section.end,
-                id: section.id,
-                annotation: section.annotation,
-              });
-              my.stages.createRegionSwitchToStageThree(region);
-            });
-            my.stages.updateStage(1);
-            my.updateTaskTime();
-            my.workflowBtns.update();
+           my.soundReady = true;
+           my.loadSegments();
         });
+
+    },
+ 
+    loadSegments: function(){
+      var my = this;
+      if (this.refReady && this.soundReady){
+          my.playBar2.update();
+          my.stages2.updateStage(1);
+          
+          my.currentTask.segments_ref.forEach(function(section){
+          
+            var region = my.wavesurfer2.addRegion({
+              start: section.start,
+              end: section.end,
+              id: section.id,
+              drag: false,
+              resize: false,
+              canDelete: false,
+            });
+            my.stages2.createRegionSwitchToStageThree(region);
+          
+          });
+          my.playBar.update();
+          my.currentTask.segments.forEach(function(section){
+          var values = {
+            start: section.start,
+            end: section.end,
+            id: section.id,
+            annotation: section.annotation,
+            similarity: section.similarity
+          }; 
+          var region = my.wavesurfer.addRegion(values);
+          if (section.reference != null){
+            region.regionRef = my.wavesurfer2.regions.list[section.reference];
+          }
+          my.stages.createRegionSwitchToStageThree(region);
+        });
+        my.stages.updateStage(1);
+        my.updateTaskTime();
+        my.workflowBtns.update();
+      }
     },
 
     updateTaskTime: function() {
@@ -271,8 +289,6 @@ UrbanEars.prototype = {
             url: dataUrl,
             data: JSON.stringify(content),
             contentType: "application/json; charset=utf-8",
-            //contentType: 'application/json',
-            //data: content
         })
         .done(function(data) {
             // If the last task had a hiddenImage component, remove it

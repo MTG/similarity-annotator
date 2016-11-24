@@ -320,6 +320,9 @@ AnnotationStages.prototype = {
             regionData.proximity = region.proximity;
         }
         regionData.similarity = region.similarity;
+        if (region.regionRef != null) {
+            regionData.reference = region.regionRef.id
+        }
         return regionData;
     },
 
