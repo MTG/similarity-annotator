@@ -160,13 +160,14 @@
 .annotation_tag.selected {
   color: #fff !important;
   background-color: #00B1B9;
+  background-position: 0 30px;
 }
 
 .similarity_option:hover,
 .similarity_option.selected {
   color: #fff !important;
   background-color: #00B1B9;
-}
+  background-position: 0 30px;}
 
 .similarity_option {
   background-color: #fff;
@@ -201,7 +202,7 @@
 
 .submit_container .btn,
 .exit {
-  color: #fff !important;
+  color: #9c9c9c !important;
   font-weight: bold;
   background-color: #000080;
 }
@@ -209,6 +210,7 @@
 .submit_container .btn:hover:enabled,
 .exit:hover {
   background-color: #000040;
+  background-position: 0 30px;
 }
 
 .current_region, .current_region_ref {
