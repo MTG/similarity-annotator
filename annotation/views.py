@@ -74,7 +74,7 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
 
 
 @login_required
-def ref_sound_detail(request, exercise_id, sound_id):
+def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     if request.method == 'POST':
         tier_form = TierForm(request.POST)
         if tier_form.is_valid():
@@ -86,6 +86,7 @@ def ref_sound_detail(request, exercise_id, sound_id):
     context = {'form': tier_form}
     sound = get_object_or_404(Sound, id=sound_id)
     context['sound'] = sound
+    context['tier_id'] = tier_id
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
 

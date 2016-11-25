@@ -270,7 +270,7 @@ StageThreeView.prototype = {
  * Dependencies:
  *   jQuey, urban-ears.css, Wavesurfer (lib/wavesurfer.js), Message (src/message.js)
  */
-function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef) {
+function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef, editEnable) {
     this.currentStage = 0;
     this.currentRegion = null;
     this.usingProximity = false;
@@ -286,6 +286,7 @@ function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef) {
     this.previousF1Score = 0;
     this.events = [];
     this.alwaysShowTags = false;
+    this.editEnable = editEnable;
 
     // These are not reset, since they should only be shown for the first clip
     this.shownTagHint = false;
@@ -412,7 +413,7 @@ AnnotationStages.prototype = {
         // Swap regions 
         this.swapRegion(newStage, region);
 
-        if (this.wavesurferRef){
+        if (this.wavesurferRef || this.editEnable){
           // Update the dom of which ever stage the user is switching to
           var newContent = null;
           if (this.alwaysShowTags){
@@ -864,7 +865,7 @@ AnnotationStages.prototype = {
 
     // Attach event handlers for wavesurfer events
     addWaveSurferEvents: function() {
-       if (this.wavesurferRef) {
+       if (this.wavesurferRef || this.editEnable) {
           this.wavesurfer.enableDragSelection();
           this.wavesurfer.on('region-update-end', this.trackMovement.bind(this));
           this.wavesurfer.on('region-update-end', this.createRegionSwitchToStageThree.bind(this));
@@ -875,9 +876,11 @@ AnnotationStages.prototype = {
           this.wavesurfer.on('region-created', this.trackBeginingOfRegionCreation.bind(this));
           this.wavesurfer.on('region-created', this.switchToStageOneOnCreate.bind(this));
           this.wavesurfer.on('region-removed', this.deleteAnnotation.bind(this));
-          this.wavesurferRef.on('region-dblclick', this.changedSelectionOnRef.bind(this));
-          this.wavesurferRef.on('label-dblclick', this.changedSelectionOnRef.bind(this));
-        } 
+          if (this.wavesurferRef) {
+              this.wavesurferRef.on('region-dblclick', this.changedSelectionOnRef.bind(this));
+              this.wavesurferRef.on('label-dblclick', this.changedSelectionOnRef.bind(this));
+          } 
+       }
         this.wavesurfer.on('region-dblclick', this.switchToStageThree.bind(this));
         this.wavesurfer.on('label-dblclick', this.switchToStageThree.bind(this));
         this.wavesurfer.on('audioprocess', this.updateEndOfRegion.bind(this));

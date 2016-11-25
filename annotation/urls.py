@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^(?P<exercise_id>[0-9]+)/(?P<sound_id>[0-9]+)/tiers_list/$', views.tier_list, name='tier_list'),
     url(r'^(?P<exercise_id>[0-9]+)/sound_detail/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',
         views.sound_detail, name='sound_detail'),
-    url(r'^(?P<exercise_id>[0-9]+)/ref_sound_detail/(?P<sound_id>[0-9]+)$',
+    url(r'^(?P<exercise_id>[0-9]+)/ref_sound_detail/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',
         views.ref_sound_detail, name='ref_sound_detail'),
     url(r'^annotation_action/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',
         views.annotation_action, name='annotation-action'),
