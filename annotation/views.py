@@ -4,11 +4,13 @@ import json
 import zipfile
 import tempfile
 
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
 from .forms import ExerciseForm, TierForm
@@ -20,6 +22,26 @@ def exercise_list(request):
     exercises_list = Exercise.objects.all()
     context = {'exercises_list': exercises_list}
     return render(request, 'annotationapp/exercises_list.html', context)
+
+
+@login_required
+def tier_list(request, exercise_id, sound_id):
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            exercise = Exercise.objects.get(id=exercise_id)
+            Tier.objects.create(name=tier_name, exercise=exercise)
+    else:
+        tier_form = TierForm()
+    sound = Sound.objects.get(id=sound_id)
+    exercise = Exercise.objects.get(id=exercise_id)
+    tiers_list = exercise.tiers.all()
+    context = {'exercise': exercise, 'sound': sound, 'tiers_list': tiers_list, 'form': tier_form}
+    # if the sound is the reference sound of the exercise, add a context parameter
+    if sound == exercise.reference_sound:
+        context['reference_sound'] = True
+    return render(request, 'annotationapp/tiers_list.html', context)
 
 
 @login_required
@@ -46,23 +68,16 @@ def sound_list(request, exercise_id):
 
 
 @login_required
-def sound_detail(request, exercise_id, sound_id):
-    if request.method == 'POST':
-        tier_form = TierForm(request.POST)
-        if tier_form.is_valid():
-            tier_name = request.POST['name']
-            exercise = Exercise.objects.get(id=exercise_id)
-            Tier.objects.create(name=tier_name, exercise=exercise)
-    else:
-        tier_form = TierForm()
-    context = {'form': tier_form}
+def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
+    context = {}
     context['sound'] = sound
+    context['tier_id'] = tier_id
     return render(request, 'annotationapp/sound_detail.html', context)
 
 
 @login_required
-def ref_sound_detail(request, exercise_id, sound_id):
+def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     if request.method == 'POST':
         tier_form = TierForm(request.POST)
         if tier_form.is_valid():
@@ -74,64 +89,80 @@ def ref_sound_detail(request, exercise_id, sound_id):
     context = {'form': tier_form}
     sound = get_object_or_404(Sound, id=sound_id)
     context['sound'] = sound
+    context['tier_id'] = tier_id
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
 
 @login_required
 @csrf_exempt
 def annotation_action(request, sound_id, tier_id):
-    body_unicode = request.body.decode('utf-8')
-    post_body = json.loads(body_unicode)
-    action = post_body['action']
     sound = get_object_or_404(Sound, id=sound_id)
     tier = get_object_or_404(Tier, id=tier_id)
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        post_body = json.loads(body_unicode)
+        Annotation.objects.filter(sound=sound, tier=tier).delete()
+        for a in post_body['annotations']:
+            new_annotation = Annotation.objects.create(start_time=a['start'],
+                    end_time=a['end'], name=a['annotation'], sound=sound,
+                    tier=tier, user=request.user)
+            if a['similarity'] == 'yes':
+                ref = Annotation.objects.get(id=int(a['reference']))
+                AnnotationSimilarity.objects.create(reference=ref,
+                        similar_sound=new_annotation,
+                        similarity_measure=float(a['annotation']))
 
-    out = {'status': 'error'}
-    if action == 'remove':
-        annotation_id = post_body['annotation_id']
-        annotation = get_object_or_404(Annotation, id=annotation_id)
-        annotation.delete()
-        out = {'status': 'success'}
+        choose_next = False
+        next_tier = None
+        for t in sound.exercise.tiers.order_by('id').all():
+            if choose_next:
+                next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id,
+                    "tier_id": t.id,
+                    "exercise_id": sound.exercise.id
+                    })
+                choose_next = False
+            if t.id == tier.id:
+                choose_next = True
+        out = {'status': 'success', "next": next_tier}
+        return JsonResponse(out)
     else:
-        reference = post_body.get('referenceId', None)
-        ref_obj = None
-        name = post_body.get('labelText', '')
+        ref_sound = sound.exercise.reference_sound
+        out = {
+            "task": {
+            "feedback": "none",
+            "visualization": "waveform",
+            "similaritySegment": ["yes", "no"],
+            "annotationType": "input",
+            "alwaysShowTags": False
+            }
+        }
+        out['task']['segments_ref'] = []
+        for a in Annotation.objects.filter(sound=ref_sound, tier=tier).all():
+            out['task']['segments_ref'].append({
+                "start": a.start_time,
+                "end": a.end_time,
+                "annotation": a.name,
+                "id": a.id,
+                })
+        out['task']['segments'] = []
+        for a in Annotation.objects.filter(sound=sound, tier=tier).all():
+            references = a.annotationsimilarity_set.all()
+            annotation = {
+                "start": a.start_time,
+                "end": a.end_time,
+                "annotation": a.name,
+                "id": a.id,
+                "similarity": 'no'
+                }
+            if len(references):
+                reference = references[0]
+                annotation['similarity'] = "yes"
+                annotation['reference'] = reference.reference_id
+            out['task']['segments'].append(annotation)
 
-        if reference:
-            ref_obj = get_object_or_404(Annotation, id=reference)
-            if name:
-                name = float(name)
-            else:
-                name = 0
-
-        start = post_body['startTime']
-        end = post_body['endTime']
-        if action == 'add':
-            annotation = Annotation()
-            annotation.name = name
-            annotation.start_time = start
-            annotation.end_time = end
-            annotation.user = request.user
-            annotation.sound = sound
-            annotation.tier = tier
-            annotation.save()
-            if ref_obj:
-                simil = AnnotationSimilarity()
-                simil.similar_sound = annotation
-                simil.reference = ref_obj
-                simil.similarity_measure = name
-                simil.save()
-            out = {'status': 'success', 'annotation_id': annotation.id}
-        elif action == 'edit':
-            annotation_id = post_body['annotation_id']
-            annotation = get_object_or_404(Annotation, id=annotation_id)
-            annotation.name = name
-            annotation.start_time = start
-            annotation.end_time = end
-            annotation.user = request.user
-            annotation.save()
-            out = {'status': 'success', 'annotation_id': annotation.id}
-    return JsonResponse(out)
+        out['task']['url'] = '%s%s' % (settings.MEDIA_URL, sound.filename)
+        out['task']['url_ref'] = '%s%s' % (settings.MEDIA_URL, ref_sound.filename)
+        return JsonResponse(out)
 
 
 @login_required

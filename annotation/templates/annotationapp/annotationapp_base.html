@@ -24,7 +24,6 @@
             </div>
             <div class="span2">
                 {% block logout %}
-                    <input type="button" onclick="location.href='/accounts/logout';" value="Logout" />
                 {% endblock %}
             </div>
         </div>
@@ -34,7 +33,7 @@
             {% block links %}
             {% endblock %}
         </div>
-        <div class="span10">
+        <div class="span12">
             {% block content %}
             {% endblock %}
         </div>
