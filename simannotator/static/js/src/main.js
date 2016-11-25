@@ -291,11 +291,9 @@ UrbanEars.prototype = {
             contentType: "application/json; charset=utf-8",
         })
         .done(function(data) {
-            // If the last task had a hiddenImage component, remove it
-            if (my.currentTask.feedback === 'hiddenImage') {
-                my.hiddenImage.remove();
+            if (data.status == "success" && data.next != null) {
+              window.location = data.next;
             }
-            my.loadNextTask();
         })
         .fail(function() {
             alert('Error: Unable to Submit Annotations');

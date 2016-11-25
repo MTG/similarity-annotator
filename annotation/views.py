@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
 from .forms import ExerciseForm, TierForm
@@ -106,7 +107,19 @@ def annotation_action(request, sound_id, tier_id):
                 AnnotationSimilarity.objects.create(reference=ref,
                         similar_sound=new_annotation,
                         similarity_measure=float(a['annotation']))
-        out = {'status': 'success'}
+
+        choose_next = False
+        next_tier = None
+        for t in sound.exercise.tiers.order_by('id').all():
+            if choose_next:
+                next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id,
+                    "tier_id": t.id,
+                    "exercise_id": sound.exercise.id
+                    })
+                choose_next = False
+            if t.id == tier.id:
+                choose_next = True
+        out = {'status': 'success', "next": next_tier}
         return JsonResponse(out)
     else:
         ref_sound = sound.exercise.reference_sound
