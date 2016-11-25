@@ -11,3 +11,7 @@
         <p><input type="submit" value="Create and upload" /></p>
     </form>
 {% endblock %}
+
+{% block logout %}
+        <input type="button" onclick="location.href='/accounts/logout';" value="Logout" />
+{% endblock %}

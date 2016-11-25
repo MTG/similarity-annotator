@@ -18,3 +18,7 @@
 {% block links %}
     <input type="button" onclick="location.href='/{{ exercise.id }}/download/';" value="Download annotations" />
 {% endblock %}
+
+{% block logout %}
+        <input type="button" onclick="location.href='/accounts/logout';" value="Logout" />
+{% endblock %}
