@@ -130,7 +130,7 @@ StageThreeView.prototype = {
         var proximity = $('<div>');
         var proximityLabel = $('<div>', {
             class: 'stage_3_label',
-            text: 'The sound is:',
+            text: 'Is similarity measure:',
         });
 
         var proximityContainer = $('<div>', {
