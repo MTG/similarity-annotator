@@ -65,16 +65,8 @@ def sound_list(request, exercise_id):
 
 @login_required
 def sound_detail(request, exercise_id, sound_id, tier_id):
-    if request.method == 'POST':
-        tier_form = TierForm(request.POST)
-        if tier_form.is_valid():
-            tier_name = request.POST['name']
-            exercise = Exercise.objects.get(id=exercise_id)
-            Tier.objects.create(name=tier_name, exercise=exercise)
-    else:
-        tier_form = TierForm()
-    context = {'form': tier_form}
     sound = get_object_or_404(Sound, id=sound_id)
+    context = {}
     context['sound'] = sound
     context['tier_id'] = tier_id
     return render(request, 'annotationapp/sound_detail.html', context)
@@ -110,7 +102,6 @@ def annotation_action(request, sound_id, tier_id):
                     end_time=a['end'], name=a['annotation'], sound=sound,
                     tier=tier, user=request.user)
             if a['similarity'] == 'yes':
-                print(a['reference'])
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref,
                         similar_sound=new_annotation,
@@ -125,8 +116,6 @@ def annotation_action(request, sound_id, tier_id):
             "visualization": "waveform",
             "similaritySegment": ["yes", "no"],
             "annotationType": "input",
-            "numRecordings": 9,
-            "recordingIndex": 1,
             "alwaysShowTags": False
             }
         }
