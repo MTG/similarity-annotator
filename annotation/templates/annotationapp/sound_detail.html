@@ -24,18 +24,6 @@
     <script type="text/javascript" src="/static/js/src/main.js" defer></script>
 {% endblock %}
 
-{% block links %}
-    <div class="form-group row">
-      <div class="col-xs-1">
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>{{ form }} </p>
-        <p><input type="submit" value="Create tier" /></p>
-        </form>
-      </div>
-    </div>
-{% endblock %}
-
 {% block content %}
     <!-- Modal Structure -->
     <div id="modal1" class="modal">

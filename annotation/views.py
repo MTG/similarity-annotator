@@ -24,6 +24,23 @@ def exercise_list(request):
 
 
 @login_required
+def tier_list(request, exercise_id, sound_id):
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            exercise = Exercise.objects.get(id=exercise_id)
+            Tier.objects.create(name=tier_name, exercise=exercise)
+    else:
+        tier_form = TierForm()
+    sound = Sound.objects.get(id=sound_id)
+    exercise = Exercise.objects.get(id=exercise_id)
+    tiers_list = exercise.tiers.all()
+    context = {'exercise': exercise, 'sound': sound, 'tiers_list': tiers_list, 'form': tier_form}
+    return render(request, 'annotationapp/tiers_list.html', context)
+
+
+@login_required
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
     sounds_list = exercise.sounds.all()
