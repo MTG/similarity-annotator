@@ -13,7 +13,11 @@
 {% block content %}
     {% if tiers_list %}
         {% for tier in tiers_list %}
-            <li><a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a></li>
+            {% if reference_sound %}
+                <li><a href="/{{ exercise.id }}/ref_sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a></li>
+            {% else %}
+                <li><a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a></li>
+            {% endif %}
         {% endfor %}
     {% else %}
         <p>There is no tiers</p>

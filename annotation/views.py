@@ -38,6 +38,9 @@ def tier_list(request, exercise_id, sound_id):
     exercise = Exercise.objects.get(id=exercise_id)
     tiers_list = exercise.tiers.all()
     context = {'exercise': exercise, 'sound': sound, 'tiers_list': tiers_list, 'form': tier_form}
+    # if the sound is the reference sound of the exercise, add a context parameter
+    if sound == exercise.reference_sound:
+        context['reference_sound'] = True
     return render(request, 'annotationapp/tiers_list.html', context)
 
 
