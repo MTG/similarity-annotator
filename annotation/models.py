@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 def exercise_upload_to(instance, filename):
     return os.path.join(instance.name, filename)
 
+
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
