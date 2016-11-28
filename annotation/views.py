@@ -12,6 +12,7 @@ from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
 from .forms import ExerciseForm, TierForm
 from .utils import store_tmp_file, exercise_annotations_to_json
@@ -48,7 +49,17 @@ def tier_list(request, exercise_id, sound_id):
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
     sounds_list = exercise.sounds.all()
-    context = {'exercise': exercise, 'sounds_list': sounds_list}
+    paginator = Paginator(sounds_list, 20)
+    page = request.GET.get('page')
+    try:
+        sounds = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        sounds = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        sounds = paginator.page(paginator.num_pages)
+    context = {'exercise': exercise, 'sounds_list': sounds}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
@@ -62,7 +73,17 @@ def sound_list(request, exercise_id):
         else:
             reference_sound = exercise.reference_sound
             sounds_list = sounds_list.exclude(id=reference_sound.id)
-            context['sounds_list'] = sounds_list
+            paginator = Paginator(sounds_list, 20)
+            page = request.GET.get('page')
+            try:
+                sounds = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                sounds = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                sounds = paginator.page(paginator.num_pages)
+            context['sounds_list'] = sounds
             context['reference_sound'] = reference_sound
     return render(request, 'annotationapp/sounds_list.html', context)
 

@@ -7,11 +7,25 @@
         <li><a href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}<span style="color:#cc0000"> reference sound</span> </a> </li>
     {% endif %}
     {% if sounds_list %}
-        <ul class="pagination">
-            {% for sound in sounds_list %}
+        {% for sound in sounds_list %}
                 <li><a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
-            {% endfor %}
-        </ul>
+        {% endfor %}
+        <div class="pagination">
+{#            {% for sound in sounds_list %}#}
+{#                <li><a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>#}
+{#            {% endfor %}#}
+            {% if sounds_list.has_previous %}
+                <a href="?page={{ sounds_list.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ sounds_list.number }} of {{ sounds_list.paginator.num_pages }}.
+            </span>
+
+            {% if sounds_list.has_next %}
+                <a href="?page={{ sounds_list.next_page_number }}">next</a>
+            {% endif %}
+        </div>
     {% else %}
         <p>There is no sounds</p>
     {% endif %}
