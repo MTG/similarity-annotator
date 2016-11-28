@@ -47,6 +47,19 @@
         </div>
     </div>
     <div class="annotation">
+      <span><b>Reference Pitch Sound:</b></span>
+      {% if sound.exercise.reference_pitch_sound %}
+      <div>
+        <h4> Reference Pitch sound</h4>
+      </div>
+      
+      <div>
+        <audio controls=controls>
+          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      {% endif %}
       <span><b>Reference Sound:</b></span>
         <div class="labels_ref"></div>
         <div class="audio_visual_ref"></div>
