@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 try:
                     reference_pitch_file_relative_path = exercise_description['tanpura']
                     source_path = os.path.join(dataset_path, reference_pitch_file_relative_path)
-                    reference_pitch_filename = os.path.basename(reference_sound_file_relative_path)
+                    reference_pitch_filename = os.path.basename(reference_pitch_file_relative_path)
                     # copy the file into media
                     destination_path = annotation.utils.copy_sound_into_media(source_path, exercise_name,
                                                                               reference_pitch_filename)
