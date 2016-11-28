@@ -7,9 +7,11 @@
         <li><a href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}<span style="color:#cc0000"> reference sound</span> </a> </li>
     {% endif %}
     {% if sounds_list %}
-        {% for sound in sounds_list %}
-            <li><a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
-        {% endfor %}
+        <ul class="pagination">
+            {% for sound in sounds_list %}
+                <li><a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
+            {% endfor %}
+        </ul>
     {% else %}
         <p>There is no sounds</p>
     {% endif %}
