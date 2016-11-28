@@ -25,5 +25,6 @@ services:
       - .:/code
       - ./media:/media/
       - ./tmp:/tmp/
+      - /homedtic/sgulati/riyaz_data:/riyaz_data
     depends_on:
       - db
