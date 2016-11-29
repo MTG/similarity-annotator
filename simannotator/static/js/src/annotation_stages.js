@@ -536,6 +536,7 @@ AnnotationStages.prototype = {
             if (region.regionRef != null) {
               $('.current_region_ref').removeClass('current_region_ref');
               $('.current_label_ref').removeClass('current_label_ref');
+              
               $(region.regionRef.element).addClass('current_region_ref');
               $(region.regionRef.annotationLabel.element).addClass('current_label_ref');
             }
@@ -547,6 +548,7 @@ AnnotationStages.prototype = {
     
     changedSelectionOnRef: function(region) {
         if (this.currentRegion != null && this.currentRegion.similarity == 'yes') {
+          region.update({color: this.currentRegion.color});
           this.currentRegion.regionRef = region;
         }
     },

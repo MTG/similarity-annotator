@@ -91,7 +91,8 @@ def sound_list(request, exercise_id):
 @login_required
 def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
-    context = {'sound': sound, 'tier_id': tier_id}
+    tier = get_object_or_404(Tier, id=tier_id)
+    context = {'sound': sound, 'tier_id': tier_id, 'tier': tier}
     return render(request, 'annotationapp/sound_detail.html', context)
 
 
