@@ -112,7 +112,7 @@ PlayBar.prototype = {
 
     // Update the progress timestamp (called when audio is playing)
     updateTimer: function() {
-        $('.timer').text(this.getTimerText());
+        $(this.container).find('.timer').text(this.getTimerText());
     },
 
     // Used to track events related to playing and pausing the clip (click or spacebar)

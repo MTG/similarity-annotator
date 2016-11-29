@@ -24,7 +24,6 @@ function UrbanEars() {
     this.workflowBtns2;
     this.currentTask;
     this.taskStartTime;
-    this.hiddenImage;
     this.soundReady = false;
     this.refReady = false;
     // Boolean, true if currently sending http post request 
@@ -74,10 +73,6 @@ function UrbanEars() {
         container: '.labels'
     });
 
-    // Create hiddenImage, an image that is slowly revealed to a user as they annotate 
-    // (only for this.currentTask.feedback === 'hiddenImage')
-    this.hiddenImage = new HiddenImg('.hidden_img', 100);
-    this.hiddenImage.create();
 
     // Create the play button and time that appear below the wavesurfer
     this.playBar = new PlayBar(this.wavesurfer, '.play_bar');
@@ -87,7 +82,7 @@ function UrbanEars() {
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages2 = new AnnotationStages(this.wavesurfer2, this.hiddenImage);
+    this.stages2 = new AnnotationStages(this.wavesurfer2);
     this.stages2.create();
 
     // Create Workflow btns (submit and exit)
@@ -97,7 +92,7 @@ function UrbanEars() {
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages = new AnnotationStages(this.wavesurfer, this.hiddenImage, this.wavesurfer2);
+    this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurfer2);
     this.stages.create();
 
     // Create Workflow btns (submit and exit)
@@ -293,6 +288,8 @@ UrbanEars.prototype = {
         .done(function(data) {
             if (data.status == "success" && data.next != null) {
               window.location = data.next;
+            }else if(data.status == "success"){
+                Message.notifyAlert('Successfully saved all the changes, that was the last Tier.'); 
             }
         })
         .fail(function() {
