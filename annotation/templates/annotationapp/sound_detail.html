@@ -1,8 +1,8 @@
-{% extends 'annotationapp/annotationapp_base.html' %}
+{#{% extends 'annotationapp/annotationapp_base.html' %}#}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-{% block title %} {{ sound.filename }} annotation page {% endblock %}
+
 {% block extra_head %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/materialize.min.css">
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="row prompt">
-        <h4 class="center">Highlight &amp; Tag Each Sound</h4>
+        <h4 class="center">{{ sound.filename }}</h4>
         <div class="instructions">
             <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9312;</span> &nbsp Familiarize yourself with the list of sound tags under the audio recording.</h6>
             <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9313;</span> &nbsp Click the play button and listen to the recording.</h6>
@@ -49,38 +49,30 @@
     <div class="annotation">
       <span><b>Reference Pitch Sound:</b></span>
       {% if sound.exercise.reference_pitch_sound %}
-      <div>
-        <h4> Reference Pitch sound</h4>
-      </div>
-      
-      <div>
-        <audio controls=controls>
-          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-      </div>
+          <div>
+            <audio controls=controls>
+              <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
       {% endif %}
       <span><b>Reference Sound:</b></span>
         <div class="labels_ref"></div>
         <div class="audio_visual_ref"></div>
         <div class="play_bar_ref"></div>
-        <span><b>Sound to annotate:</b></span>
+        <span><b>Sound to annotate: </b></span>
         <div class="labels"></div>
         <div class="audio_visual"></div>
         <div class="play_bar"></div>
         <div class="hidden_img"></div>
         <div class="creation_stage_container"></div>
         <div class="submit_container"></div>
-    </div>    
+    </div>
     <script>
       var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
-    </script>   
-    <!--<script src="{# static 'js/sound_detail.js' #}"></script>-->
+    </script>
 {% endblock %}
 </html>
 
-{% block logout %}
-    <button>
-    <a href="/accounts/logout">logout</a>
-    </button>
-{% endblock %}
+
+
