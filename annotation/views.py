@@ -91,9 +91,7 @@ def sound_list(request, exercise_id):
 @login_required
 def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
-    context = {}
-    context['sound'] = sound
-    context['tier_id'] = tier_id
+    context = {'sound': sound, 'tier_id': tier_id}
     return render(request, 'annotationapp/sound_detail.html', context)
 
 
@@ -125,22 +123,20 @@ def annotation_action(request, sound_id, tier_id):
         Annotation.objects.filter(sound=sound, tier=tier).delete()
         for a in post_body['annotations']:
             new_annotation = Annotation.objects.create(start_time=a['start'],
-                    end_time=a['end'], name=a['annotation'], sound=sound,
-                    tier=tier, user=request.user)
+                                                       end_time=a['end'], name=a['annotation'], sound=sound,
+                                                       tier=tier, user=request.user)
             if a['similarity'] == 'yes':
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref,
-                        similar_sound=new_annotation,
-                        similarity_measure=float(a['annotation']))
+                                                    similar_sound=new_annotation,
+                                                    similarity_measure=float(a['annotation']))
 
         choose_next = False
         next_tier = None
         for t in sound.exercise.tiers.order_by('id').all():
             if choose_next:
-                next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id,
-                    "tier_id": t.id,
-                    "exercise_id": sound.exercise.id
-                    })
+                next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id, "tier_id": t.id,
+                                                            "exercise_id": sound.exercise.id})
                 choose_next = False
             if t.id == tier.id:
                 choose_next = True
@@ -150,11 +146,11 @@ def annotation_action(request, sound_id, tier_id):
         ref_sound = sound.exercise.reference_sound
         out = {
             "task": {
-            "feedback": "none",
-            "visualization": "waveform",
-            "similaritySegment": ["yes", "no"],
-            "annotationType": "input",
-            "alwaysShowTags": False
+                "feedback": "none",
+                "visualization": "waveform",
+                "similaritySegment": ["yes", "no"],
+                "annotationType": "input",
+                "alwaysShowTags": False
             }
         }
         out['task']['segments_ref'] = []
@@ -259,7 +255,7 @@ def upload(request):
     if request.method == 'POST':
         exercise_form = ExerciseForm(request.POST, files=request.FILES)
         if exercise_form.is_valid():
-            exercise = exercise_form.save()
+            exercise_form.save()
             exercise_name = request.POST['name']
             tmp_path = store_tmp_file(request.FILES['zip_file'], exercise_name)
             call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=exercise_name)

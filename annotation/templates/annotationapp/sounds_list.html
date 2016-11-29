@@ -11,9 +11,6 @@
                 <li><a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
         {% endfor %}
         <div class="pagination">
-{#            {% for sound in sounds_list %}#}
-{#                <li><a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>#}
-{#            {% endfor %}#}
             {% if sounds_list.has_previous %}
                 <a href="?page={{ sounds_list.previous_page_number }}">previous</a>
             {% endif %}
