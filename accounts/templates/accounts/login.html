@@ -1,39 +1,29 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
 
-{% load i18n %}
-
 {% block title %}Login{% endblock %}
 
-{% block logout %} {% endblock %}
-
-{% block content %}
-
-
-  <div id="login-form" class="registration-content col-xs-12">
-    <form method="post" action="{% url "accounts-login" %}?next={{ redirect_url }} ">{% csrf_token %}
-      <div class="form-group">
-        <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' placeholder='{% trans "Username" %}'>
-        {{form.errors.username}}
-      </div>
-      <div class="form-group">
-        <input type="password"  class="form-control" id="{{form.password.auto_id}}" name='{{form.password.name}}' placeholder='{% trans "Password" %}'>
-        {{form.errors.password}}
-      </div>
-      {{form.non_field_errors}}
-
-      <input type="hidden" name="next" value="{{ next }}"/>
-      <div>
-        <button id="login-form-submit" type="submit" class="btn btn-success">
-         {% trans "Log in" %}
-        </button>
-      </div>
-    </form>
-
-  </div>
-
-{% endblock %}
-
 {% block links %}
+<div id="login-form">
+<form method="post" action="{% url "accounts-login" %}?next={{ redirect_url }} ">{% csrf_token %}
+  <div class="form-group">
+    <input type="text"  class="form-control" id="{{form.username.auto_id}}" name='{{form.username.name}}' placeholder="Username">
+    {{form.errors.username}}
+  </div>
+  <div class="form-group">
+    <input type="password"  class="form-control" id="{{form.password.auto_id}}" name='{{form.password.name}}' placeholder="Password">
+    {{form.errors.password}}
+  </div>
+  {{form.non_field_errors}}
+
+  <input type="hidden" name="next" value="{{ next }}"/>
+  <div>
+    <button id="login-form-submit" type="submit" class="btn btn-success">
+     Log in
+    </button>
+  </div>
+</form>
+
+</div>
 Don't have an account yet?
 <div>
 <a href="/accounts/register/">Register</a>
