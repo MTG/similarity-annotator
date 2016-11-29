@@ -1,14 +1,10 @@
 # Similarity Annotation Tool
 
 A web based tool to annotate similarity of sounds regarding a target sound. 
-The web application is written in django framework and the interface for annotation is based on peaks.js
+The web application is written in django framework and the interface for annotation is based on [CrowdCurio audio annotator] (https://github.com/CrowdCurio/audio-annotator) 
 
-## Installation
+## Installation and run
 
-### Step 1
-Install [audiowaveform] (https://github.com/bbc/audiowaveform)
-
-### Step 2
 Install [docker-compose] (https://docs.docker.com/compose/install/) and then just run:
 
     docker-compose build
