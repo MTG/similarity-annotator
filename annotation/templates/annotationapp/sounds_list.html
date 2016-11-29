@@ -3,6 +3,11 @@
 {% block title %} List of {{ exercise.name }} sounds {% endblock %}
 
 {% block content %}
+    {% if display_filter != 'all' %}
+      <a href="{% url 'sound_list' exercise.id %}?filter=all">Display all sounds</a>
+    {% else %}
+      <a href="{% url 'sound_list' exercise.id %}">Show only sounds without annotations</a>
+    {% endif %}
     {% if reference_sound %}
         <li><a href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}<span style="color:#cc0000"> reference sound</span> </a> </li>
     {% endif %}

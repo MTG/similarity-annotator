@@ -48,8 +48,12 @@ def tier_list(request, exercise_id, sound_id):
 @login_required
 def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
-    sounds_list = exercise.sounds.all()
-    paginator = Paginator(sounds_list, 20)
+    display_filter = request.GET.get('filter', False)
+    sounds_list = exercise.sounds
+    if display_filter != 'all':
+        sounds_list = sounds_list.filter(annotations__isnull=True)
+
+    paginator = Paginator(sounds_list.all(), 20)
     page = request.GET.get('page')
     try:
         sounds = paginator.page(page)
@@ -59,7 +63,7 @@ def sound_list(request, exercise_id):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         sounds = paginator.page(paginator.num_pages)
-    context = {'exercise': exercise, 'sounds_list': sounds}
+    context = {'display_filter': display_filter, 'exercise': exercise, 'sounds_list': sounds}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
