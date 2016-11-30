@@ -3,10 +3,18 @@ import json
 import shutil
 import zipfile
 import subprocess
+import decimal
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Sound, Exercise, Annotation, AnnotationSimilarity
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 
 
 def exercise_annotations_to_json(exercise_id):
@@ -46,7 +54,7 @@ def exercise_annotations_to_json(exercise_id):
 
         sounds_annotations[sound.filename] = tiers
 
-    return json.dumps(sounds_annotations)
+    return json.dumps(sounds_annotations, cls=DecimalEncoder)
 
 
 def store_tmp_file(uploaded_file, exercise_name):
