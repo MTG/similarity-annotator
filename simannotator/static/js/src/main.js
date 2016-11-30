@@ -159,6 +159,7 @@ UrbanEars.prototype = {
               drag: false,
               resize: false,
               canDelete: false,
+              annotation: section.annotation,
             });
             my.stages2.createRegionSwitchToStageThree(region);
           
