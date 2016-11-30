@@ -40,6 +40,7 @@ def exercise_annotations_to_json(exercise_id):
                 try:
                     annotation_similarity = AnnotationSimilarity.objects.get(similar_sound=annotation)
                     similarity = {'reference_annotation': annotation_similarity.reference.id,
+                                  'similarity_value': annotation_similarity.similarity_measure
                                   }
                 except ObjectDoesNotExist:
                     similarity = None

@@ -357,6 +357,11 @@ AnnotationStages.prototype = {
                 if (region.similarity == 'yes' && (region.regionRef == null)) {
                   Message.notifyAlert('Make shure to select a similarity section'); 
                   return false;
+                }else if (region.similarity == 'yes'){
+                  if (isNaN(region.annotation)){
+                    Message.notifyAlert('Make shure the annotations is a valid number for similarity segments'); 
+                    return false;
+                  }
                 }else if (region.annotation === '' || (this.usingProximity && region.proximity === '')) {
                     if (this.usingProximity) {
                         Message.notifyAlert('Make sure all your annotations have an annotation tag and a proximity tag!'); 
