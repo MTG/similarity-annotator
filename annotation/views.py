@@ -128,13 +128,13 @@ def annotation_action(request, sound_id, tier_id):
         Annotation.objects.filter(sound=sound, tier=tier).delete()
         for a in post_body['annotations']:
             new_annotation = Annotation.objects.create(start_time=a['start'],
-                                                       end_time=a['end'], name=a['annotation'], sound=sound,
-                                                       tier=tier, user=request.user)
+                end_time=a['end'], value=a['annotation'], sound=sound,
+                tier=tier, user=request.user)
+
             if a['similarity'] == 'yes':
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref,
-                                                    similar_sound=new_annotation,
-                                                    similarity_measure=float(a['annotation']))
+                    similar_sound=new_annotation)
 
         choose_next = False
         next_tier = None
@@ -163,7 +163,7 @@ def annotation_action(request, sound_id, tier_id):
             out['task']['segments_ref'].append({
                 "start": a.start_time,
                 "end": a.end_time,
-                "annotation": a.name,
+                "annotation": a.value,
                 "id": a.id,
                 })
         out['task']['segments'] = []
@@ -172,7 +172,7 @@ def annotation_action(request, sound_id, tier_id):
             annotation = {
                 "start": a.start_time,
                 "end": a.end_time,
-                "annotation": a.name,
+                "annotation": a.value,
                 "id": a.id,
                 "similarity": 'no'
                 }
@@ -199,7 +199,7 @@ def get_annotations(request, sound_id, tier_id):
             'annotation_id': i.id,
             'startTime': i.start_time,
             'endTime': i.end_time,
-            'name': i.name
+            'name': i.value
             }
         if len(references):
             reference = references[0]

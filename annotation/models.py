@@ -38,7 +38,7 @@ class Sound(models.Model):
 
 
 class Annotation(models.Model):
-    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
     start_time = models.DecimalField(max_digits=6, decimal_places=3)
     end_time = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     sound = models.ForeignKey(Sound, related_name='annotations')
@@ -52,4 +52,3 @@ class Annotation(models.Model):
 class AnnotationSimilarity(models.Model):
     reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
     similar_sound = models.ForeignKey(Annotation)
-    similarity_measure = models.IntegerField("similarity_measure")
