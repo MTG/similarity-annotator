@@ -146,7 +146,7 @@
   line-height: 30px;
   text-transform: uppercase;
 }
-.custom_tag {
+.annotation_inp, .simil-val-inp{
   margin: 0px 10px 10px 10px !important;
   width: 200px !important;
 }

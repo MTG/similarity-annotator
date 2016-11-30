@@ -171,6 +171,7 @@ UrbanEars.prototype = {
             end: section.end,
             id: section.id,
             annotation: section.annotation,
+            similValue: section.similValue,
             similarity: section.similarity
           }; 
           var region = my.wavesurfer.addRegion(values);
@@ -212,7 +213,6 @@ UrbanEars.prototype = {
             var numRecordings = my.currentTask.numRecordings || 1;
             var alwaysShowTags = my.currentTask.alwaysShowTags;
             my.stages.reset(
-                [],
                 similaritySegment,
                 annotationType,
                 annotationSolutions,

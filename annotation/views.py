@@ -128,13 +128,13 @@ def annotation_action(request, sound_id, tier_id):
         Annotation.objects.filter(sound=sound, tier=tier).delete()
         for a in post_body['annotations']:
             new_annotation = Annotation.objects.create(start_time=a['start'],
-                                                       end_time=a['end'], name=a['annotation'], sound=sound,
-                                                       tier=tier, user=request.user)
+               end_time=a['end'], name=a['annotation'], sound=sound,
+               tier=tier, user=request.user)
             if a['similarity'] == 'yes':
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref,
-                                                    similar_sound=new_annotation,
-                                                    similarity_measure=float(a['annotation']))
+                    similar_sound=new_annotation,
+                    similarity_measure=float(a['similValue']))
 
         choose_next = False
         next_tier = None
@@ -179,6 +179,7 @@ def annotation_action(request, sound_id, tier_id):
             if len(references):
                 reference = references[0]
                 annotation['similarity'] = "yes"
+                annotation['similValue'] = reference.similarity_measure
                 annotation['reference'] = reference.reference_id
             out['task']['segments'].append(annotation)
 

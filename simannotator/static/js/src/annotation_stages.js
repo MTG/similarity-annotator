@@ -111,49 +111,14 @@ StageThreeView.prototype = {
         this.dom = container.append([message, time, tagContainer]);
     },
 
-    // Replace the proximity and annotation elements with the new elements that contain the
-    // tags in the proximityTags lists and input of annotationType
-    updateTagContents: function(proximityTags, similaritySegment, annotationType) {
+    // Replace the annotation elements with the new elements that contain the
+    // options in the lists like annotationType and similValueType
+    updateTagContents: function(similaritySegment, annotationType) {
         $('.tag_container', this.dom).empty();
-        var proximity = this.createProximityTags(proximityTags);
         var similarity = this.createSimilarityOptions(similaritySegment);
         // For now the only support type is text input
         var annotation = this.createAnnotationType(annotationType);
-        $('.tag_container', this.dom).append([similarity, annotation, proximity]);
-    },
-
-    // Create proximity tag elements
-    createProximityTags: function(proximityTags) {
-        if (proximityTags.length === 0) { return; }
-        var my = this;
-
-        var proximity = $('<div>');
-        var proximityLabel = $('<div>', {
-            class: 'stage_3_label',
-            text: 'The sound is:',
-        });
-
-        var proximityContainer = $('<div>', {
-            class: 'proximity_tags'
-        });
-
-        proximityTags.forEach(function (tagName, index) {
-            var tag = $('<button>', {
-                class: 'proximity_tag btn',
-                text: tagName,
-            });
-            // When a proximity tag is clicked fire the 'change-tag' event with what proximity it is and
-            // colour that proximity is associated with
-            tag.click(function () {
-                $(my).trigger(
-                    'change-tag', 
-                    [{proximity: tagName, color: my.colors[index]}]
-                );
-            });
-            proximityContainer.append(tag);
-        });
-
-        return proximity.append([proximityLabel, proximityContainer]);
+        $('.tag_container', this.dom).append([similarity, annotation]);
     },
 
     // Create proximity tag elements
@@ -206,7 +171,19 @@ StageThreeView.prototype = {
         });
 
         var input = $('<input>', {
-            class: 'custom_tag',
+            class: 'annotation_inp',
+        });
+
+        var similValueLabel = $('<div>', {
+            class: 'stage_3_label',
+            text: 'Value:',
+        });
+
+        var similValueContainer = $('<div>', {
+            class: 'annotation_container'
+        });
+        var input2 = $('<input>', {
+            class: 'simil-val-inp',
         });
         var btn = $('<button>', {
             class: 'annotation_tag btn',
@@ -215,12 +192,13 @@ StageThreeView.prototype = {
 
         // When a proximity tag is clicked fire the 'change-tag' event with what annotation tag it is
         btn.click(function () {
-            $(my).trigger('change-tag', [{annotation: input.val()}]);
+            $(my).trigger('change-tag', [{annotation: input.val(), similValue: input2.val()}]);
         });
         annotationContainer.append(input);
         annotationContainer.append(btn);
+        similValueContainer.append(input2);
 
-        return annotation.append([annotationLabel, annotationContainer]);
+        return annotation.append([similValueLabel, similValueContainer, annotationLabel, annotationContainer]);
     },
 
     // Update stage 3 dom with the current regions data
@@ -240,21 +218,18 @@ StageThreeView.prototype = {
     // Update the elements of the proximity and annotation tags to highlight
     // which tags match the selected region's current annotation and proximity
     updateSelectedTags: function(region) {
-        $('.proximity_tag', this.dom).removeClass('selected');
         $('.similarity_option', this.dom).removeClass('selected');
-        $('.custom_tag', this.dom).val('');
+        $('.annotation_inp', this.dom).val('');
+        $('.simil-val-inp', this.dom).val('');
+
+        if (region.similValue) {
+            $('.simil-val-inp', this.dom).val(region.similValue);
+        }
 
         if (region.annotation) {
-            $('.custom_tag', this.dom).val(region.annotation);
+            $('.annotation_inp', this.dom).val(region.annotation);
         }
 
-        if (region.proximity) {
-            var selectedTags = $('.proximity_tag', this.dom).filter(function () {
-                return this.innerHTML === region.proximity;
-            });
-            selectedTags.addClass('selected');
-        }
-        
         if (region.similarity) {
             var selectedTags = $('.similarity_option', this.dom).filter(function () {
               return this.innerHTML === region.similarity;
@@ -273,7 +248,6 @@ StageThreeView.prototype = {
 function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef, editEnable) {
     this.currentStage = 0;
     this.currentRegion = null;
-    this.usingProximity = false;
     this.stageOneView = new StageOneView();
     this.stageTwoView = new StageTwoView();
     this.stageThreeView = new StageThreeView();
@@ -317,12 +291,10 @@ AnnotationStages.prototype = {
             'end': region.end,
             'annotation': region.annotation
         };
-        if (this.usingProximity) {
-            regionData.proximity = region.proximity;
-        }
         regionData.similarity = region.similarity;
         if (region.regionRef != null) {
-            regionData.reference = region.regionRef.id
+            regionData.reference = region.regionRef.id;
+            regionData.similValue = region.similValue;
         }
         return regionData;
     },
@@ -358,16 +330,12 @@ AnnotationStages.prototype = {
                   Message.notifyAlert('Make shure to select a similarity section'); 
                   return false;
                 }else if (region.similarity == 'yes'){
-                  if (isNaN(region.annotation)){
+                  if (region.similValue === '' || isNaN(region.similValue)){
                     Message.notifyAlert('Make shure the annotations is a valid number for similarity segments'); 
                     return false;
                   }
-                }else if (region.annotation === '' || (this.usingProximity && region.proximity === '')) {
-                    if (this.usingProximity) {
-                        Message.notifyAlert('Make sure all your annotations have an annotation tag and a proximity tag!'); 
-                    } else {
-                        Message.notifyAlert('Make sure all your annotations have a tag!'); 
-                    }
+                }else if (region.annotation === '') {
+                    Message.notifyAlert('Make sure all your annotations have a name!'); 
                     return false;
                 }
             }
@@ -485,7 +453,6 @@ AnnotationStages.prototype = {
     clear: function() {
         this.currentStage = 0;
         this.currentRegion = null;
-        this.usingProximity = false;
         this.annotationSolutions = [];
         this.city = '';
         this.previousF1Score = 0;
@@ -496,21 +463,19 @@ AnnotationStages.prototype = {
     },
 
     // Reset field values and update the proximity tags, annotation tages and annotation solutions
-    reset: function(proximityTags, similaritySegment, annotationType, solution, alwaysShowTags) {
+    reset: function(similaritySegment, annotationType, solution, alwaysShowTags) {
         this.clear();
         // Update all Tags' Contents
         this.alwaysShowTags = alwaysShowTags || false;
-        this.updateContentsTags(proximityTags, similaritySegment, annotationType);
-        this.usingProximity = proximityTags.length > 0;
+        this.updateContentsTags(similaritySegment, annotationType);
         // Update solution set
         this.annotationSolutions = solution.annotations || [];
         this.city = solution.city || '';
     },
 
     // Update stage 3 dom with new proximity tags and annotation tags
-    updateContentsTags: function(proximityTags, similaritySegment, annotationType) {
+    updateContentsTags: function(similaritySegment, annotationType) {
         this.stageThreeView.updateTagContents(
-            proximityTags,
             similaritySegment,
             annotationType
         );
@@ -637,15 +602,12 @@ AnnotationStages.prototype = {
     // Event handler: called when a region's tags are added or changed
     updateRegion: function(event, data) {
         var annotationEventType = null;
-        var proximityEventType = null;
         var similarityEventType = null;
 
         // Determine if the tags where added for the first time or just changed
-        if (data.annotation && data.annotation !== this.currentRegion.annotation) {
+        if ((data.annotation && data.annotation !== this.currentRegion.annotation) ||
+           (data.similValue && data.similValue != this.currentRegion.similValue)){
             annotationEventType = this.currentRegion.annotation ? 'change' : 'add';
-        }
-        if (data.proximity && data.proximity !== this.currentRegion.proximity) {
-            proximityEventType = this.currentRegion.proximity ? 'change' : 'add';
         }
         if (data.similarity && data.similarity !== this.currentRegion.similarity) {
             similarityEventType = this.currentRegion.similarity ? 'change' : 'add';
@@ -664,13 +626,7 @@ AnnotationStages.prototype = {
                 this.currentRegion.annotation
             );
         }
-        if (proximityEventType) {
-            this.trackEvent(
-                proximityEventType + '-proximity-label',
-                this.currentRegion.id,
-                this.currentRegion.proximity
-            );
-        }
+        
         if (similarityEventType) {
             if (this.currentRegion.similarity == 'yes') {
               Message.notifyHint('Double click on a segment of the Reference Sound.');
@@ -683,8 +639,7 @@ AnnotationStages.prototype = {
         }
         // If the region has all its required tags, deselect the region and go back to stage 1
         if (this.currentRegion.annotation != "" && 
-            (this.currentRegion.similarity == 'no' || this.currentRegion.regionRef) && 
-            (!this.usingProximity || this.currentRegion.proximity)) {
+            (this.currentRegion.similarity == 'no' || this.currentRegion.regionRef)){
             this.updateStage(1);
         }
     },
