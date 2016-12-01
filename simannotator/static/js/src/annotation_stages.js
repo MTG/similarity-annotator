@@ -112,7 +112,7 @@ StageThreeView.prototype = {
     },
 
     // Replace the annotation elements with the new elements that contain the
-    // options in the lists like annotationType and similValueType
+    // options in the lists like annotationType 
     updateTagContents: function(similaritySegment, annotationType) {
         $('.tag_container', this.dom).empty();
         var similarity = this.createSimilarityOptions(similaritySegment);
@@ -180,7 +180,7 @@ StageThreeView.prototype = {
         });
 
         var similValueContainer = $('<div>', {
-            class: 'annotation_container'
+            class: 'simil_value_container'
         });
         var input2 = $('<input>', {
             class: 'simil-val-inp',
@@ -196,9 +196,10 @@ StageThreeView.prototype = {
         });
         annotationContainer.append(input);
         annotationContainer.append(btn);
+        similValueContainer.append(similValueLabel);
         similValueContainer.append(input2);
 
-        return annotation.append([similValueLabel, similValueContainer, annotationLabel, annotationContainer]);
+        return annotation.append([similValueContainer, annotationLabel, annotationContainer]);
     },
 
     // Update stage 3 dom with the current regions data
@@ -221,6 +222,7 @@ StageThreeView.prototype = {
         $('.similarity_option', this.dom).removeClass('selected');
         $('.annotation_inp', this.dom).val('');
         $('.simil-val-inp', this.dom).val('');
+        $('.simil_value_container', this.dom).hide();
 
         if (region.similValue) {
             $('.simil-val-inp', this.dom).val(region.similValue);
@@ -235,6 +237,9 @@ StageThreeView.prototype = {
               return this.innerHTML === region.similarity;
             });
             selectedTags.addClass('selected');
+            if (region.similarity == 'yes'){
+              $('.simil_value_container', this.dom).show();
+            }
         }
     }
 };

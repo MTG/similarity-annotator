@@ -131,6 +131,7 @@
 
 .proximity_tags,
 .annotation_container,
+.simil_value_container,
 .similarity_options {
   display: inline-block;
   width: 80%;
