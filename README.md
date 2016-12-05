@@ -11,6 +11,7 @@ Install [docker-compose] (https://docs.docker.com/compose/install/) and then jus
     docker-compose run
 
 ## License
-All the software is distributed with the [Affero GPL v3 license] (http://www.gnu.org/licenses/agpl-3.0.en.html)
+All the software is distributed with the [Affero GPL v3 license] (http://www.gnu.org/licenses/agpl-3.0.en.html) except the CrowdCurio files that are
+licensed under BSD-2 clause.
 
 
