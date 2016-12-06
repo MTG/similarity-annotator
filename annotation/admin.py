@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity
+from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, DataSet
+
+
+class DataSetAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('name',)
+    list_filter = ('id', 'name')
 
 
 class ExerciseAdmin(admin.ModelAdmin):
@@ -29,5 +35,7 @@ admin.site.register(Tier)
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Annotation, AnnotationAdmin)
 admin.site.register(AnnotationSimilarity, AnnotationSimilarityAdmin)
+admin.site.register(DataSet, DataSetAdmin)
+
 
 

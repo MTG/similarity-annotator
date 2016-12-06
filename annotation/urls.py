@@ -3,7 +3,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.exercise_list, name='exercise_list'),
+    url(r'^$', views.data_set_list, name='data_set_list'),
+    url(r'^(?P<dataset_id>[0-9]+)/$', views.exercise_list, name='exercise_list'),
     url(r'^(?P<exercise_id>[0-9]+)/sound_list/$', views.sound_list, name='sound_list'),
     url(r'^(?P<exercise_id>[0-9]+)/(?P<sound_id>[0-9]+)/tiers_list/$', views.tier_list, name='tier_list'),
     url(r'^(?P<exercise_id>[0-9]+)/sound_detail/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',

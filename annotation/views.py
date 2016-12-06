@@ -13,14 +13,22 @@ from django.http import HttpResponse, Http404, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
+from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet
 from .forms import ExerciseForm, TierForm
 from .utils import store_tmp_file, exercise_annotations_to_json
 
 
 @login_required
-def exercise_list(request):
-    exercises_list = Exercise.objects.all()
+def data_set_list(request):
+    data_sets_list = DataSet.objects.all()
+    context = {'data_sets_list': data_sets_list}
+    return render(request, 'annotationapp/data_sets_list.html', context)
+
+
+@login_required
+def exercise_list(request, dataset_id):
+    data_set = DataSet.objects.get(id=dataset_id)
+    exercises_list = data_set.exercises.all()
     context = {'exercises_list': exercises_list}
     return render(request, 'annotationapp/exercises_list.html', context)
 
