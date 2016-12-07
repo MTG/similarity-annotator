@@ -29,7 +29,6 @@ class Tier(models.Model):
 
 class Sound(models.Model):
     filename = models.CharField(max_length=200)
-    waveform_data = models.CharField(max_length=200)
     exercise = models.ForeignKey(Exercise, related_name='sounds')
     has_annotations = models.BooleanField(default=False)
 
