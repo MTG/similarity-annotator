@@ -57,7 +57,7 @@ def exercise_annotations_to_json(exercise_id):
     return json.dumps(sounds_annotations, cls=DecimalEncoder)
 
 
-def store_tmp_file(uploaded_file, dataset_name, exercise_name):
+def store_tmp_file(uploaded_file, exercise_name):
     """
     Stores the uploaded file to the TEMP folder
     Args:
@@ -67,7 +67,7 @@ def store_tmp_file(uploaded_file, dataset_name, exercise_name):
     Return:
         path: path to newly saved-to-disk file
     """
-    path = os.path.join(settings.TEMP_ROOT, dataset_name, exercise_name + '.zip')
+    path = os.path.join(settings.TEMP_ROOT, exercise_name + '.zip')
     try:
         destination = open(path, 'w+b')
         for chunk in uploaded_file.chunks():
