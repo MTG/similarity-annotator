@@ -3,7 +3,7 @@
 {% block title %} Create a new exercise {% endblock %}
 
 {% block content %}
-    <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+    <form action="{% url 'upload' dataset_id %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <p>{{ form }}</p>
         <p>{{ form.non_field_errors }}</p>

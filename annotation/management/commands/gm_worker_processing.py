@@ -28,9 +28,10 @@ class Command(BaseCommand):
         """
         data = json.loads(gearman_job.data)
         zip_file_path = data['file_path']
+        dataset_name = data['dataset_name']
         exercise_name = data['exercise_name']
 
-        self.write_log("Decompressing file for exercise %s" % exercise_name)
+        self.write_log("Decompressing file for exercise %s of data set %s" % (exercise_name, dataset_name))
 
         exercise_files_path = annotation.utils.decompress_files(exercise_name, zip_file_path)
 

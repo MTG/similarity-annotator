@@ -29,7 +29,7 @@ def data_set_list(request):
 def exercise_list(request, dataset_id):
     data_set = DataSet.objects.get(id=dataset_id)
     exercises_list = data_set.exercises.all()
-    context = {'exercises_list': exercises_list}
+    context = {'exercises_list': exercises_list, 'dataset_id':dataset_id}
     return render(request, 'annotationapp/exercises_list.html', context)
 
 
@@ -265,18 +265,20 @@ def download_annotations(request, sound_id):
 
 
 @login_required
-def upload(request):
+def upload(request, dataset_id):
     if request.method == 'POST':
         exercise_form = ExerciseForm(request.POST, files=request.FILES)
         if exercise_form.is_valid():
             exercise_form.save()
             exercise_name = request.POST['name']
-            tmp_path = store_tmp_file(request.FILES['zip_file'], exercise_name)
-            call_command('gm_client_unzip_sound_files', file_path=tmp_path, exercise_name=exercise_name)
+            dataset = DataSet.objects.get(id=dataset_id)
+            tmp_path = store_tmp_file(request.FILES['zip_file'], dataset.name, exercise_name)
+            call_command('gm_client_unzip_sound_files', file_path=tmp_path, dataset_name=dataset.name,
+                         exercise_name=exercise_name)
             return render(request, 'annotationapp/upload_success.html')
     else:
         exercise_form = ExerciseForm()
-    context = {'form': exercise_form}
+    context = {'form': exercise_form, 'dataset_id': dataset_id}
     return render(request, 'annotationapp/upload_form.html', context)
 
 
