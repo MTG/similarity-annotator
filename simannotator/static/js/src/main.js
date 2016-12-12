@@ -99,6 +99,7 @@ function UrbanEars() {
     this.workflowBtns = new WorkflowBtns();
     this.workflowBtns.create();
 
+
     this.addEvents();
 }
 
@@ -144,6 +145,32 @@ UrbanEars.prototype = {
 
     },
  
+    createSegment: function(){
+      var my = this;
+      var currTime = my.wavesurfer.getCurrentTime();
+      var segments = my.currentTask.segments;
+      segments.sort(function(a, b){return a.start-b.start});
+      var lastEnd = 0;
+      var added = false;
+      segments.forEach(function(section){
+          if (added == false && section.start > currTime && lastEnd != parseFloat(section.start)){
+             var region = my.wavesurfer.addRegion({
+              start: lastEnd,
+              end: parseFloat(section.start),
+            });
+            my.stages2.createRegionSwitchToStageThree(region);
+            added = true;
+          }
+          lastEnd = parseFloat(section.end);
+      });
+      if (added === false){
+        var region = my.wavesurfer.addRegion({
+          start: lastEnd,
+          end: lastEnd + 1,
+        });
+        my.stages2.createRegionSwitchToStageThree(region);
+      }
+    },
     loadSegments: function(){
       var my = this;
       if (this.refReady && this.soundReady){
@@ -307,6 +334,12 @@ UrbanEars.prototype = {
 function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
+    document.onkeypress = function(event) {
+      if(event.keyCode == 'i'.charCodeAt(0)){
+        urbanEars.createSegment();
+      }
+    }
+
     // Load the first audio annotation task
     urbanEars.loadNextTask();
 }
