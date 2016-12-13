@@ -32,7 +32,12 @@ def tier_list(request, exercise_id, sound_id):
         if tier_form.is_valid():
             tier_name = request.POST['name']
             exercise = Exercise.objects.get(id=exercise_id)
-            Tier.objects.create(name=tier_name, exercise=exercise)
+            parent_tier_id = request.POST['parent_tier']
+            if parent_tier_id:
+                parent_tier = Tier.objects.get(id=parent_tier_id)
+                Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+            else:
+                Tier.objects.create(name=tier_name, exercise=exercise)
     else:
         tier_form = TierForm()
     sound = Sound.objects.get(id=sound_id)
