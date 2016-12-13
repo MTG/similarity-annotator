@@ -298,7 +298,7 @@ UrbanEars.prototype = {
             };
 
             if (this.stages.aboveThreshold()) {
-                // If the user is suppose to recieve feedback and got enough of the annotations correct
+                // If the user is suppose to receive feedback and got enough of the annotations correct
                 // display the city the clip was recorded for 2 seconds and then submit their work
                 var my = this;
                 this.stages.displaySolution();
