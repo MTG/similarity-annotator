@@ -34,5 +34,9 @@ class ExerciseForm(forms.ModelForm):
 class TierForm(forms.ModelForm):
     class Meta:
         model = Tier
-        fields = ['name']
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'style': 'width: 8em;'})}
+        fields = ['name', 'parent_tier']
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'style': 'width: 8em;',
+                                                  'placeholder': 'Name'}),
+                   'parent_tier': forms.Select(attrs={'class': 'form-control', 'style': 'width: 8em;',
+                                                      'placeholder': 'parent_tier'})}
+
