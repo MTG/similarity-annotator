@@ -26,6 +26,8 @@ function UrbanEars() {
     this.taskStartTime;
     this.soundReady = false;
     this.refReady = false;
+    this.currentMoveId = null;
+    this.currentMoveSection = null;
     // Boolean, true if currently sending http post request 
     this.sendingResponse = false;
 
@@ -113,19 +115,54 @@ UrbanEars.prototype = {
             my.wavesurfer2.seekTo(progress);
         };
 
+        var moveNextSection = function (movedSection) {
+            var segments = my.stages.getAnnotations();
+            var moveNext = false;
+            segments.sort(function(a, b){return a.start-b.start});
+            segments.forEach(function(segment){
+                if (moveNext && Math.abs(my.currentMoveSection.end - segment.start) < 0.1 ) {
+                    var length = segment.end - segment.start;
+                    var next = my.wavesurfer.regions.list[segment.id];
+                    next.start = movedSection.end;
+                    next.end= movedSection.end + length;
+                    next.updateRender();
+                    my.wavesurfer.fireEvent('region-updated', next);
+                    moveNext = false;
+                }else if (Math.abs(my.currentMoveSection.start - segment.end) < 0.1 ) {
+                    var length = segment.end - segment.start;
+                    var prev = my.wavesurfer.regions.list[segment.id];
+                    prev.end = movedSection.start;
+                    prev.start = movedSection.start - length;
+                    prev.updateRender();
+                    my.wavesurfer.fireEvent('region-updated', prev);
+                }else if (segment.id == my.currentMoveId){
+                    moveNext = true;
+                }
+            });
+            my.currentMoveId = null;
+        };
 
+        var moveStart = function (section) {
+            if (my.currentMoveId != section.id){
+              my.currentMoveId = section.id;
+              my.currentMoveSection = {end: section.end, start: section.start};
+            }
+        };
+        
         // function that moves the vertical progress bar to the current time in the audio clip
         var updateProgressBar = function () {
             var progress = my.wavesurfer.getCurrentTime() / my.wavesurfer.getDuration();
             my.wavesurfer.seekTo(progress);
         };
-
+        
         // Update vertical progress bar to the currentTime when the sound clip is 
         // finished or paused since it is only updated on audioprocess
         this.wavesurfer2.on('pause', updateProgressBar2);
         this.wavesurfer2.on('finish', updateProgressBar2);    
         this.wavesurfer.on('pause', updateProgressBar);
         this.wavesurfer.on('finish', updateProgressBar);    
+        this.wavesurfer.on('region-update-end', moveNextSection);    
+        this.wavesurfer.on('region-updated', moveStart);    
 
         // When a new sound file is loaded into the wavesurfer update the  play bar, update the 
         // annotation stages back to stage 1, update when the user started the task, update the workflow buttons.
