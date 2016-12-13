@@ -1,4 +1,4 @@
-simannotator/local_settings.py
+simannotator/development_settings.py
 .idea/
 *.pyc
 media/

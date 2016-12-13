@@ -17,10 +17,8 @@ class CreateSoundTest(TestCase):
 
     def test_sound_creation(self):
         sound_filename = 'test_sound.wav'
-        waveform_data_file_path = '/test/waveform_data_file_path.dat'
-
         sounds_before_creation = Sound.objects.all().count()
-        sound = create_sound_object(self.exercise, sound_filename, waveform_data_file_path)
+        sound = create_sound_object(self.exercise, sound_filename)
         sounds_after_creation = Sound.objects.all().count()
 
         self.assertTrue(sound in Sound.objects.all())
