@@ -27,6 +27,8 @@ def exercise_list(request):
 
 @login_required
 def tier_list(request, exercise_id, sound_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+    tiers_list = exercise.tiers.all()
     if request.method == 'POST':
         tier_form = TierForm(request.POST)
         if tier_form.is_valid():
@@ -39,10 +41,9 @@ def tier_list(request, exercise_id, sound_id):
             else:
                 Tier.objects.create(name=tier_name, exercise=exercise)
     else:
-        tier_form = TierForm()
+        tiers_list_ids = tiers_list.values_list('id')
+        tier_form = TierForm(parent_tier_ids=tiers_list_ids)
     sound = Sound.objects.get(id=sound_id)
-    exercise = Exercise.objects.get(id=exercise_id)
-    tiers_list = exercise.tiers.all()
     context = {'exercise': exercise, 'sound': sound, 'tiers_list': tiers_list, 'form': tier_form}
     # if the sound is the reference sound of the exercise, add a context parameter
     if sound == exercise.reference_sound:
