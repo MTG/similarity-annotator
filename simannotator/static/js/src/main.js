@@ -163,13 +163,23 @@ UrbanEars.prototype = {
           }
           lastEnd = parseFloat(section.end);
       });
-      if (added === false){
-        var region = my.wavesurfer.addRegion({
-          start: lastEnd,
-          end: currTime,
-        });
-        my.stages2.createRegionSwitchToStageThree(region);
+      if (added === false) {
+          if (currTime > lastEnd) {
+              var region = my.wavesurfer.addRegion({
+                  start: lastEnd,
+                  end: currTime,
+              });
+              my.stages2.createRegionSwitchToStageThree(region);
+          }
+          else {
+              var region = my.wavesurfer.addRegion({
+                  start: lastEnd,
+                  end: lastEnd + 1,
+              });
+              my.stages2.createRegionSwitchToStageThree(region);
+          }
       }
+
     },
     loadSegments: function(){
       var my = this;
