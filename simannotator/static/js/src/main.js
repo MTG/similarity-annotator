@@ -153,15 +153,26 @@ UrbanEars.prototype = {
       var lastEnd = 0;
       var added = false;
       segments.forEach(function(section){
-          if (added == false && section.start > currTime && lastEnd != parseFloat(section.start)){
-             var region = my.wavesurfer.addRegion({
+          if (added == false && section.start > currTime && lastEnd != section.start){
+            var region = my.wavesurfer.addRegion({
               start: lastEnd,
-              end: parseFloat(section.start),
+              end: section.start,
             });
             my.stages2.createRegionSwitchToStageThree(region);
             added = true;
+          }else if (added == false && section.start < currTime && section.end > currTime) {
+            var region = my.wavesurfer.addRegion({
+              start: currTime,
+              end: section.end,
+            });
+            my.stages2.createRegionSwitchToStageThree(region);
+            var oldSection =  my.wavesurfer.regions.list[section.id];
+            oldSection.end = currTime;
+            oldSection.updateRender();
+            my.wavesurfer.fireEvent('region-updated', oldSection);
+            added = true;
           }
-          lastEnd = parseFloat(section.end);
+          lastEnd = section.end;
       });
       if (added === false) {
           if (currTime > lastEnd) {
