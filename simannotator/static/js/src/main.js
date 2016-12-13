@@ -148,7 +148,7 @@ UrbanEars.prototype = {
     createSegment: function(){
       var my = this;
       var currTime = my.wavesurfer.getCurrentTime();
-      var segments = my.currentTask.segments;
+      var segments = my.stages.getAnnotations();
       segments.sort(function(a, b){return a.start-b.start});
       var lastEnd = 0;
       var added = false;
