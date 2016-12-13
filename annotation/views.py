@@ -132,14 +132,17 @@ def annotation_action(request, sound_id, tier_id):
         post_body = json.loads(body_unicode)
         Annotation.objects.filter(sound=sound, tier=tier).delete()
         for a in post_body['annotations']:
-            new_annotation = Annotation.objects.create(start_time=a['start'],
-               end_time=a['end'], name=a['annotation'], sound=sound,
-               tier=tier, user=request.user)
+            new_annotation = Annotation.objects.create(start_time=a['start'], end_time=a['end'], name=a['annotation'],
+                                                       sound=sound, tier=tier, user=request.user)
+            # create annotations in child tiers
+            if tier.child_tiers.all():
+                for child_tier in tier.child_tiers.all():
+                    Annotation.objects.create(start_time=a['start'], end_time=a['end'], name=a['annotation'],
+                                              sound=sound, tier=child_tier, user=request.user)
             if a['similarity'] == 'yes':
                 ref = Annotation.objects.get(id=int(a['reference']))
-                AnnotationSimilarity.objects.create(reference=ref,
-                    similar_sound=new_annotation,
-                    similarity_measure=float(a['similValue']))
+                AnnotationSimilarity.objects.create(reference=ref, similar_sound=new_annotation,
+                                                    similarity_measure=float(a['similValue']))
 
         choose_next = False
         next_tier = None
