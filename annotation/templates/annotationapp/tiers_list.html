@@ -5,8 +5,11 @@
 {% block links %}
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <p>{{ form }} </p>
-        <p><input type="submit" value="Create tier" /></p>
+            <h5>Create new tier:</h5>
+            <p>{{ form.name }} </p>
+            <h5>Select parent tier if desired:</h5>
+            <p>{{ form.parent_tier }} </p>
+        <button type="submit" class="btn btn-info">Create</button>
         </form>
 {% endblock %}
 
