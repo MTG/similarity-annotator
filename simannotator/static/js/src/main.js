@@ -166,7 +166,7 @@ UrbanEars.prototype = {
       if (added === false){
         var region = my.wavesurfer.addRegion({
           start: lastEnd,
-          end: lastEnd + 1,
+          end: currTime,
         });
         my.stages2.createRegionSwitchToStageThree(region);
       }
