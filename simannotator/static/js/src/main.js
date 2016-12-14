@@ -132,7 +132,6 @@ UrbanEars.prototype = {
                     var length = segment.end - segment.start;
                     var prev = my.wavesurfer.regions.list[segment.id];
                     prev.end = movedSection.start;
-                    prev.start = movedSection.start - length;
                     prev.updateRender();
                     my.wavesurfer.fireEvent('region-updated', prev);
                 }else if (segment.id == my.currentMoveId){
