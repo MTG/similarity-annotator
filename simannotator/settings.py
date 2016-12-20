@@ -117,7 +117,7 @@ deploy_env = os.environ.get('DEPLOY_ENV')
 import dj_database_url
 if deploy_env == 'prod':
     debug = False
-    ALLOWED_HOSTS = ['localhost', 'asplab-web1', 'asplab-web1.s.upf.edu', 'simannotator.upf.edu']
+    ALLOWED_HOSTS = ['localhost', 'asplab-web1', 'asplab-web1.s.upf.edu', 'simannotator.mtg.upf.edu']
 else:
     debug = True
 
