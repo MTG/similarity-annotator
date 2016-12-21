@@ -15,13 +15,13 @@
  */
 function UrbanEars() {
     this.wavesurfer;
-    this.wavesurfer2;
+    this.wavesurferRef;
     this.playBar;
-    this.playBar2;
+    this.playBarRef;
     this.stages;
-    this.stages2;
+    this.stagesRef;
     this.workflowBtns;
-    this.workflowBtns2;
+    this.workflowBtnsRef;
     this.currentTask;
     this.taskStartTime;
     this.soundReady = false;
@@ -52,8 +52,8 @@ function UrbanEars() {
         colorMap: spectrogramColorMap
     });
 
-    this.wavesurfer2 = Object.create(WaveSurfer);
-    this.wavesurfer2.init({
+    this.wavesurferRef = Object.create(WaveSurfer);
+    this.wavesurferRef.init({
         container: '.audio_visual_ref',
         waveColor: '#FF00FF',
         progressColor: '#FF00FF',
@@ -62,9 +62,9 @@ function UrbanEars() {
         height: height,
         colorMap: spectrogramColorMap
     });
-    var labels2 = Object.create(WaveSurfer.Labels);
-    labels2.init({
-        wavesurfer: this.wavesurfer2,
+    var labelsRef = Object.create(WaveSurfer.Labels);
+    labelsRef.init({
+        wavesurfer: this.wavesurferRef,
         container: '.labels_ref'
     });
     
@@ -79,22 +79,22 @@ function UrbanEars() {
     // Create the play button and time that appear below the wavesurfer
     this.playBar = new PlayBar(this.wavesurfer, '.play_bar');
     this.playBar.create();
-    this.playBar2 = new PlayBar(this.wavesurfer2, '.play_bar_ref');
-    this.playBar2.create();
+    this.playBarRef = new PlayBar(this.wavesurferRef, '.play_bar_ref');
+    this.playBarRef.create();
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages2 = new AnnotationStages(this.wavesurfer2);
-    this.stages2.create();
+    this.stagesRef = new AnnotationStages(this.wavesurferRef);
+    this.stagesRef.create();
 
     // Create Workflow btns (submit and exit)
-    this.workflowBtns2 = new WorkflowBtns();
-    this.workflowBtns2.create();
+    this.workflowBtnsRef = new WorkflowBtns();
+    this.workflowBtnsRef.create();
 
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurfer2);
+    this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef);
     this.stages.create();
 
     // Create Workflow btns (submit and exit)
@@ -103,6 +103,19 @@ function UrbanEars() {
 
 
     this.addEvents();
+    
+    var my = this;
+    var slider = document.querySelector('#slider');
+    slider.oninput = function () {
+        var zoomLevel = Number(slider.value);
+          my.wavesurfer.zoom(zoomLevel);
+    };
+ 
+    var sliderRef = document.querySelector('#slider_ref');
+    sliderRef.oninput = function () {
+        var zoomLevel = Number(sliderRef.value);
+          my.wavesurferRef.zoom(zoomLevel);
+    };
 }
 
 UrbanEars.prototype = {
@@ -110,9 +123,9 @@ UrbanEars.prototype = {
         var my = this;
 
         // function that moves the vertical progress bar to the current time in the audio clip
-        var updateProgressBar2 = function () {
-            var progress = my.wavesurfer2.getCurrentTime() / my.wavesurfer2.getDuration();
-            my.wavesurfer2.seekTo(progress);
+        var updateProgressBarRef = function () {
+            var progress = my.wavesurferRef.getCurrentTime() / my.wavesurferRef.getDuration();
+            my.wavesurferRef.seekTo(progress);
         };
 
         var moveNextSection = function (movedSection) {
@@ -156,8 +169,8 @@ UrbanEars.prototype = {
         
         // Update vertical progress bar to the currentTime when the sound clip is 
         // finished or paused since it is only updated on audioprocess
-        this.wavesurfer2.on('pause', updateProgressBar2);
-        this.wavesurfer2.on('finish', updateProgressBar2);    
+        this.wavesurferRef.on('pause', updateProgressBarRef);
+        this.wavesurferRef.on('finish', updateProgressBarRef);    
         this.wavesurfer.on('pause', updateProgressBar);
         this.wavesurfer.on('finish', updateProgressBar);    
         this.wavesurfer.on('region-update-end', moveNextSection);    
@@ -166,7 +179,7 @@ UrbanEars.prototype = {
         // When a new sound file is loaded into the wavesurfer update the  play bar, update the 
         // annotation stages back to stage 1, update when the user started the task, update the workflow buttons.
         // Also if the user is suppose to get hidden image feedback, append that component to the page
-        this.wavesurfer2.on('ready', function () {
+        this.wavesurferRef.on('ready', function () {
             my.refReady = true;
             my.loadSegments();
         });
@@ -194,14 +207,14 @@ UrbanEars.prototype = {
               start: lastEnd,
               end: section.start,
             });
-            my.stages2.createRegionSwitchToStageThree(region);
+            my.stagesRef.createRegionSwitchToStageThree(region);
             added = true;
           }else if (added == false && section.start < currTime && section.end > currTime) {
             var region = my.wavesurfer.addRegion({
               start: currTime,
               end: section.end,
             });
-            my.stages2.createRegionSwitchToStageThree(region);
+            my.stagesRef.createRegionSwitchToStageThree(region);
             var oldSection =  my.wavesurfer.regions.list[section.id];
             oldSection.end = currTime;
             oldSection.updateRender();
@@ -216,14 +229,14 @@ UrbanEars.prototype = {
                   start: lastEnd,
                   end: currTime,
               });
-              my.stages2.createRegionSwitchToStageThree(region);
+              my.stagesRef.createRegionSwitchToStageThree(region);
           }
           else {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: lastEnd + 1,
               });
-              my.stages2.createRegionSwitchToStageThree(region);
+              my.stagesRef.createRegionSwitchToStageThree(region);
           }
       }
 
@@ -231,12 +244,12 @@ UrbanEars.prototype = {
     loadSegments: function(){
       var my = this;
       if (this.refReady && this.soundReady){
-          my.playBar2.update();
-          my.stages2.updateStage(1);
+          my.playBarRef.update();
+          my.stagesRef.updateStage(1);
           
           my.currentTask.segments_ref.forEach(function(section){
           
-            var region = my.wavesurfer2.addRegion({
+            var region = my.wavesurferRef.addRegion({
               start: section.start,
               end: section.end,
               id: section.id,
@@ -245,7 +258,7 @@ UrbanEars.prototype = {
               canDelete: false,
               annotation: section.annotation,
             });
-            my.stages2.createRegionSwitchToStageThree(region);
+            my.stagesRef.createRegionSwitchToStageThree(region);
           
           });
           my.playBar.update();
@@ -260,7 +273,7 @@ UrbanEars.prototype = {
           }; 
           var region = my.wavesurfer.addRegion(values);
           if (section.reference != null){
-            region.regionRef = my.wavesurfer2.regions.list[section.reference];
+            region.regionRef = my.wavesurferRef.regions.list[section.reference];
           }
           my.stages.createRegionSwitchToStageThree(region);
         });
@@ -311,9 +324,9 @@ UrbanEars.prototype = {
             my.wavesurfer.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
             my.wavesurfer.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
             my.wavesurfer.load(my.currentTask.url);
-            my.wavesurfer2.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
-            my.wavesurfer2.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
-            my.wavesurfer2.load(my.currentTask.url_ref);
+            my.wavesurferRef.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
+            my.wavesurferRef.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
+            my.wavesurferRef.load(my.currentTask.url_ref);
         };
 
         // Just update task specific data right away
