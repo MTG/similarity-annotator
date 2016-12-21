@@ -29,6 +29,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         annotations_files_path = options['path']
         user_name = options['username']
+        try:
+            user = User.objects.get(username=user_name)
+        except ObjectDoesNotExist:
+            print("This username does not exist in the database")
+            return 0
         # read files in the directory
         for file_name in [file for file in os.listdir(annotations_files_path) if file.endswith('.json')]:
             file_path = os.path.join(annotations_files_path, file_name)
@@ -48,7 +53,6 @@ class Command(BaseCommand):
                     tier = Tier.objects.create(name=tier_name, exercise=sound.exercise)
                 # create annotations for each item in the list
                 for annotation in list_of_annotations:
-                    user = User.objects.get(username=user_name)
                     # create annotation for reference sound
                     reference_annotation = Annotation.objects.create(sound=sound.exercise.reference_sound,
                                                                      tier=tier, user=user,
