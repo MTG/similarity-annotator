@@ -252,8 +252,8 @@ UrbanEars.prototype = {
             contentType: "application/json; charset=utf-8",
         })
         .done(function(data) {
-            if (data.status == "success" && data.next != null) {
-              window.location = data.next;
+            if (data.status == "success" && nextUrl != 'None') {
+              window.location = nextUrl;
             }
         })
         .fail(function() {

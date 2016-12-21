@@ -102,7 +102,19 @@ def sound_list(request, exercise_id):
 def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
     tier = get_object_or_404(Tier, id=tier_id)
-    context = {'sound': sound, 'tier_id': tier_id, 'tier': tier}
+
+    choose_next = False
+    next_tier = None
+    for t in sound.exercise.tiers.order_by('id').all():
+        if choose_next:
+            next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id,
+                        "tier_id": t.id,
+                        "exercise_id": exercise_id})
+            choose_next = False
+        if t.id == int(tier_id):
+            choose_next = True
+
+    context = {'next_url': next_tier, 'sound': sound, 'tier_id': tier_id, 'tier': tier}
     return render(request, 'annotationapp/sound_detail.html', context)
 
 
@@ -116,9 +128,21 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
             Tier.objects.create(name=tier_name, exercise=exercise)
     else:
         tier_form = TierForm()
-    context = {'form': tier_form}
+
     sound = get_object_or_404(Sound, id=sound_id)
-    context['sound'] = sound
+
+    choose_next = False
+    next_tier = None
+    for t in sound.exercise.tiers.order_by('id').all():
+        if choose_next:
+            next_tier = reverse('ref_sound_detail', kwargs={"sound_id": sound_id,
+                        "tier_id": t.id,
+                        "exercise_id": exercise_id})
+            choose_next = False
+        if t.id == int(tier_id):
+            choose_next = True
+
+    context = {'next_url': next_tier, 'form': tier_form, 'sound': sound}
     context['tier_id'] = tier_id
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
@@ -145,16 +169,7 @@ def annotation_action(request, sound_id, tier_id):
                 AnnotationSimilarity.objects.create(reference=ref, similar_sound=new_annotation,
                                                     similarity_measure=float(a['similValue']))
 
-        choose_next = False
-        next_tier = None
-        for t in sound.exercise.tiers.order_by('id').all():
-            if choose_next:
-                next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id, "tier_id": t.id,
-                                                            "exercise_id": sound.exercise.id})
-                choose_next = False
-            if t.id == tier.id:
-                choose_next = True
-        out = {'status': 'success', "next": next_tier}
+        out = {'status': 'success'}
         return JsonResponse(out)
     else:
         ref_sound = sound.exercise.reference_sound

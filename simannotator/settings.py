@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+try:
+        from .local_settings import *
+except ImportError:
+        pass
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -112,28 +116,27 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
-
-deploy_env = os.environ.get('DEPLOY_ENV')
 import dj_database_url
+'''
+deploy_env = os.environ.get('DEPLOY_ENV')
 if deploy_env == 'prod':
     debug = False
-    ALLOWED_HOSTS = ['localhost', 'asplab-web1', 'asplab-web1.s.upf.edu', 'simannotator.upf.edu']
+    db_url = os.environ.get('DATABASE_URL')
+
 else:
     debug = True
-
-default_url = 'postgres://postgres@db/postgres'
-DATABASE_URL_ENV_NAME = 'DATABASE_URL'
+    db_url = 'postgres://postgres@db/postgres'
 
 DEBUG = debug
+DATABASES = {'default': dj_database_url.parse(db_url)}
+'''
+default_url = 'postgres://postgres@db/postgres'
+DATABASE_URL_ENV_NAME = 'DATABASE_URL'
 DATABASES = {'default': dj_database_url.config(DATABASE_URL_ENV_NAME, default=default_url)}
-
-MEDIA_ROOT = "/media"
-TEMP_ROOT = "/tmp"
+DEBUG = True
+MEDIA_ROOT = "media"
+TEMP_ROOT = "tmp"
 
 STATIC_ROOT = "/static"
 
 GEARMAN_JOB_SERVERS = ["gearman:4730"]
-
-# in case some development settings are used
-if os.path.isfile(os.path.join(os.getcwd(), 'simannotator/development_settings.py')):
-    from .development_settings import *
