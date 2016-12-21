@@ -31,6 +31,7 @@ class Sound(models.Model):
     filename = models.CharField(max_length=200)
     exercise = models.ForeignKey(Exercise, related_name='sounds')
     has_annotations = models.BooleanField(default=False)
+    is_discarded = models.BooleanField(default=False)
 
     def __str__(self):
         return self.filename
