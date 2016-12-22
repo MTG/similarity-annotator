@@ -260,7 +260,6 @@ function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef, editEnable) {
     this.wavesurfer = wavesurfer;
     this.hiddenImage = hiddenImage;
     this.deletedAnnotations = [];
-    this.annotationSolutions = [];
     this.city = '';
     this.previousF1Score = 0;
     this.events = [];
@@ -458,24 +457,18 @@ AnnotationStages.prototype = {
     clear: function() {
         this.currentStage = 0;
         this.currentRegion = null;
-        this.annotationSolutions = [];
-        this.city = '';
-        this.previousF1Score = 0;
         this.wavesurfer.clearRegions();
         this.events = [];
         this.deletedAnnotations = [];
         this.alwaysShowTags = false;
     },
 
-    // Reset field values and update the proximity tags, annotation tages and annotation solutions
-    reset: function(similaritySegment, annotationType, solution, alwaysShowTags) {
+    // Reset field values and update the proximity tags, annotation tages and annotation 
+    reset: function(similaritySegment, annotationType, alwaysShowTags) {
         this.clear();
         // Update all Tags' Contents
         this.alwaysShowTags = alwaysShowTags || false;
         this.updateContentsTags(similaritySegment, annotationType);
-        // Update solution set
-        this.annotationSolutions = solution.annotations || [];
-        this.city = solution.city || '';
     },
 
     // Update stage 3 dom with new proximity tags and annotation tags
@@ -667,89 +660,6 @@ AnnotationStages.prototype = {
         }
     },
 
-    // Calculate the current f1 score of the user's annotation (if there is no solution set returns 0)
-    computeF1Score: function() {
-        if (this.annotationSolutions.length === 0) { return 0; }
-        var segmentLength = 1; // Each segment is one second long
-        var gridSize = Math.ceil(this.wavesurfer.getDuration()) / segmentLength;
-        var solutionGrid = [];
-        var userGrid = [];
-
-        for (var i = 0; i < gridSize; ++i) {
-            solutionGrid.push([]);
-            userGrid.push([]);
-        }
-
-        // Slice up solution set events into segments
-        for (var i = 0; i < this.annotationSolutions.length; i++) {
-            var event = this.annotationSolutions[i];
-
-            // Find first and last segments that overlap with the event
-            var firstSegment = Math.floor(event.start / segmentLength);
-            var lastSegment = Math.floor(event.end / segmentLength);
-
-            // Handle corner case where event ends exaclty on grid boundary
-            if (event.end % segmentLength === 0) {
-                lastSegment -= 1;
-            }
-
-            // Add label to all overlapping segments
-            for (var j = firstSegment; j < lastSegment + 1; j++) {
-                solutionGrid[j].push(event.annotation);
-            }
-        }
-
-        for (var region_id in this.wavesurfer.regions.list) {
-            var event = this.wavesurfer.regions.list[region_id];
-
-            // Find first and last segments that overlap with the event
-            var firstSegment = Math.floor(event.start / segmentLength);
-            var lastSegment = Math.floor(event.end / segmentLength);
-
-            // Handle corner case where event ends exaclty on grid boundary
-            if (event.end % segmentLength === 0) {
-                lastSegment -= 1;
-            }
-
-            // Add label to all overlapping segments
-            for (var j = firstSegment; j < lastSegment + 1; j++) {
-                if (event.annotation !== '') {
-                    userGrid[j].push(event.annotation);
-                }
-            }
-        }
-
-        // Make sure each segment label lists are unique
-        for (var i = 0; i < gridSize; i++) {
-            solutionGrid[i] = $.unique(solutionGrid[i]);
-            userGrid[i] = $.unique(userGrid[i]);
-        }
-
-        var tpTotal = 0; // total number of true positives
-        var fpTotal = 0; // total number of false positives
-        var fnTotal = 0; // total number of false negatives
-
-        for (var i = 0; i < gridSize; i++) {
-            var solutionSegmentLabels = solutionGrid[i];
-            var userSegmentLabels = userGrid[i];
-            var intersection = $(solutionSegmentLabels).filter(userSegmentLabels);
-
-            // True positives are labels that appear in both lists
-            var tp = intersection.length;
-            // False positives are labels that appear in est but not in ref
-            var fp = solutionSegmentLabels.length - tp;
-            // False negatives are labels that appear in ref but not in est
-            var fn = userSegmentLabels.length - tp;
-
-            tpTotal += tp;
-            fpTotal += fp;
-            fnTotal += fn;
-        }
-
-        var f1Score = 2 * tpTotal / (2 * tpTotal + fpTotal + fnTotal);
-        return f1Score;
-    },
-
     // Notify the user if their f1 score is increasing
     notify: function(f1Score) {
         if (f1Score > this.previousF1Score) {
@@ -771,14 +681,6 @@ AnnotationStages.prototype = {
         return hasFeedback && this.previousF1Score >= 0.65;
     },
 
-    // Display the city the clip was recorded in to the user
-    displaySolution: function() {
-        Message.notifyCompletion(this.city);
-        if (this.wavesurfer.params.feedback === 'hiddenImage') {
-            this.hiddenImage.showImage();
-            this.hiddenImage.writeMessage(this.city);
-        }
-    },
 
     // Event Handler: triggered when region is first started to be created, adds action to event list
     trackBeginingOfRegionCreation: function(region) {

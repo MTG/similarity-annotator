@@ -300,7 +300,7 @@ UrbanEars.prototype = {
     // Update the task specific data of the interfaces components
     update: function() {
         var my = this;
-        var mainUpdate = function(annotationSolutions) {
+        var mainUpdate = function() {
 
             // Update the different tags the user can use to annotate, also update the solutions to the
             // annotation task if the user is suppose to recieve feedback
@@ -312,7 +312,6 @@ UrbanEars.prototype = {
             my.stages.reset(
                 similaritySegment,
                 annotationType,
-                annotationSolutions,
                 alwaysShowTags
             );
 
@@ -330,7 +329,7 @@ UrbanEars.prototype = {
         };
 
         // Just update task specific data right away
-        mainUpdate({});
+        mainUpdate();
     },
 
     // Update the interface with the next task's data
@@ -357,17 +356,7 @@ UrbanEars.prototype = {
                 annotations: this.stages.getAnnotations(),
             };
 
-            if (this.stages.aboveThreshold()) {
-                // If the user is suppose to receive feedback and got enough of the annotations correct
-                // display the city the clip was recorded for 2 seconds and then submit their work
-                var my = this;
-                this.stages.displaySolution();
-                setTimeout(function() {
-                    my.post(content);
-                }, 2000);
-            } else {
-                this.post(content);
-            }
+            this.post(content);
         }
     },
 
