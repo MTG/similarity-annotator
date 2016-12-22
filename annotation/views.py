@@ -57,8 +57,10 @@ def sound_list(request, exercise_id):
     display_filter = request.GET.get('filter', False)
     sounds_list = exercise.sounds
     if display_filter != 'all':
-        sounds_list = sounds_list.filter(annotations__isnull=True)
-
+        if display_filter != 'discarded':
+            sounds_list = sounds_list.filter(annotations__isnull=True)
+        else:
+            sounds_list = sounds_list.filter(is_discarded=True)
     paginator = Paginator(sounds_list.all(), 20)
     page = request.GET.get('page')
     try:
@@ -94,7 +96,8 @@ def sound_list(request, exercise_id):
                 # If page is out of range (e.g. 9999), deliver last page of results.
                 sounds = paginator.page(paginator.num_pages)
             context['sounds_list'] = sounds
-            context['reference_sound'] = reference_sound
+            if display_filter != 'discarded':
+                context['reference_sound'] = reference_sound
     return render(request, 'annotationapp/sounds_list.html', context)
 
 

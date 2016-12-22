@@ -3,8 +3,9 @@
 {% block title %} List of {{ exercise.name }} sounds {% endblock %}
 
 {% block content %}
-    {% if display_filter != 'all' %}
+    {% if display_filter != 'all' and display_filter != 'discarded'%}
       <a href="{% url 'sound_list' exercise.id %}?filter=all">Display all sounds</a>
+        <a href="{% url 'sound_list' exercise.id %}?filter=discarded">Display discarded sounds</a>
     {% else %}
       <a href="{% url 'sound_list' exercise.id %}">Show only sounds without annotations</a>
     {% endif %}
