@@ -5,7 +5,7 @@ import zipfile
 import tempfile
 
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.core import serializers
@@ -103,6 +103,10 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
     tier = get_object_or_404(Tier, id=tier_id)
     context = {'sound': sound, 'tier_id': tier_id, 'tier': tier}
+    if request.method == 'POST':
+        sound.is_discarded = True
+        sound.save()
+        return redirect('/' + exercise_id + '/sound_list')
     return render(request, 'annotationapp/sound_detail.html', context)
 
 

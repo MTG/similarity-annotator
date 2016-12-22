@@ -39,6 +39,7 @@ class TierForm(forms.ModelForm):
                                                   'placeholder': 'Name'}),
                    'parent_tier': forms.Select(attrs={'class': 'form-control', 'style': 'width: 8em;',
                                                       'placeholder': 'parent_tier'})}
+
     def __init__(self, *args, **kwargs):
         ids = kwargs.get('parent_tier_ids', None)
         if 'parent_tier_ids' in kwargs:

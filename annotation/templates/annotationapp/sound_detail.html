@@ -1,4 +1,3 @@
-{#{% extends 'annotationapp/annotationapp_base.html' %}#}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -24,51 +23,45 @@
     <script type="text/javascript" src="/static/js/src/main.js" defer></script>
 {% endblock %}
 
-{% block content %}
-    <!-- Modal Structure -->
-    <div id="modal1" class="modal">
-        <div class="modal-content">
-            <h4>Tutorial Video</h4>
-            <div class="videowrapper">
-                <iframe id="tutorial-video" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class=" modal-action modal-close waves-effect waves-red btn-flat">Close</a>
-        </div>
+<body>
+<!-- Modal Structure -->
+<div id="modal1" class="modal">
+    <div class="modal-footer">
+        <a href="#!" class=" modal-action modal-close waves-effect waves-red btn-flat">Close</a>
     </div>
-    <div class="row prompt">
-      <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
-    </div>
-    <div class="annotation">
-      <span><b>Reference Pitch Sound:</b></span>
-      {% if sound.exercise.reference_pitch_sound %}
-          <div>
-            <audio controls=controls>
-              <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
-              Your browser does not support the audio element.
-            </audio>
-          </div>
-      {% endif %}
-      <span><b>Reference Sound:</b></span>
-        <div class="labels_ref"></div>
-        <div class="audio_visual_ref"></div>
-        <div class="play_bar_ref"></div>
-        <span><b>Sound to annotate: </b></span>
-        <div class="labels"></div>
-        <div class="audio_visual"></div>
-        <div class="play_bar"></div>
-        <div class="box">
-        <input type="checkbox"/>
-        <label>Discard sound</label>
-        </div>
-        <div class="creation_stage_container"></div>
-        <div class="submit_container"></div>
-    </div>
-    <script>
-      var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
-    </script>
-{% endblock %}
+</div>
+<div class="row prompt">
+  <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
+</div>
+<div class="annotation">
+  <span><b>Reference Pitch Sound:</b></span>
+  {% if sound.exercise.reference_pitch_sound %}
+      <div>
+        <audio controls=controls>
+          <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+  {% endif %}
+  <span><b>Reference Sound:</b></span>
+    <div class="labels_ref"></div>
+    <div class="audio_visual_ref"></div>
+    <div class="play_bar_ref"></div>
+    <span><b>Sound to annotate: </b></span>
+    <div class="labels"></div>
+    <div class="audio_visual"></div>
+    <div class="play_bar"></div>
+    <div class="creation_stage_container"></div>
+    <div class="submit_container"></div>
+</div>
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Discard this sound">
+</form>
+</body>
+<script>
+  var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
+</script>
 </html>
 
 
