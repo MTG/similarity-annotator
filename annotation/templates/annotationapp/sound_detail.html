@@ -39,12 +39,6 @@
     </div>
     <div class="row prompt">
       <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
-        <div class="instructions">
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9312;</span> &nbsp Familiarize yourself with the list of sound tags under the audio recording.</h6>
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9313;</span> &nbsp Click the play button and listen to the recording.</h6>
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9314;</span> &nbsp For each sound that you hear click and drag to create a new annotation.</h6>
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9315;</span> &nbsp Select the appropriate tag and indicate whether the sound is near or far.</h6>
-        </div>
     </div>
     <div class="annotation">
       <span><b>Reference Pitch Sound:</b></span>
@@ -64,6 +58,10 @@
         <div class="labels"></div>
         <div class="audio_visual"></div>
         <div class="play_bar"></div>
+        <div class="box">
+        <input type="checkbox"/>
+        <label>Discard sound</label>
+        </div>
         <div class="creation_stage_container"></div>
         <div class="submit_container"></div>
     </div>
