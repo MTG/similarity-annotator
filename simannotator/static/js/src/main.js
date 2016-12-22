@@ -405,7 +405,7 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-      if(event.keyCode == 'i'.charCodeAt(0)){
+      if(document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)){
         urbanEars.createSegment();
       }
     }
