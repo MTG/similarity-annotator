@@ -52,12 +52,14 @@
     <div class="audio_visual"></div>
     <div class="play_bar"></div>
     <div class="creation_stage_container"></div>
-    <div class="submit_container"></div>
+    <div class="submit_container">
+      <form style="display: inline;" action="{% url 'sound_detail' sound.exercise.id sound.id tier_id%}" method="post">
+      {% csrf_token %}
+      <button class="btn">Discard this sound</button>
+      </form>
+
+    </div>
 </div>
-<form action="" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Discard this sound">
-</form>
 </body>
 <script>
   var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
