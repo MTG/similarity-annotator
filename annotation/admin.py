@@ -9,9 +9,9 @@ class ExerciseAdmin(admin.ModelAdmin):
 
 
 class SoundAdmin(admin.ModelAdmin):
-    list_display = ('filename', 'exercise')
+    list_display = ('filename', 'exercise', 'is_discarded')
     list_display_links = ('filename', 'exercise')
-    list_filter = ('exercise',)
+    list_filter = ('exercise', 'is_discarded', )
 
 
 class AnnotationAdmin(admin.ModelAdmin):
