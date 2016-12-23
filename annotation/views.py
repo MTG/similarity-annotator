@@ -107,9 +107,8 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
     next_tier = None
     for t in sound.exercise.tiers.order_by('id').all():
         if choose_next:
-            next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id,
-                        "tier_id": t.id,
-                        "exercise_id": exercise_id})
+            next_tier = reverse('sound_detail', kwargs={"sound_id": sound_id, "tier_id": t.id,
+                                                        "exercise_id": exercise_id})
             choose_next = False
         if t.id == int(tier_id):
             choose_next = True
