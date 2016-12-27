@@ -66,3 +66,4 @@ class AnnotationSimilarity(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=200)
+    tiers = models.ManyToManyField(Tier)
