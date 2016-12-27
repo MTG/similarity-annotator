@@ -1,7 +1,7 @@
 import os
 import json
 from django.core.management.base import BaseCommand
-from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from annotation.models import Exercise, Tier
 import annotation.utils
 
@@ -25,11 +25,14 @@ class Command(BaseCommand):
             description_file_path = os.path.join(dataset_path, options['description'])
             descriptions = json.load(open(description_file_path))
             for exercise_name, exercise_description in descriptions.items():
-                # create exercise
-                exercise = Exercise.objects.create(name=exercise_name)
-                annotation.utils.create_exercise_directory(exercise_name)
-                # create initial tier "whole sound"
-                Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
+                # create exercise if it doesn't exist
+                try:
+                    exercise = Exercise.objects.get(name=exercise_name)
+                except ObjectDoesNotExist:
+                    exercise = Exercise.objects.create(name=exercise_name)
+                    annotation.utils.create_exercise_directory(exercise_name)
+                    # create initial tier "whole sound"
+                    Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
                 # create reference sound
                 try:
                     reference_sound_file_relative_path = exercise_description['ref_media']
