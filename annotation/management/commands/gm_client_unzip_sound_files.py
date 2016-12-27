@@ -20,10 +20,11 @@ class Command(BaseCommand):
         gm_client = py3gearman.GearmanClient(settings.GEARMAN_JOB_SERVERS)
 
         file_path = options['file_path']
+        dataset_name = options['dataset_name']
         exercise_name = options['exercise_name']
 
         # Generate a job
-        data = json.dumps({'file_path': file_path, 'exercise_name': exercise_name})
+        data = json.dumps({'file_path': file_path, 'dataset_name': dataset_name, 'exercise_name': exercise_name})
 
         # For the to-be-analyzed sounds, create a job and send it to the gearman server
         gm_client.submit_job('unzip_sound_files', data, background=True, wait_until_complete=False)

@@ -1,0 +1,19 @@
+{% extends 'annotationapp/annotationapp_base.html' %}
+{% block title %} List of data sets {% endblock %}
+{% block content %}
+    {% if data_sets_list %}
+        <ul class="pagination">
+            {% for data_set in data_sets_list %}
+                <li><h4><a href="/{{ data_set.id }}">{{ data_set.name }}</a></h4></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No data sets available.</p>
+    {% endif %}
+{% endblock %}
+
+{% block logout %}
+    <button>
+    <a href="/accounts/logout">logout</a>
+    </button>
+{% endblock %}
