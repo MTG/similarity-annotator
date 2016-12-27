@@ -13,7 +13,7 @@ from django.http import HttpResponse, Http404, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier
+from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, Tag
 from .forms import ExerciseForm, TierForm
 from .utils import store_tmp_file, exercise_annotations_to_json
 
@@ -177,13 +177,14 @@ def annotation_action(request, sound_id, tier_id):
         out = {'status': 'success'}
         return JsonResponse(out)
     else:
+        tags = Tag.objects.values_list('name', flat=True).all()
         ref_sound = sound.exercise.reference_sound
         out = {
             "task": {
                 "feedback": "none",
                 "visualization": "waveform",
                 "similaritySegment": ["yes", "no"],
-                "annotationTags": ["tag1", "tag2"],
+                "annotationTags": list(tags),
                 "alwaysShowTags": False
             }
         }

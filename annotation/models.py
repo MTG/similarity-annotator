@@ -53,3 +53,7 @@ class AnnotationSimilarity(models.Model):
     reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
     similar_sound = models.ForeignKey(Annotation)
     similarity_measure = models.IntegerField("similarity_measure")
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=200)

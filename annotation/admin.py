@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity
+from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, Tag
 
 
 class ExerciseAdmin(admin.ModelAdmin):
@@ -26,6 +26,7 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
 
 admin.site.register(Sound, SoundAdmin)
 admin.site.register(Tier)
+admin.site.register(Tag)
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Annotation, AnnotationAdmin)
 admin.site.register(AnnotationSimilarity, AnnotationSimilarityAdmin)
