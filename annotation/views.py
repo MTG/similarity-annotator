@@ -222,8 +222,10 @@ def annotation_action(request, sound_id, tier_id):
                 annotation['reference'] = reference.reference_id
             out['task']['segments'].append(annotation)
 
-        out['task']['url'] = '%s%s' % (settings.MEDIA_URL, sound.filename)
-        out['task']['url_ref'] = '%s%s' % (settings.MEDIA_URL, ref_sound.filename)
+        out['task']['url'] = os.path.join(settings.MEDIA_URL, sound.exercise.data_set.name, sound.exercise.name,
+                                          sound.filename)
+        out['task']['url_ref'] = os.path.join(settings.MEDIA_URL, sound.exercise.data_set.name, sound.exercise.name,
+                                              ref_sound.filename)
         return JsonResponse(out)
 
 
