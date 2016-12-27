@@ -24,6 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dataset_path = options['path']
         dataset_name = options['dataset']
+
         # check if data set exists
         try:
             data_set = DataSet.objects.get(name=dataset_name)
@@ -41,6 +42,7 @@ class Command(BaseCommand):
                 annotation.utils.create_exercise_directory(dataset_name, exercise_name)
                 # create initial tier "whole sound"
                 Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
+
             # create reference sound
             try:
                 reference_sound_file_relative_path = exercise_description['ref_media']
@@ -51,10 +53,15 @@ class Command(BaseCommand):
                 annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
                                                        reference_sound_filename)
 
-                reference_sound = annotation.utils.get_or_create_sound_object(exercise, reference_sound_filename, source_path)
+                reference_sound = annotation.utils.get_or_create_sound_object(exercise, reference_sound_filename,
+                                                                              source_path)
                 exercise.reference_sound = reference_sound
                 exercise.save()
                 print("Created sound reference for exercise %s" % exercise_name)
+                # check if there is a file for the annotations of the reference sound
+                reference_sound_annotations_file_path = os.path.splitext(source_path)[0] + '.trans_json'
+                if os.path.exists(reference_sound_annotations_file_path):
+                    annotation.utils.create_annotations(reference_sound_annotations_file_path, reference_sound)
             except KeyError:
                 print("The exercise %s does not have reference sound" % exercise_name)
 
