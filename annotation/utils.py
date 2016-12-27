@@ -133,11 +133,7 @@ def copy_sound_into_media(src, data_set_name, exercise_name, sound_filename):
     Copy files from source to destination
     """
     dst = os.path.join(settings.MEDIA_ROOT, data_set_name, exercise_name, sound_filename)
-    try:
-        shutil.copyfile(src, dst)
-    except Exception as e:
-        print(e)
-
+    shutil.copyfile(src, dst)
     if dst.startswith("/media/"):
         dst = dst[7:]
 
