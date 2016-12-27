@@ -5,7 +5,7 @@ import zipfile
 import tempfile
 
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.core import serializers
@@ -57,8 +57,10 @@ def sound_list(request, exercise_id):
     display_filter = request.GET.get('filter', False)
     sounds_list = exercise.sounds
     if display_filter != 'all':
-        sounds_list = sounds_list.filter(annotations__isnull=True)
-
+        if display_filter != 'discarded':
+            sounds_list = sounds_list.filter(annotations__isnull=True)
+        else:
+            sounds_list = sounds_list.filter(is_discarded=True)
     paginator = Paginator(sounds_list.all(), 20)
     page = request.GET.get('page')
     try:
@@ -94,15 +96,19 @@ def sound_list(request, exercise_id):
                 # If page is out of range (e.g. 9999), deliver last page of results.
                 sounds = paginator.page(paginator.num_pages)
             context['sounds_list'] = sounds
-            context['reference_sound'] = reference_sound
+            if display_filter != 'discarded':
+                context['reference_sound'] = reference_sound
     return render(request, 'annotationapp/sounds_list.html', context)
 
 
 @login_required
 def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
+    if request.method == 'POST':
+        sound.is_discarded = True
+        sound.save()
+        return redirect('/' + exercise_id + '/sound_list')
     tier = get_object_or_404(Tier, id=tier_id)
-
     choose_next = False
     next_tier = None
     for t in sound.exercise.tiers.order_by('id').all():

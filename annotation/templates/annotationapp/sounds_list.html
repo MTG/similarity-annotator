@@ -3,8 +3,11 @@
 {% block title %} List of {{ exercise.name }} sounds {% endblock %}
 
 {% block content %}
-    {% if display_filter != 'all' %}
-      <a href="{% url 'sound_list' exercise.id %}?filter=all">Display all sounds</a>
+    {% if display_filter != 'all' and display_filter != 'discarded'%}
+    <div class="btn-group" role="group" aria-label="...">
+      <a class="btn btn-default" href="{% url 'sound_list' exercise.id %}?filter=all">Display all sounds</a>
+      <a class="btn btn-default" href="{% url 'sound_list' exercise.id %}?filter=discarded">Display discarded sounds</a>
+    </div>
     {% else %}
       <a href="{% url 'sound_list' exercise.id %}">Show only sounds without annotations</a>
     {% endif %}
