@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
                                                        reference_sound_filename)
 
-                reference_sound = annotation.utils.create_sound_object(exercise, reference_sound_filename, source_path)
+                reference_sound = annotation.utils.get_or_create_sound_object(exercise, reference_sound_filename, source_path)
                 exercise.reference_sound = reference_sound
                 exercise.save()
                 print("Created sound reference for exercise %s" % exercise_name)
@@ -81,7 +81,7 @@ class Command(BaseCommand):
                     # copy the sound into media
                     annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name, sound_filename)
 
-                    sound = annotation.utils.create_sound_object(exercise, sound_filename, source_path)
+                    sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path)
 
                     print("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise_name))
                 except Exception as e:
