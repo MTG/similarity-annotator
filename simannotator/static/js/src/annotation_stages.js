@@ -112,12 +112,12 @@ StageThreeView.prototype = {
     },
 
     // Replace the annotation elements with the new elements that contain the
-    // options in the lists like annotationType 
-    updateTagContents: function(similaritySegment, annotationType) {
+    // options in the lists like annotationTags
+    updateTagContents: function(similaritySegment, annotationTags) {
         $('.tag_container', this.dom).empty();
         var similarity = this.createSimilarityOptions(similaritySegment);
         // For now the only support type is text input
-        var annotation = this.createAnnotationType(annotationType);
+        var annotation = this.createAnnotationType(annotationTags);
         $('.tag_container', this.dom).append([similarity, annotation]);
     },
 
@@ -157,7 +157,7 @@ StageThreeView.prototype = {
 
 
     // Create annotation elements
-    createAnnotationType: function(annotationType) {
+    createAnnotationType: function(annotationTags) {
         var my = this;
 
         var annotation = $('<div>');
@@ -170,8 +170,22 @@ StageThreeView.prototype = {
             class: 'annotation_container'
         });
 
+        var tagsContainer = $('<div>');
+        annotationContainer.append(tagsContainer);
+
         var input = $('<input>', {
             class: 'annotation_inp',
+        });
+
+        annotationTags.forEach(function (tagName) {
+            var tag = $('<button>', {
+                class: 'annotation_tag btn',
+                text: tagName,
+            });
+            tag.click(function () {
+                input.val(tagName);
+            });
+            tagsContainer.append(tag);
         });
 
         var similValueLabel = $('<div>', {
@@ -464,18 +478,18 @@ AnnotationStages.prototype = {
     },
 
     // Reset field values and update the proximity tags, annotation tages and annotation 
-    reset: function(similaritySegment, annotationType, alwaysShowTags) {
+    reset: function(similaritySegment, annotationTags, alwaysShowTags) {
         this.clear();
         // Update all Tags' Contents
         this.alwaysShowTags = alwaysShowTags || false;
-        this.updateContentsTags(similaritySegment, annotationType);
+        this.updateContentsTags(similaritySegment, annotationTags);
     },
 
     // Update stage 3 dom with new proximity tags and annotation tags
-    updateContentsTags: function(similaritySegment, annotationType) {
+    updateContentsTags: function(similaritySegment, annotationTags) {
         this.stageThreeView.updateTagContents(
             similaritySegment,
-            annotationType
+            annotationTags
         );
     },
 

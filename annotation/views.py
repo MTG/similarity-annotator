@@ -177,7 +177,7 @@ def annotation_action(request, sound_id, tier_id):
                 "feedback": "none",
                 "visualization": "waveform",
                 "similaritySegment": ["yes", "no"],
-                "annotationType": "input",
+                "annotationTags": ["tag1", "tag2"],
                 "alwaysShowTags": False
             }
         }
