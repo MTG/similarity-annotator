@@ -77,11 +77,15 @@ def store_tmp_file(uploaded_file, exercise_name):
     return path
 
 
-def create_exercise_directory(exercise_name):
+def create_exercise_directory(data_set, exercise_name):
     """
     create directory for exercise audio files
     """
-    exercise_files_path = os.path.join(settings.MEDIA_ROOT, exercise_name)
+    # first check if dataset directory exist adn create it if don't
+    data_set_files_path = os.path.join(settings.MEDIA_ROOT, data_set)
+    if not os.path.exists(data_set_files_path):
+        os.makedirs(data_set_files_path)
+    exercise_files_path = os.path.join(data_set_files_path, exercise_name)
     if not os.path.exists(exercise_files_path):
         os.makedirs(exercise_files_path)
     return exercise_files_path
@@ -119,18 +123,20 @@ def decompress_files(dataset_name, exercise_name, zip_file_path):
     return exercise_files_path
 
 
-def create_sound_object(exercise, sound_filename):
-    sound_filename = os.path.join(exercise.name, sound_filename)
-    sound = Sound.objects.create(filename=sound_filename, exercise=exercise)
+def create_sound_object(exercise, sound_filename, original_filename=None):
+    sound = Sound.objects.create(filename=sound_filename, exercise=exercise, original_filename=original_filename)
     return sound
 
 
-def copy_sound_into_media(src, exercise_name, sound_filename):
+def copy_sound_into_media(src, data_set_name, exercise_name, sound_filename):
     """
     Copy files from source to destination
     """
-    dst = os.path.join(settings.MEDIA_ROOT, exercise_name, sound_filename)
-    shutil.copyfile(src, dst)
+    dst = os.path.join(settings.MEDIA_ROOT, data_set_name, exercise_name, sound_filename)
+    try:
+        shutil.copyfile(src, dst)
+    except Exception as e:
+        print(e)
 
     if dst.startswith("/media/"):
         dst = dst[7:]
