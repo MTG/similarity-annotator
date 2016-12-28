@@ -146,6 +146,5 @@ def copy_sound_into_media(src, data_set_name, exercise_name, sound_filename):
 def create_annotations(annotations_file_path, sound):
     try:
         annotations = json.load(open(annotations_file_path))
-        print(annotations)
     except FileNotFoundError:
         print("The file %s doesn't exist" % annotations_file_path)

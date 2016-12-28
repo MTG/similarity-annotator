@@ -14,6 +14,11 @@ class ExerciseAdmin(admin.ModelAdmin):
     list_filter = ('id', 'name')
 
 
+class TierAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'exercise', 'entire_sound')
+    list_display_links = ('name',)
+
+
 class SoundAdmin(admin.ModelAdmin):
     list_display = ('filename', 'exercise', 'is_discarded')
     list_display_links = ('filename', 'exercise')
@@ -31,7 +36,7 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'reference', 'similar_sound')
 
 admin.site.register(Sound, SoundAdmin)
-admin.site.register(Tier)
+admin.site.register(Tier, TierAdmin)
 admin.site.register(Tag)
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Annotation, AnnotationAdmin)

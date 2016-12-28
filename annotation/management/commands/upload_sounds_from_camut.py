@@ -38,14 +38,28 @@ class Command(BaseCommand):
             try:
                 exercise = Exercise.objects.get(name=exercise_name)
             except ObjectDoesNotExist:
-                # exercise = Exercise.objects.create(name=exercise_name, data_set=data_set)
-                # annotation.utils.create_exercise_directory(dataset_name, exercise_name)
+                exercise = Exercise.objects.create(name=exercise_name, data_set=data_set)
+                annotation.utils.create_exercise_directory(dataset_name, exercise_name)
                 # check if there is a rubric file to create the tiers and labels
                 rubric_file_path = os.path.join(dataset_path, 'rubric.json')
                 if os.path.exists(rubric_file_path):
                     rubric_data = json.load(open(rubric_file_path))
-                    for tier_names, tier_data in rubric_data.items():
-                        print(tier_names)
+                    for tier_name, tier_data in rubric_data.items():
+                        try:
+                            Tier.objects.get(name=tier_name, exercise=exercise)
+                        except ObjectDoesNotExist:
+                            if 'parent_tier' in tier_data:
+                                try:
+                                    parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
+                                except ObjectDoesNotExist:
+                                    parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise)
+                                tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+                            else:
+                                tier = Tier.objects.create(name=tier_name, exercise=exercise)
+                            if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
+                                tier.entire_sound = True
+                                tier.save()
+                            print("Created tier %s in exercise %s" % (tier.name, exercise.name))
                 else:
                     # create initial tier "whole sound"
                     Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
@@ -91,7 +105,7 @@ class Command(BaseCommand):
                     sound_file_relative_path = sound_description['path']
                     source_path = os.path.join(dataset_path, sound_file_relative_path)
                     sound_filename = os.path.basename(sound_file_relative_path)
-            
+
                     # copy the sound into media
                     annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name, sound_filename)
 
