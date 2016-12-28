@@ -26,9 +26,13 @@ class SoundAdmin(admin.ModelAdmin):
 
 
 class AnnotationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'sound', 'tier')
-    list_display_links = ('name', 'sound', 'tier')
-    list_filter = ('id', 'sound')
+    list_display = ('id', 'name', 'sound', 'tier', 'get_exercise', 'start_time', 'user')
+    list_display_links = ('name', )
+    list_filter = ('sound', )
+
+    @staticmethod
+    def get_exercise(obj):
+        return obj.sound.exercise
 
 
 class AnnotationSimilarityAdmin(admin.ModelAdmin):

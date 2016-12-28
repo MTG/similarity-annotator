@@ -2,12 +2,11 @@ import os
 import json
 import shutil
 import zipfile
-import subprocess
 import decimal
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Sound, Exercise, Annotation, AnnotationSimilarity
+from .models import Sound, Exercise, Annotation, AnnotationSimilarity, Tier, User
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -143,8 +142,15 @@ def copy_sound_into_media(src, data_set_name, exercise_name, sound_filename):
     return dst
 
 
-def create_annotations(annotations_file_path, sound):
+def create_reference_annotations(annotations_file_path, sound, username):
     try:
         annotations = json.load(open(annotations_file_path))
+        user = User.objects.get(username=username)
+        for tier_name, tier_annotations in annotations.items():
+            tier = Tier.objects.get(name=tier_name, exercise=sound.exercise)
+            for annotation in tier_annotations:
+                Annotation.objects.create(name=annotation["label"], start_time=annotation["start_time"],
+                                          end_time=annotation["end_time"], sound=sound, tier=tier, user=user)
+                print("Created annotation %s on reference sound %s" % (annotation["label"], sound.filename))
     except FileNotFoundError:
         print("The file %s doesn't exist" % annotations_file_path)
