@@ -241,8 +241,6 @@ UrbanEars.prototype = {
 
     // Make POST request, passing back the content data. On success load in the next task
     post: function (content) {
-        console.log("This post will fail since this is a frontend demo.");
-        console.log("Here is the data about the annotation task");
         console.log(content);
         var my = this;
         $.ajax({
@@ -254,6 +252,8 @@ UrbanEars.prototype = {
         .done(function(data) {
             if (data.status == "success" && nextUrl != 'None') {
               window.location = nextUrl;
+            } else {
+             Message.notifyAlert('Successfully saved all the changes, that was the last Tier.');  
             }
         })
         .fail(function() {

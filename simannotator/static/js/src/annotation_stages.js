@@ -170,22 +170,8 @@ StageThreeView.prototype = {
             class: 'annotation_container'
         });
 
-        var tagsContainer = $('<div>');
-        annotationContainer.append(tagsContainer);
-
         var input = $('<input>', {
             class: 'annotation_inp',
-        });
-
-        annotationTags.forEach(function (tagName) {
-            var tag = $('<button>', {
-                class: 'annotation_tag btn',
-                text: tagName,
-            });
-            tag.click(function () {
-                input.val(tagName);
-            });
-            tagsContainer.append(tag);
         });
 
         var similValueLabel = $('<div>', {
@@ -199,6 +185,22 @@ StageThreeView.prototype = {
         var input2 = $('<input>', {
             class: 'simil-val-inp',
         });
+
+        var tagsContainer = $('<div>');
+        similValueContainer.append(tagsContainer);
+
+
+        annotationTags.forEach(function (tagName) {
+            var tag = $('<button>', {
+                class: 'annotation_tag btn',
+                text: tagName,
+            });
+            tag.click(function () {
+                input2.val(tagName);
+            });
+            tagsContainer.append(tag);
+        });
+
         var btn = $('<button>', {
             class: 'annotation_tag btn',
             text: 'Done',
@@ -208,12 +210,13 @@ StageThreeView.prototype = {
         btn.click(function () {
             $(my).trigger('change-tag', [{annotation: input.val(), similValue: input2.val()}]);
         });
+        annotationContainer.append(annotationLabel);
         annotationContainer.append(input);
         annotationContainer.append(btn);
         similValueContainer.append(similValueLabel);
         similValueContainer.append(input2);
 
-        return annotation.append([similValueContainer, annotationLabel, annotationContainer]);
+        return annotation.append([similValueContainer, annotationContainer]);
     },
 
     // Update stage 3 dom with the current regions data
