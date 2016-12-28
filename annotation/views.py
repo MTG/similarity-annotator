@@ -186,7 +186,7 @@ def annotation_action(request, sound_id, tier_id):
         out = {'status': 'success'}
         return JsonResponse(out)
     else:
-        tags = Tag.objects.values_list('name', flat=True).all()
+        tags = Tag.objects.filter(tiers=tier).values_list('name', flat=True).all()
         ref_sound = sound.exercise.reference_sound
         out = {
             "task": {
