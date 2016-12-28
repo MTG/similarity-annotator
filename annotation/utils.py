@@ -2,7 +2,6 @@ import os
 import json
 import shutil
 import zipfile
-import subprocess
 import decimal
 
 from django.conf import settings
