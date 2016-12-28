@@ -169,19 +169,48 @@ def annotation_action(request, sound_id, tier_id):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         post_body = json.loads(body_unicode)
-        Annotation.objects.filter(sound=sound, tier=tier).delete()
+        added = {}
+        old_annotations = Annotation.objects.filter(sound=sound, tier=tier)
         for a in post_body['annotations']:
-            new_annotation = Annotation.objects.create(start_time=a['start'], end_time=a['end'], name=a['annotation'],
-                                                       sound=sound, tier=tier, user=request.user)
-            # create annotations in child tiers
-            if tier.child_tiers.all():
-                for child_tier in tier.child_tiers.all():
-                    Annotation.objects.create(start_time=a['start'], end_time=a['end'], sound=sound, tier=child_tier,
-                                              user=request.user)
+            a_obj = None
+            if isinstance(a['id'], int):
+                a_obj = old_annotations.filter(pk=a['id'])
+
+            if a_obj and a_obj.count():
+                new_annotation = a_obj[0]
+                new_annotation.start_time = a['start']
+                new_annotation.end_time = a['end']
+                new_annotation.name = a['annotation']
+                new_annotation.user = request.user
+                new_annotation.save()
+            else:
+                new_annotation = Annotation.objects.create(sound=sound,
+                        start_time=a['start'], end_time=a['end'], tier=tier,
+                        name=a['annotation'], user=request.user)
+
+            # Re-create all AnnotationSimilarity for this user
+            new_annotation.annotationsimilarity_set.filter(user=request.user).delete()
             if a['similarity'] == 'yes':
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref, similar_sound=new_annotation,
-                                                    similarity_measure=float(a['similValue']))
+                                                    similarity_measure=float(a['similValue']),
+                                                    user = request.user)
+
+            added[new_annotation.id] = {'start': a['start'], 'end': a['end']}
+
+        # Remove old_annotation that are not in new list
+        for a in old_annotations.all():
+            if a.id not in added:
+                a.delete()
+
+        # create annotations in child tiers
+        if tier.child_tiers.all():
+            for child_tier in tier.child_tiers.all():
+                if Annotation.objects.filter(sound=sound, tier=child_tier).count() == 0:
+                    for k in added.keys():
+                        Annotation.objects.create(start_time=added[k]['start'],
+                                end_time=added[k]['end'], sound=sound, tier=child_tier,
+                                user=request.user)
 
         out = {'status': 'success'}
         return JsonResponse(out)
@@ -207,7 +236,7 @@ def annotation_action(request, sound_id, tier_id):
                 })
         out['task']['segments'] = []
         for a in Annotation.objects.filter(sound=sound, tier=tier).all():
-            references = a.annotationsimilarity_set.all()
+            references = a.annotationsimilarity_set.filter(user=request.user).all()
             annotation = {
                 "start": a.start_time,
                 "end": a.end_time,
