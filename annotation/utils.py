@@ -146,17 +146,23 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
     try:
         annotations = json.load(open(annotations_file_path))
         user = User.objects.get(username=username)
+        print("SOUND: %s" % sound.filename)
         for tier_name, tier_annotations in annotations.items():
             tier = Tier.objects.get(name=tier_name, exercise=sound.exercise)
+            print("TIER: %s" % tier_name)
+            print("num tier annotations: %s" % len(tier_annotations))
             for annotation_data in tier_annotations:
                 if reference:
+                    print("reference")
                     Annotation.objects.create(name=annotation_data["label"], start_time=annotation_data["start_time"],
                                               end_time=annotation_data["end_time"], sound=sound, tier=tier, user=user)
                     print("Created annotation %s on reference sound %s" % (annotation_data["label"], sound.filename))
                 else:
+                    print("normal")
                     # retrieve reference sound of the exercise and the corresponding Annotation
                     reference_sound_of_the_exercise = sound.exercise.reference_sound
                     try:
+                        print("start_time: %s, end_time: %s" % (annotation_data["start_time"], annotation_data["end_time"]))
                         reference_sound_annotation = Annotation.objects.get(sound=reference_sound_of_the_exercise,
                                                                             tier=tier,
                                                                             start_time=annotation_data["start_time"],
@@ -175,7 +181,7 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
 
                     except ObjectDoesNotExist:
                         print("There is no reference sound annotation in tier %s for file %s" %
-                              (annotations_file_path, tier_name))
+                              (tier_name, annotations_file_path))
                         return 0
     except FileNotFoundError:
         print("The file %s doesn't exist" % annotations_file_path)
