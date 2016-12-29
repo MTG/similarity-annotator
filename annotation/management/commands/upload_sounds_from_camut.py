@@ -140,10 +140,9 @@ class Command(BaseCommand):
                     sound_annotations_file_path = os.path.splitext(source_path)[0] + '.json'
                     if os.path.exists(sound_annotations_file_path):
                         if options['force_annotations']:
-                            reference_sound.annotations.all().delete()
-                        if not reference_sound.annotations.all():
-                            annotation.utils.create_reference_annotations(sound_annotations_file_path,
-                                                                          reference_sound, username)
+                            sound.annotations.all().delete()
+                        if not sound.annotations.all():
+                            annotation.utils.create_annotations(sound_annotations_file_path, sound, username, False)
                 except Exception as e:
                     print(e.message)
 
