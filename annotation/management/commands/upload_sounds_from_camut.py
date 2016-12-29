@@ -112,9 +112,11 @@ class Command(BaseCommand):
 
                 reference_sound_annotations_file_path = os.path.splitext(source_path)[0] + '.trans_json'
                 if os.path.exists(reference_sound_annotations_file_path):
-                    if options['force_annotations'] or not reference_sound.annotations.all():
-                        annotation.utils.create_reference_annotations(reference_sound_annotations_file_path,
-                                                                      reference_sound, username)
+                    if options['force_annotations']:
+                        reference_sound.annotations.all().delete()
+                    if not reference_sound.annotations.all():
+                        annotation.utils.create_annotations(reference_sound_annotations_file_path, reference_sound,
+                                                            username, True)
             except KeyError:
                 print("The exercise %s does not have reference sound" % exercise_name)
 
@@ -132,6 +134,16 @@ class Command(BaseCommand):
                     sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path)
 
                     print("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise_name))
+
+                    # CREATE ANNOTATIONS
+
+                    sound_annotations_file_path = os.path.splitext(source_path)[0] + '.json'
+                    if os.path.exists(sound_annotations_file_path):
+                        if options['force_annotations']:
+                            reference_sound.annotations.all().delete()
+                        if not reference_sound.annotations.all():
+                            annotation.utils.create_reference_annotations(sound_annotations_file_path,
+                                                                          reference_sound, username)
                 except Exception as e:
                     print(e.message)
 
