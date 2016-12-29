@@ -6,7 +6,7 @@ import decimal
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Sound, Exercise, Annotation, AnnotationSimilarity
+from .models import Sound, Exercise, Annotation, AnnotationSimilarity, Tier, User
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -140,3 +140,49 @@ def copy_sound_into_media(src, data_set_name, exercise_name, sound_filename):
         dst = dst[7:]
 
     return dst
+
+
+def create_annotations(annotations_file_path, sound, username, reference=False):
+    try:
+        annotations = json.load(open(annotations_file_path))
+        user = User.objects.get(username=username)
+        print("SOUND: %s" % sound.original_filename)
+        for tier_name, tier_annotations in annotations.items():
+            tier = Tier.objects.get(name=tier_name, exercise=sound.exercise)
+            print("TIER: %s" % tier_name)
+            print("num tier annotations: %s" % len(tier_annotations))
+            for annotation_data in tier_annotations:
+                if reference:
+                    print("reference")
+                    Annotation.objects.create(name=annotation_data["label"], start_time=annotation_data["start_time"],
+                                              end_time=annotation_data["end_time"], sound=sound, tier=tier, user=user)
+                    print("Created annotation %s on reference sound %s" % (annotation_data["label"], sound.filename))
+                else:
+                    print("normal")
+                    # retrieve reference sound of the exercise and the corresponding Annotation
+                    reference_sound_of_the_exercise = sound.exercise.reference_sound
+                    try:
+                        print("start_time: %s, end_time: %s" % (annotation_data["start_time"], annotation_data["end_time"]))
+                        reference_sound_annotation = Annotation.objects.get(sound=reference_sound_of_the_exercise,
+                                                                            tier=tier,
+                                                                            start_time=annotation_data["start_time"],
+                                                                            end_time=annotation_data["end_time"])
+                        # create annotation on similar sound with same reference annotation label
+                        annotation = Annotation.objects.create(name=reference_sound_annotation.name,
+                                                               start_time=annotation_data["start_time"],
+                                                               end_time=annotation_data["end_time"], sound=sound,
+                                                               tier=tier, user=user)
+                        # create annotation similarity with both annotations
+                        annotation_similarity = AnnotationSimilarity.objects.create(
+                            reference=reference_sound_annotation, similar_sound=annotation,
+                            similarity_measure=annotation_data, user=user)
+                        print("Created AnnotationSimilarity %s from on sound %s in exercise %s" %
+                              (annotation_similarity.id, sound.filename, sound.exercise.name))
+
+                    except ObjectDoesNotExist:
+                        print("There is no reference sound annotation in tier %s for file %s" %
+                              (tier_name, annotations_file_path))
+                        return 0
+    except FileNotFoundError:
+        print("The file %s doesn't exist" % annotations_file_path)
+
