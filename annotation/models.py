@@ -45,6 +45,23 @@ class Sound(models.Model):
     def __str__(self):
         return self.filename
 
+    def get_annotations_as_dict(self):
+        ret = {}
+        for tier in self.exercise.tiers.all():
+            annotations = Annotation.objects.filter(sound=self, tier=tier)
+
+            ret[tier.name] = []
+            for i in annotations.all():
+                for s in i.annotationsimilarity_set.all():
+                    ret[tier.name].append({
+                        'ref_start_time': float(s.reference.start_time),
+                        'start_time': float(i.start_time),
+                        'ref_end_time': float(s.reference.end_time),
+                        'end_time': float(i.end_time),
+                        'value': s.similarity_measure
+                        })
+        return ret
+
 
 class Annotation(models.Model):
     name = models.CharField(max_length=200)

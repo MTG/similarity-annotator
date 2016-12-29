@@ -31,8 +31,6 @@ class Command(BaseCommand):
             if sound != sound.exercise.reference_sound:
                 # take the original filename as the destination in which to download the file
                 annotation_file_path = os.path.splitext(sound.original_filename)[0] + '.json'
-                # retrieve annotation for each tier of the sounds exercises
-                for tier in sound.exercise.tiers.all():
-                    annotations = Annotation.objects.filter(tier=tier, sound=sound)
-                    for annotation in annotations:
-                        print(annotation.name)
+                annotations = sound.get_annotations_as_dict()
+                with open(annotation_file_path, 'w') as outfile:
+                    json.dump(annotations, outfile)
