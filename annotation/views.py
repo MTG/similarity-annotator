@@ -283,48 +283,22 @@ def get_annotations(request, sound_id, tier_id):
 def download_annotations(request, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
 
-    s = io.BytesIO()
-    zf = zipfile.ZipFile(s, "w")
-    zip_subdir = "sound_%d" % sound.id
-    zip_filename = "%s.zip" % zip_subdir
+    ret = {}
     for tier in sound.exercise.tiers.all():
         annotations = Annotation.objects.filter(sound=sound, tier=tier)
 
-        ret = []
+        ret[tier.name] = []
         for i in annotations.all():
-            ret.append({
-                'annotation_id': i.id,
-                'startTime': str(i.start_time),
-                'endTime': str(i.end_time)
-                })
-        # Generate XML version of annotations
-        XMLSerializer = serializers.get_serializer("xml")
-        xml_serializer = XMLSerializer()
-        fp, temp_file = tempfile.mkstemp(".xml")
-        print("---------------")
-        print(temp_file)
-        print("---------------")
-        xml_serializer.serialize(annotations.all(), strem=fp)
+            for s in i.annotationsimilarity_set.all():
+                ret[tier.name].append({
+                    'ref_start_time': float(s.reference.start_time),
+                    'start_time': float(i.start_time),
+                    'ref_end_time': float(s.reference.end_time),
+                    'end_time': float(i.end_time),
+                    'value': s.similarity_measure
+                    })
 
-        zip_path = os.path.join(zip_subdir, "tier_%s.xml" % tier.id)
-        zf.write(temp_file, zip_path)
-
-        # Generate JSON version of annotations
-        fp, temp_file = tempfile.mkstemp(".json")
-        json.dump(ret, open(temp_file, 'w'))
-
-        zip_path = os.path.join(zip_subdir, "tier_%s.json" % tier.id)
-        zf.write(temp_file, zip_path)
-
-    zf.close()
-
-    # Grab ZIP file from in-memory, make response with correct MIME-type
-    resp = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
-    # ..and correct content-disposition
-    resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
-
-    return resp
-
+    return JsonResponse(ret)
 
 @login_required
 def upload(request, dataset_id):
