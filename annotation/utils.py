@@ -146,7 +146,7 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
     try:
         annotations = json.load(open(annotations_file_path))
         user = User.objects.get(username=username)
-        print("SOUND: %s" % sound.filename)
+        print("SOUND: %s" % sound.original_filename)
         for tier_name, tier_annotations in annotations.items():
             tier = Tier.objects.get(name=tier_name, exercise=sound.exercise)
             print("TIER: %s" % tier_name)
