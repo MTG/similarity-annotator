@@ -149,9 +149,8 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     next_tier = None
     for t in sound.exercise.tiers.order_by('id').all():
         if choose_next:
-            next_tier = reverse('ref_sound_detail', kwargs={"sound_id": sound_id,
-                        "tier_id": t.id,
-                        "exercise_id": exercise_id})
+            next_tier = reverse('ref_sound_detail', kwargs={"sound_id": sound_id, "tier_id": t.id,
+                                                            "exercise_id": exercise_id})
             choose_next = False
         if t.id == int(tier_id):
             choose_next = True
@@ -184,9 +183,8 @@ def annotation_action(request, sound_id, tier_id):
                 new_annotation.user = request.user
                 new_annotation.save()
             else:
-                new_annotation = Annotation.objects.create(sound=sound,
-                        start_time=a['start'], end_time=a['end'], tier=tier,
-                        name=a['annotation'], user=request.user)
+                new_annotation = Annotation.objects.create(sound=sound, start_time=a['start'], end_time=a['end'],
+                                                           tier=tier, name=a['annotation'], user=request.user)
 
             # Re-create all AnnotationSimilarity for this user
             new_annotation.annotationsimilarity_set.filter(user=request.user).delete()
@@ -194,7 +192,7 @@ def annotation_action(request, sound_id, tier_id):
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref, similar_sound=new_annotation,
                                                     similarity_measure=float(a['similValue']),
-                                                    user = request.user)
+                                                    user=request.user)
 
             added[new_annotation.id] = {'start': a['start'], 'end': a['end']}
 
@@ -208,9 +206,8 @@ def annotation_action(request, sound_id, tier_id):
             for child_tier in tier.child_tiers.all():
                 if Annotation.objects.filter(sound=sound, tier=child_tier).count() == 0:
                     for k in added.keys():
-                        Annotation.objects.create(start_time=added[k]['start'],
-                                end_time=added[k]['end'], sound=sound, tier=child_tier,
-                                user=request.user)
+                        Annotation.objects.create(start_time=added[k]['start'], end_time=added[k]['end'], sound=sound,
+                                                  tier=child_tier, user=request.user)
 
         out = {'status': 'success'}
         return JsonResponse(out)
@@ -285,6 +282,7 @@ def download_annotations(request, sound_id):
 
     ret = sound.get_annotations_as_dict()
     return JsonResponse(ret)
+
 
 @login_required
 def upload(request, dataset_id):

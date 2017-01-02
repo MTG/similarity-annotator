@@ -2,7 +2,7 @@ import os
 import json
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
-from annotation.models import DataSet, Exercise, Tier
+from annotation.models import DataSet, Exercise, Tier, Tag
 import annotation.utils
 
 
@@ -50,31 +50,43 @@ class Command(BaseCommand):
                 exercise = Exercise.objects.create(name=exercise_name, data_set=data_set)
                 annotation.utils.create_exercise_directory(dataset_name, exercise_name)
 
-                # CREATE TIERS
-                # check if there is a rubric file to create the tiers and labels
+            # CREATE TIERS
+            # check if there is a rubric file to create the tiers and labels
 
-                rubric_file_path = os.path.join(dataset_path, 'rubric.json')
-                if os.path.exists(rubric_file_path):
-                    rubric_data = json.load(open(rubric_file_path))
-                    for tier_name, tier_data in rubric_data.items():
-                        try:
-                            Tier.objects.get(name=tier_name, exercise=exercise)
-                        except ObjectDoesNotExist:
-                            if 'parent_tier' in tier_data:
-                                try:
-                                    parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
-                                except ObjectDoesNotExist:
-                                    parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise)
-                                tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
-                            else:
-                                tier = Tier.objects.create(name=tier_name, exercise=exercise)
-                            if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
-                                tier.entire_sound = True
-                                tier.save()
-                            print("Created tier %s in exercise %s" % (tier.name, exercise.name))
-                else:
-                    # create initial tier "whole sound"
-                    Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
+            rubric_file_path = os.path.join(dataset_path, 'rubric.json')
+            if os.path.exists(rubric_file_path):
+                rubric_data = json.load(open(rubric_file_path))
+                for tier_name, tier_data in rubric_data.items():
+                    try:
+                        tier = Tier.objects.get(name=tier_name, exercise=exercise)
+                    except ObjectDoesNotExist:
+                        if 'parent_tier' in tier_data:
+                            try:
+                                parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
+                            except ObjectDoesNotExist:
+                                parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise)
+                            tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+                        else:
+                            tier = Tier.objects.create(name=tier_name, exercise=exercise)
+                        if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
+                            tier.entire_sound = True
+                            tier.save()
+                        print("Created tier %s in exercise %s" % (tier.name, exercise.name))
+
+                    # CREATE TAGS IF DEFINED IN THE RUBRIC FILE
+                    if 'rubric' in tier_data:
+                        for tag_data in tier_data['rubric']['ratings']:
+                            tag, created = Tag.objects.get_or_create(name=tag_data)
+                            if created:
+                                print("Created tag: %s" % tag.name)
+                            if tier not in tag.tiers.all():
+                                tag.tiers.add(tier)
+                    else:
+                        print("NO RUBRIC IN FILE")
+
+            else:
+                # create initial tier "whole sound"
+                Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
 
             # CREATE REFERENCE PITCH
 
@@ -87,7 +99,6 @@ class Command(BaseCommand):
                                                                           reference_pitch_filename)
                 exercise.reference_pitch_sound.name = destination_path
                 exercise.save()
-                print("Created pitch reference for exercise %s" % exercise_name)
             except KeyError:
                 print("The exercise %s does not have a pitch reference")
 
@@ -106,7 +117,6 @@ class Command(BaseCommand):
                                                                               source_path)
                 exercise.reference_sound = reference_sound
                 exercise.save()
-                print("Created sound reference for exercise %s" % exercise_name)
 
                 # CREATE REFERENCE ANNOTATIONS
 
@@ -133,8 +143,6 @@ class Command(BaseCommand):
 
                     sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path)
 
-                    print("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise_name))
-
                     # CREATE ANNOTATIONS
 
                     sound_annotations_file_path = os.path.splitext(source_path)[0] + '.json'
@@ -144,6 +152,5 @@ class Command(BaseCommand):
                         if not sound.annotations.all():
                             annotation.utils.create_annotations(sound_annotations_file_path, sound, username, False)
                 except Exception as e:
-                    print(e.message)
-
+                    print("Error while creating sounds and annotations from files: %s" % e)
 
