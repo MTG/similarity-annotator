@@ -1,8 +1,7 @@
-{% extends 'annotationapp/annotationapp_base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-{% block title %} {{ sound.filename }} annotation page {% endblock %}
+
 {% block extra_head %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/materialize.min.css">
@@ -24,28 +23,9 @@
     <script type="text/javascript" src="/static/js/src/main_ref.js" defer></script>
 {% endblock %}
 
-{% block content %}
-    <!-- Modal Structure -->
-    <div id="modal1" class="modal">
-        <div class="modal-content">
-            <h4>Tutorial Video</h4>
-            <div class="videowrapper">
-                <iframe id="tutorial-video" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class=" modal-action modal-close waves-effect waves-red btn-flat">Close</a>
-        </div>
-    </div>
-    <div class="row prompt">
-        <h4 class="center">Highlight &amp; Tag Each Sound</h4>
-        <div class="instructions">
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9312;</span> &nbsp Familiarize yourself with the list of sound tags under the audio recording.</h6>
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9313;</span> &nbsp Click the play button and listen to the recording.</h6>
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9314;</span> &nbsp For each sound that you hear click and drag to create a new annotation.</h6>
-            <h6><span style="color: #00B1B9; font-size: 18px; font-weight: 600;">&#9315;</span> &nbsp Select the appropriate tag and indicate whether the sound is near or far.</h6>
-        </div>
-    </div>
+<div class="row prompt">
+  <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
+</div>
     <div class="annotation">
        <span><b>Sound to annotate:</b></span>
         <div class="labels"></div>
@@ -59,13 +39,5 @@
       var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
       var nextUrl = '{{ next_url}}';
     </script>   
- 
-{% endblock %}
-
-{% block logout %}
-    <button>
-    <a href="/accounts/logout">logout</a>
-    </button>
-{% endblock %}
 
 </html>
