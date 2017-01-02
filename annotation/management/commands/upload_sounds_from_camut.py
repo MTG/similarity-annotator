@@ -2,7 +2,7 @@ import os
 import json
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
-from annotation.models import DataSet, Exercise, Tier
+from annotation.models import DataSet, Exercise, Tier, Tag
 import annotation.utils
 
 
@@ -58,7 +58,7 @@ class Command(BaseCommand):
                     rubric_data = json.load(open(rubric_file_path))
                     for tier_name, tier_data in rubric_data.items():
                         try:
-                            Tier.objects.get(name=tier_name, exercise=exercise)
+                            tier = Tier.objects.get(name=tier_name, exercise=exercise)
                         except ObjectDoesNotExist:
                             if 'parent_tier' in tier_data:
                                 try:
@@ -72,6 +72,14 @@ class Command(BaseCommand):
                                 tier.entire_sound = True
                                 tier.save()
                             print("Created tier %s in exercise %s" % (tier.name, exercise.name))
+
+                        # CREATE TAGS IF DEFINED IN THE RUBRIC FILE
+                        if 'rubric' in tier_data:
+                            for tag_data in tier_data['rubric']['ratings']:
+                                tag, created = Tag.objects.get_or_create(name=tag_data)
+                                if tier not in tag.tiers.all():
+                                    tag.tiers.add(tier)
+
                 else:
                     # create initial tier "whole sound"
                     Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
@@ -145,5 +153,4 @@ class Command(BaseCommand):
                             annotation.utils.create_annotations(sound_annotations_file_path, sound, username, False)
                 except Exception as e:
                     print("Error while creating sounds and annotations from files: %s" % e)
-
 

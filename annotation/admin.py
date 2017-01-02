@@ -39,9 +39,13 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
     list_display = ('id', 'reference', 'similar_sound', 'similarity_measure')
     list_display_links = ('id', 'reference', 'similar_sound')
 
+
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+
 admin.site.register(Sound, SoundAdmin)
 admin.site.register(Tier, TierAdmin)
-admin.site.register(Tag)
+admin.site.register(Tag, TagAdmin)
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Annotation, AnnotationAdmin)
 admin.site.register(AnnotationSimilarity, AnnotationSimilarityAdmin)
