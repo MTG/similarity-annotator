@@ -127,6 +127,7 @@ def get_or_create_sound_object(exercise, sound_filename, original_filename=None)
         sound = Sound.objects.get(filename=sound_filename, exercise=exercise, original_filename=original_filename)
     except ObjectDoesNotExist:
         sound = Sound.objects.create(filename=sound_filename, exercise=exercise, original_filename=original_filename)
+        print("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise.name))
     return sound
 
 
