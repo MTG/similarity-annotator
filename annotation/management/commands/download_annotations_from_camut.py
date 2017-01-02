@@ -2,8 +2,7 @@ import os
 import json
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
-from annotation.models import Exercise, Sound, Annotation, AnnotationSimilarity, Tier, DataSet
+from annotation.models import Exercise, Sound, DataSet
 
 
 class Command(BaseCommand):
