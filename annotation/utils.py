@@ -153,20 +153,24 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
             print("num tier annotations: %s" % len(tier_annotations))
             for annotation_data in tier_annotations:
                 if reference:
-                    print("reference")
-                    Annotation.objects.create(name=annotation_data["label"], start_time=annotation_data["start_time"],
-                                              end_time=annotation_data["end_time"], sound=sound, tier=tier, user=user)
-                    print("Created annotation %s on reference sound %s" % (annotation_data["label"], sound.filename))
+                    try:
+                        Annotation.objects.get(name=annotation_data["label"], start_time=annotation_data["start_time"],
+                                               end_time=annotation_data["end_time"], sound=sound, tier=tier, user=user)
+                    except ObjectDoesNotExist:
+                        Annotation.objects.create(name=annotation_data["label"],
+                                                  start_time=annotation_data["start_time"],
+                                                  end_time=annotation_data["end_time"], sound=sound, tier=tier,
+                                                  user=user)
+                        print("Created annotation %s on reference sound %s" % (annotation_data["label"],
+                                                                               sound.filename))
                 else:
-                    print("normal")
                     # retrieve reference sound of the exercise and the corresponding Annotation
                     reference_sound_of_the_exercise = sound.exercise.reference_sound
                     try:
-                        print("start_time: %s, end_time: %s" % (annotation_data["start_time"], annotation_data["end_time"]))
                         reference_sound_annotation = Annotation.objects.get(sound=reference_sound_of_the_exercise,
                                                                             tier=tier,
-                                                                            start_time=annotation_data["start_time"],
-                                                                            end_time=annotation_data["end_time"])
+                                                                            start_time=annotation_data["ref_start_time"],
+                                                                            end_time=annotation_data["ref_end_time"])
                         # create annotation on similar sound with same reference annotation label
                         annotation = Annotation.objects.create(name=reference_sound_annotation.name,
                                                                start_time=annotation_data["start_time"],
@@ -175,7 +179,7 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
                         # create annotation similarity with both annotations
                         annotation_similarity = AnnotationSimilarity.objects.create(
                             reference=reference_sound_annotation, similar_sound=annotation,
-                            similarity_measure=annotation_data, user=user)
+                            similarity_measure=annotation_data["value"], user=user)
                         print("Created AnnotationSimilarity %s from on sound %s in exercise %s" %
                               (annotation_similarity.id, sound.filename, sound.exercise.name))
 

@@ -144,6 +144,6 @@ class Command(BaseCommand):
                         if not sound.annotations.all():
                             annotation.utils.create_annotations(sound_annotations_file_path, sound, username, False)
                 except Exception as e:
-                    print(e.message)
+                    print("Error while creating sounds and annotations from files: %s" % e)
 
 
