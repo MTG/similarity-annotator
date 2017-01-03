@@ -156,6 +156,8 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
             choose_next = True
 
     context = {'next_url': next_tier, 'form': tier_form, 'sound': sound}
+    tier = Tier.objects.get(id=tier_id)
+    context['tier'] = tier
     context['tier_id'] = tier_id
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
