@@ -200,7 +200,10 @@ StageThreeView.prototype = {
             });
             tagsContainer.append(tag);
         });
-
+        
+        var manyValues = $('<div>', {
+            class: 'simil-vals-list',
+        });
         var btn = $('<button>', {
             class: 'annotation_tag btn',
             text: 'Done',
@@ -216,7 +219,7 @@ StageThreeView.prototype = {
         similValueContainer.append(similValueLabel);
         similValueContainer.append(input2);
 
-        return annotation.append([similValueContainer, annotationContainer]);
+        return annotation.append([similValueContainer, annotationContainer, manyValues]);
     },
 
     // Update stage 3 dom with the current regions data
@@ -239,8 +242,19 @@ StageThreeView.prototype = {
         $('.similarity_option', this.dom).removeClass('selected');
         $('.annotation_inp', this.dom).val('');
         $('.simil-val-inp', this.dom).val('');
+        $('.simil-vals-list', this.dom).html('');
         $('.simil_value_container', this.dom).hide();
 
+        if (region.manyValues) {
+            var values = document.createElement("ul");
+            region.manyValues.forEach(function(value) {
+              var li = document.createElement("li");
+              li.appendChild(document.createTextNode(value));
+              values.appendChild(li)
+            }); 
+            $('.simil-vals-list', this.dom).append("<div class='stage_3_label'>Multiple Values:</div>");
+            $('.simil-vals-list', this.dom).append(values);
+        }
         if (region.similValue) {
             $('.simil-val-inp', this.dom).val(region.similValue);
         }
@@ -552,7 +566,6 @@ AnnotationStages.prototype = {
     // Event handler: called when the a region is draged or resized, adds action to event list
     trackMovement: function(region, event, type) {
         if (this.currentStage === 3) {
-            this.giveFeedback();
             this.trackEvent('region-moved-' + type, this.currentRegion.id, null, this.currentRegion.start, this.currentRegion.end);
         }
     },
@@ -602,8 +615,6 @@ AnnotationStages.prototype = {
 
     // Event Handler: called when region is deleted
     deleteAnnotation: function(region) {
-        // update f1 score and give the user feedback
-        this.giveFeedback();
         // Add the action to the event list
         this.trackEvent('delete', region.id);
         // Add the region to the deleted list
@@ -630,8 +641,6 @@ AnnotationStages.prototype = {
 
         // Update the current region with the tag data
         this.currentRegion.update(data);
-        // Give feedback if these tags improve the user's f1 score
-        this.giveFeedback();
 
         // Track tag change / add events
         if (annotationEventType) {
@@ -656,24 +665,6 @@ AnnotationStages.prototype = {
         if (this.currentRegion.annotation != "" && 
             (this.currentRegion.similarity == 'no' || this.currentRegion.regionRef)){
             this.updateStage(1);
-        }
-    },
-
-    // Helper function, called when the user makes changes that will affect their f1 score
-    // If the user has some type of feed back, update the f1 score and notify the user of their progress
-    giveFeedback: function() {
-        if (this.wavesurfer.params.feedback !== 'none') {
-            var newF1Score = this.computeF1Score();
-            if (this.wavesurfer.params.feedback === 'notify') {
-                this.notify(newF1Score);
-            } else if (this.wavesurfer.params.feedback === 'hiddenImage') {
-                this.hiddenImage.resetCover();
-                this.notify(newF1Score);
-                this.showImage(newF1Score);
-            }
-            // For silent feedback just update the f1score
-            // After we checked if the user has improved and recieved feedback, replace f1 score
-            this.previousF1Score = newF1Score;
         }
     },
 

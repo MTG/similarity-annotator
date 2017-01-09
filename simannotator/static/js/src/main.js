@@ -269,7 +269,8 @@ UrbanEars.prototype = {
             id: section.id,
             annotation: section.annotation,
             similValue: section.similValue,
-            similarity: section.similarity
+            similarity: section.similarity,
+            manyValues: section.manyValues
           }; 
           var region = my.wavesurfer.addRegion(values);
           if (section.reference != null){

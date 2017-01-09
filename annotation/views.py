@@ -235,7 +235,6 @@ def annotation_action(request, sound_id, tier_id):
                 })
         out['task']['segments'] = []
         for a in Annotation.objects.filter(sound=sound, tier=tier).all():
-            references = a.annotationsimilarity_set.filter(user=request.user).all()
             annotation = {
                 "start": a.start_time,
                 "end": a.end_time,
@@ -243,11 +242,25 @@ def annotation_action(request, sound_id, tier_id):
                 "id": a.id,
                 "similarity": 'no'
                 }
+            references = a.annotationsimilarity_set
+            # If user is staff then we return all the AnnotationSimilarity values
+            if not request.user.is_staff:
+                references = references.filter(user=request.user)
+
+            references = references.all()
+            many_values = []
+            for ref in references:
+                many_values.append(ref.similarity_measure)
+
+            if len(many_values) > 1:
+                annotation['manyValues'] = many_values
+
             if len(references):
                 reference = references[0]
                 annotation['similarity'] = "yes"
                 annotation['similValue'] = reference.similarity_measure
                 annotation['reference'] = reference.reference_id
+
             out['task']['segments'].append(annotation)
 
         out['task']['url'] = os.path.join(settings.MEDIA_URL, sound.exercise.data_set.name, sound.exercise.name,
