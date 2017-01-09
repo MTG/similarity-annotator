@@ -17,6 +17,7 @@ class DataSet(models.Model):
 
 class Exercise(models.Model):
     name = models.CharField(max_length=50)
+    exercise_id = models.CharField(max_length=50, blank=True, null=True)
     data_set = models.ForeignKey(DataSet, related_name='exercises')
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
     reference_pitch_sound = models.FileField(blank=True, null=True, upload_to=exercise_upload_to)

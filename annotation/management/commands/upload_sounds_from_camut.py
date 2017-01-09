@@ -40,14 +40,15 @@ class Command(BaseCommand):
             return 0
         description_file_path = os.path.join(dataset_path, options['description'])
         descriptions = json.load(open(description_file_path))
-        for exercise_name, exercise_description in descriptions.items():
+        for exercise_id, exercise_description in descriptions.items():
+            exercise_name = exercise_description['name']
 
             # CREATE EXERCISE
 
             try:
-                exercise = Exercise.objects.get(name=exercise_name)
+                exercise = Exercise.objects.get(name=exercise_name, exercise_id=exercise_id)
             except ObjectDoesNotExist:
-                exercise = Exercise.objects.create(name=exercise_name, data_set=data_set)
+                exercise = Exercise.objects.create(name=exercise_name, data_set=data_set, exercise_id=exercise_id)
                 annotation.utils.create_exercise_directory(dataset_name, exercise_name)
 
             # CREATE TIERS
