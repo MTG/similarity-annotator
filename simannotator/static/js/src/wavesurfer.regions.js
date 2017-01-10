@@ -146,6 +146,9 @@ WaveSurfer.Region = {
         this.annotation = params.annotation || '';
         this.manyValues = params.manyValues || '';
         this.similValue = params.similValue || '';
+        if (params.similValue == 0) {
+          this.similValue = "0"
+        }
         this.similarity = params.similarity || '';
 
         this.maxLength = params.maxLength;
