@@ -17,19 +17,14 @@ class ExerciseForm(forms.ModelForm):
         fields = ['name', 'reference_pitch_sound']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', })}
 
-    def clean_name(self):
-        exercise_name = self.cleaned_data["name"]
-        try:
-            Exercise.objects.get(name=exercise_name)
-            raise forms.ValidationError("En exercise with that name already exists")
-        except ObjectDoesNotExist:
-            return exercise_name
-
     def clean_zip_file(self):
         zip_file = self.cleaned_data['zip_file']
         if not zipfile.is_zipfile(zip_file):
             raise ValidationError("The file type is not correct")
 
+    def __init__(self, *args, **kwargs):
+        super(ExerciseForm, self).__init__(*args, **kwargs)
+        self.fields['name'].required = True
 
 class TierForm(forms.ModelForm):
     class Meta:
