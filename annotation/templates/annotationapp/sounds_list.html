@@ -20,7 +20,7 @@
         {% endfor %}
         <div class="pagination">
             {% if sounds_list.has_previous %}
-                <a href="?page={{ sounds_list.previous_page_number }}">previous</a>
+            <a href="?page={{ sounds_list.previous_page_number }}&{{ request.GET.urlencode }}">previous</a>
             {% endif %}
 
             <span class="current">
@@ -28,7 +28,7 @@
             </span>
 
             {% if sounds_list.has_next %}
-                <a href="?page={{ sounds_list.next_page_number }}">next</a>
+            <a href="?page={{ sounds_list.next_page_number }}&{{ request.GET.urlencode }}">next</a>
             {% endif %}
         </div>
     {% else %}
