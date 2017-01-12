@@ -161,6 +161,12 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     context['tier_id'] = tier_id
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
+def update_annotation(old_annotation, new_annotation, user):
+    old_annotation.start_time = new_annotation['start']
+    old_annotation.end_time = new_annotation['end']
+    old_annotation.name = new_annotation['annotation']
+    old_annotation.user = user
+    old_annotation.save()
 
 @login_required
 @csrf_exempt
@@ -179,11 +185,22 @@ def annotation_action(request, sound_id, tier_id):
 
             if a_obj and a_obj.count():
                 new_annotation = a_obj[0]
-                new_annotation.start_time = a['start']
-                new_annotation.end_time = a['end']
-                new_annotation.name = a['annotation']
-                new_annotation.user = request.user
-                new_annotation.save()
+                # Update the annotatons in the parent tier and child
+                related_annotations = Annotation.objects.filter(sound=sound,
+                        start_time=new_annotation.start_time,
+                        end_time=new_annotation.end_time,
+                        name=new_annotation.name)
+                if tier.parent_tier:
+                    related_annotations = related_annotation.filter(tier=tier.parent_tier).all()
+                    for rel in related_annotations:
+                        update_annotation(rel, a, request.user)
+                for child in tier.child_tiers.all():
+                    related_annotations = related_annotation.filter(tier=child).all()
+                    for rel in related_annotations:
+                        update_annotation(rel, a, request.user)
+
+                # Update the annotation in the current tier
+                update_annotation(new_annotation, a, request.user)
             else:
                 new_annotation = Annotation.objects.create(sound=sound, start_time=a['start'], end_time=a['end'],
                                                            tier=tier, name=a['annotation'], user=request.user)
@@ -201,6 +218,21 @@ def annotation_action(request, sound_id, tier_id):
         # Remove old_annotation that are not in new list
         for a in old_annotations.all():
             if a.id not in added:
+                # Delete annotation in the parent tier and child
+                related_annotations = Annotation.objects.filter(sound=sound,
+                        start_time=a.start_time,
+                        end_time=a.end_time,
+                        name=a.name)
+                if tier.parent_tier:
+                    related_annotations = related_annotation.filter(tier=tier.parent_tier).all()
+                    for rel in related_annotations:
+                        rel.delete()
+                for child in tier.child_tiers.all():
+                    related_annotations = related_annotation.filter(tier=child).all()
+                    for rel in related_annotations:
+                        rel.delete()
+
+                # Delete annotation in the current tier
                 a.delete()
 
         # create annotations in child tiers
