@@ -190,7 +190,7 @@ WorkflowBtns.prototype = {
         var my = this;
         this.nextBtn = $('<button>', {
             class: 'btn submit',
-            text: 'STORE ANNOTATIONS & LOAD NEXT TIER'
+            text: 'STORE ANNOTATIONS'
         });
         this.nextBtn.click(function () {
             $(my).trigger('submit-annotations');
