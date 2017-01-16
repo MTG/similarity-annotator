@@ -659,8 +659,9 @@ AnnotationStages.prototype = {
             );
         }
         // If the region has all its required tags, deselect the region and go back to stage 1
-        if (this.currentRegion.annotation != "" && 
+        if (this.currentRegion.annotation != "" &&
             (this.currentRegion.similarity == 'no' || this.currentRegion.regionRef)){
+            Message.notifyHint('Done: segment data is complete');
             this.updateStage(1);
         }
     },
