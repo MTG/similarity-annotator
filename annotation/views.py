@@ -199,9 +199,9 @@ def annotation_action(request, sound_id, tier_id):
                 if tier.parent_tier:
                     parent_annotation = Annotation.objects.create(sound=sound, start_time=a['start'], end_time=a['end'],
                            tier=tier.parent_tier, name=a['annotation'], user=request.user)
-                    for child in tier.child_tiers.all():
-                        child_annotation = Annotation.objects.create(sound=sound, start_time=a['start'], end_time=a['end'],
-                               tier=tier.child, name=a['annotation'], user=request.user)
+                for child in tier.child_tiers.all():
+                    child_annotation = Annotation.objects.create(sound=sound, start_time=a['start'], end_time=a['end'],
+                           tier=tier.child, name=a['annotation'], user=request.user)
 
             # Re-create all AnnotationSimilarity for this user
             new_annotation.annotationsimilarity_set.filter(user=request.user).delete()
