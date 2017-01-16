@@ -127,8 +127,9 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
             choose_next = False
         if t.id == int(tier_id):
             choose_next = True
-
-    context = {'next_url': next_tier, 'sound': sound, 'tier_id': tier_id, 'tier': tier}
+    other_tiers = sound.exercise.tiers.all()
+    context = {'next_url': next_tier, 'sound': sound, 'tier_id': tier_id, 'tier': tier, 'other_tiers': other_tiers,
+               'exercise_id': exercise_id}
     return render(request, 'annotationapp/sound_detail.html', context)
 
 
