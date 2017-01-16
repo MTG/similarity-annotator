@@ -369,9 +369,6 @@ AnnotationStages.prototype = {
                     Message.notifyAlert('Make shure the annotations is a valid number for similarity segments'); 
                     return false;
                   }
-                }else if (region.annotation === '') {
-                    Message.notifyAlert('Make sure all your annotations have a name!'); 
-                    return false;
                 }
             }
         }
