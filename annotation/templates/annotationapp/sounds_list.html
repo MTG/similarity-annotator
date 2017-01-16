@@ -36,10 +36,6 @@
     {% endif %}
 {% endblock %}
 
-{% block links %}
-    <input type="button" onclick="location.href='/{{ exercise.id }}/download/';" value="Download annotations" />
-{% endblock %}
-
 {% block logout %}
     <button>
     <a href="/accounts/logout">logout</a>
