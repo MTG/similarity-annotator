@@ -23,7 +23,7 @@
     <script type="text/javascript" src="/static/js/src/main.js" defer></script>
 {% endblock %}
 
-<body>
+{% block content %}
 <!-- Modal Structure -->
 <div id="modal1" class="modal">
     <div class="modal-footer">
@@ -40,6 +40,11 @@
         {% endif %}
     {% endfor %}
 </div>
+
+<div class="right-align">
+    <a href="/{{ exercise_id }}/sound_list" class="btn">Go back to sounds</a>
+</div>
+
 <div class="annotation">
   <span><b>Reference Pitch Sound:</b></span>
   {% if sound.exercise.reference_pitch_sound %}
@@ -69,7 +74,7 @@
 
     </div>
 </div>
-</body>
+{% endblock %}
 <script>
   var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
   var nextUrl = '{{ next_url }}';
