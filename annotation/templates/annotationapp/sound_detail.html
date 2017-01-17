@@ -41,10 +41,11 @@
     {% endfor %}
 </div>
 
-<div class="right-align">
-    <a href="/{{ exercise_id }}/sound_list" class="btn">Go back to sounds</a>
+<div style="width: 1600px">
+    <div class="right-align">
+        <a href="/{{ exercise_id }}/sound_list" class="btn">Go back to sounds</a>
+    </div>
 </div>
-
 <div class="annotation">
   <span><b>Reference Pitch Sound:</b></span>
   {% if sound.exercise.reference_pitch_sound %}
