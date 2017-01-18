@@ -12,12 +12,12 @@
     {% endif %}
     <ul class="list-group">
     {% if reference_sound %}
-        <li class="list-group-item list-group-item-info"><a href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}</a> </li>
+        <li><a style="color:#425ff4" href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}</a> </li>
     {% endif %}
     {% if sounds_list %}
         {% for sound in sounds_list %}
-        <li class="list-group-item {% if sound.annotation_state == 'E' %}list-group-item-danger{% elif sound.annotation_state == 'I' %}list-group-item-warning{% else %}list-group-item-success{%endif%}" >
-            <a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
+        <li>
+            <a style="color:{% if sound.annotation_state == 'E' %}#cc0000{% elif sound.annotation_state == 'I' %}#f4aa42{% else %}#2eb244{%endif%}" href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
         {% endfor %}
         <div class="pagination">
             {% if sounds_list.has_previous %}
