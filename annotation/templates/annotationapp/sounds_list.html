@@ -16,7 +16,7 @@
     {% endif %}
     {% if sounds_list %}
         {% for sound in sounds_list %}
-        <li class="list-group-item {% if sound_annotation_state == 'E' %}list-group-item-danger{% elif sound_annotation_state == 'I' %}list-group-item-warning{% else %}list-group-item-success{%endif%}" >
+        <li class="list-group-item {% if sound.annotation_state == 'E' %}list-group-item-danger{% elif sound.annotation_state == 'I' %}list-group-item-warning{% else %}list-group-item-success{%endif%}" >
             <a href="/{{ exercise.id }}/{{ sound.id }}/tiers_list/">{{ sound.filename }}</a></li>
         {% endfor %}
         <div class="pagination">
