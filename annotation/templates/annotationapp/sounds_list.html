@@ -12,7 +12,7 @@
     {% endif %}
     <ul class="list-group">
     {% if reference_sound %}
-        <li class="list-group-item list-group-item-info"><a href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}<span style="color:#cc0000"> reference sound</span> </a> </li>
+        <li class="list-group-item list-group-item-info"><a href="/{{ exercise.id }}/{{ reference_sound.id }}/tiers_list/">{{ reference_sound.filename }}</a> </li>
     {% endif %}
     {% if sounds_list %}
         {% for sound in sounds_list %}
