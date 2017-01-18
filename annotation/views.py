@@ -65,11 +65,8 @@ def sound_list(request, exercise_id):
     exercise = get_object_or_404(Exercise, id=exercise_id)
     display_filter = request.GET.get('filter', False)
     sounds_list = exercise.sounds
-    if display_filter != 'all':
-        if display_filter != 'discarded':
-            sounds_list = sounds_list.filter(annotations__isnull=True)
-        else:
-            sounds_list = sounds_list.filter(is_discarded=True)
+    if display_filter == 'discarded':
+        sounds_list = sounds_list.filter(is_discarded=True)
     paginator = Paginator(sounds_list.all(), 20)
     page = request.GET.get('page')
     try:
@@ -238,6 +235,18 @@ def annotation_action(request, sound_id, tier_id):
                     for k in added.keys():
                         Annotation.objects.create(start_time=added[k]['start'], end_time=added[k]['end'], sound=sound,
                                                   tier=child_tier, user=request.user)
+
+        # update annotation_state of sound
+        num_ref_annotations = Annotation.objects.filter(sound=sound.exercise.reference_sound, tier=tier).count()
+        added_annotations = Annotation.objects.filter(sound=sound, tier=tier)
+        num_similarity = AnnotationSimilarity.objects.filter(similar_sound__in=added_annotations).count()
+        state = 'E'
+        if num_ref_annotations == added_annotations.count():
+            state = 'I'
+            if num_similarity > 0:
+                state = 'C'
+        sound.annotation_state = state
+        sound.save()
 
         out = {'status': 'success'}
         return JsonResponse(out)
