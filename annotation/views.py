@@ -67,6 +67,8 @@ def sound_list(request, exercise_id):
     sounds_list = exercise.sounds
     if display_filter == 'discarded':
         sounds_list = sounds_list.filter(is_discarded=True)
+    else:
+        sounds_list = sounds_list.filter(is_discarded=False)
     paginator = Paginator(sounds_list.all(), 20)
     page = request.GET.get('page')
     try:
