@@ -138,20 +138,9 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
 
     sound = get_object_or_404(Sound, id=sound_id)
 
-    choose_next = False
-    next_tier = None
-    for t in sound.exercise.tiers.order_by('id').all():
-        if choose_next:
-            next_tier = reverse('ref_sound_detail', kwargs={"sound_id": sound_id, "tier_id": t.id,
-                                                            "exercise_id": exercise_id})
-            choose_next = False
-        if t.id == int(tier_id):
-            choose_next = True
-
-    context = {'next_url': next_tier, 'form': tier_form, 'sound': sound}
     tier = Tier.objects.get(id=tier_id)
-    context['tier'] = tier
-    context['tier_id'] = tier_id
+    other_tiers = sound.exercise.tiers.all()
+    context = {'form': tier_form, 'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
 

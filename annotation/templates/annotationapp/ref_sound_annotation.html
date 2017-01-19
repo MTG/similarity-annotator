@@ -26,6 +26,13 @@
 <div class="row prompt">
   <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
 </div>
+<div class="row prompt">
+    {% for other_tier in other_tiers %}
+        {% if other_tier != tier %}
+            <h5 class="center"><a href="/{{ exercise_id }}/ref_sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
+        {% endif %}
+    {% endfor %}
+</div>
     <div class="annotation">
        <span><b>Sound to annotate:</b></span>
         <div class="labels"></div>
@@ -36,7 +43,7 @@
         <div class="submit_container"></div>
     </div>    
     <script>
-      var dataUrl = '{% url 'annotation-action' sound.id tier_id %}';
+      var dataUrl = '{% url 'annotation-action' sound.id tier.id %}';
       var nextUrl = '{{ next_url}}';
     </script>   
 
