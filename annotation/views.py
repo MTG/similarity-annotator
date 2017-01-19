@@ -113,7 +113,10 @@ def sound_list(request, exercise_id):
 def sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
     if request.method == 'POST':
-        sound.is_discarded = True
+        if sound.is_discarded:
+            sound.is_discarded = False
+        else:
+            sound.is_discarded = True
         sound.save()
         return redirect('/' + exercise_id + '/sound_list')
     tier = get_object_or_404(Tier, id=tier_id)

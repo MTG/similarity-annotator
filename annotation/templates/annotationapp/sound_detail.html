@@ -70,7 +70,13 @@
     <div class="submit_container">
       <form style="display: inline;" action="{% url 'sound_detail' sound.exercise.id sound.id tier_id%}" method="post">
       {% csrf_token %}
-      <button class="btn">Discard this sound</button>
+      <button class="btn">
+          {% if sound.is_discarded %}
+            Activate the sound back
+          {% else %}
+            Discard this sound
+          {% endif %}
+      </button>
       </form>
 
     </div>
