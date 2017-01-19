@@ -8,7 +8,7 @@
       <a href="{% url 'sound_list' exercise.id %}?filter=discarded" class="btn">Display discarded sounds</a>
     </div>
     {% else %}
-      <a href="{% url 'sound_list' exercise.id %}" class="btn">Display Non discarded sounds</a>
+      <a href="{% url 'sound_list' exercise.id %}" class="btn">Display active discarded sounds</a>
     {% endif %}
     <ul class="list-group">
     {% if reference_sound %}
