@@ -121,7 +121,7 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
         return redirect('/' + exercise_id + '/sound_list')
     tier = get_object_or_404(Tier, id=tier_id)
     other_tiers = sound.exercise.tiers.all()
-    context = {'sound': sound, 'tier_id': tier_id, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
+    context = {'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/sound_detail.html', context)
 
 
