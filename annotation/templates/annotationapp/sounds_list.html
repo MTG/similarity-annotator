@@ -1,14 +1,14 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
 
-{% block title %} List of {{ exercise.name }} sounds {% endblock %}
+{% block title %} <b> List of </b>{{ exercise.name }} <b>sounds</b> {% endblock %}
 
 {% block content %}
     {% if display_filter != 'all' and display_filter != 'discarded'%}
     <div class="btn-group" role="group" aria-label="...">
-      <a class="btn btn-default" href="{% url 'sound_list' exercise.id %}?filter=discarded">Display discarded sounds</a>
+      <a href="{% url 'sound_list' exercise.id %}?filter=discarded" class="btn">Display discarded sounds</a>
     </div>
     {% else %}
-      <a href="{% url 'sound_list' exercise.id %}">Show only sounds without annotations</a>
+      <a href="{% url 'sound_list' exercise.id %}" class="btn">Display Non discarded sounds</a>
     {% endif %}
     <ul class="list-group">
     {% if reference_sound %}
