@@ -26,7 +26,7 @@ class SoundAdmin(admin.ModelAdmin):
 
 
 class AnnotationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'sound', 'tier', 'get_exercise', 'start_time', 'user')
+    list_display = ('id', 'name', 'sound', 'tier', 'get_exercise', 'start_time', 'user', 'created_at', 'updated_at')
     list_display_links = ('id', 'name', )
     list_filter = ('sound', )
 

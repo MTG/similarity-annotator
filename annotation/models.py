@@ -47,8 +47,7 @@ class Sound(models.Model):
     exercise = models.ForeignKey(Exercise, related_name='sounds')
     has_annotations = models.BooleanField(default=False)
     is_discarded = models.BooleanField(default=False)
-    annotation_state = models.CharField(max_length=2,
-            choices=ANNOTATION_CHOICES, default='E')
+    annotation_state = models.CharField(max_length=2, choices=ANNOTATION_CHOICES, default='E')
 
     def __str__(self):
         return self.filename
@@ -78,6 +77,8 @@ class Annotation(models.Model):
     sound = models.ForeignKey(Sound, related_name='annotations')
     tier = models.ForeignKey(Tier, related_name='annotations')
     user = models.ForeignKey(User, related_name='annotations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
