@@ -36,8 +36,8 @@ class AnnotationAdmin(admin.ModelAdmin):
 
 
 class AnnotationSimilarityAdmin(admin.ModelAdmin):
-    list_display = ('id', 'reference', 'similar_sound', 'similarity_measure')
-    list_display_links = ('id', 'reference', 'similar_sound')
+    list_display = ('id', 'reference', 'similar_sound', 'similarity_measure', 'user', 'created_at', 'updated_at')
+    list_display_links = ('id', )
 
 
 class TagAdmin(admin.ModelAdmin):

@@ -89,6 +89,8 @@ class AnnotationSimilarity(models.Model):
     similar_sound = models.ForeignKey(Annotation)
     similarity_measure = models.IntegerField("similarity_measure")
     user = models.ForeignKey(User, related_name='similarity_measures')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Tag(models.Model):
