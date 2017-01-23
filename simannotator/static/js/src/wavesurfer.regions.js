@@ -143,6 +143,7 @@ WaveSurfer.Region = {
         this.color = params.color || 'rgba(252, 238, 137, 0.5)';
         this.data = params.data || {};
         this.attributes = params.attributes || {};
+        this.stick_neighboards= params.stick_neighboards || '';
         this.annotation = params.annotation || '';
         this.manyValues = params.manyValues || '';
         this.similValue = params.similValue || '';
@@ -204,6 +205,9 @@ WaveSurfer.Region = {
         }
         if (null != params.manyValues) {
             this.manyValues = params.manyValues;
+        }
+        if (null != params.stick_neighboards) {
+            this.stick_neighboards = params.stick_neighboards;
         }
 
         this.updateRender();

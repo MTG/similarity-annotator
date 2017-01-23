@@ -136,12 +136,15 @@ UrbanEars.prototype = {
                 if (moveNext && Math.abs(my.currentMoveSection.end - segment.start) < 0.1 ) {
                     var length = segment.end - segment.start;
                     var next = my.wavesurfer.regions.list[segment.id];
-                    next.start = movedSection.end;
-                    next.end= movedSection.end + length;
-                    next.updateRender();
-                    my.wavesurfer.fireEvent('region-updated', next);
-                    moveNext = false;
-                }else if (Math.abs(my.currentMoveSection.start - segment.end) < 0.1 ) {
+                    if (next.stick_neighboards){
+                      next.start = movedSection.end;
+                      next.end= movedSection.end + length;
+                      next.updateRender();
+                      my.wavesurfer.fireEvent('region-updated', next);
+                      moveNext = false;
+                    }
+                }else if (my.currentMoveSection.stick_neighboards &&
+                        Math.abs(my.currentMoveSection.start - segment.end) < 0.1 ) {
                     var length = segment.end - segment.start;
                     var prev = my.wavesurfer.regions.list[segment.id];
                     prev.end = movedSection.start;
@@ -157,7 +160,11 @@ UrbanEars.prototype = {
         var moveStart = function (section) {
             if (my.currentMoveId != section.id){
               my.currentMoveId = section.id;
-              my.currentMoveSection = {end: section.end, start: section.start};
+              my.currentMoveSection = {
+                end: section.end, 
+                start: section.start,
+                stick_neighboards: section.stick_neighboards,
+              };
             }
         };
         
@@ -206,6 +213,7 @@ UrbanEars.prototype = {
             var region = my.wavesurfer.addRegion({
               start: lastEnd,
               end: section.start,
+              stick_neighboards: true,
             });
             my.stagesRef.createRegionSwitchToStageThree(region);
             added = true;
@@ -213,6 +221,7 @@ UrbanEars.prototype = {
             var region = my.wavesurfer.addRegion({
               start: currTime,
               end: section.end,
+              stick_neighboards: true,
             });
             my.stagesRef.createRegionSwitchToStageThree(region);
             var oldSection =  my.wavesurfer.regions.list[section.id];
@@ -228,6 +237,7 @@ UrbanEars.prototype = {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: currTime,
+                  stick_neighboards: true,
               });
               my.stagesRef.createRegionSwitchToStageThree(region);
           }
@@ -235,6 +245,7 @@ UrbanEars.prototype = {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: lastEnd + 1,
+                  stick_neighboards: true,
               });
               my.stagesRef.createRegionSwitchToStageThree(region);
           }
