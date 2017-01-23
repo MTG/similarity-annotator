@@ -4,7 +4,7 @@
     {% if exercises_list %}
         <ul class="pagination">
             {% for exercise in exercises_list %}
-                <li><h4><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a></h4></li>
+                <li><h4><a href="/{{ exercise.id }}/sound_list/">{{ exercise.name }}</a><h6>{{ exercise.created_at }}</h6></h4></li>
             {% endfor %}
         </ul>
     {% else %}

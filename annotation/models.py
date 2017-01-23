@@ -21,6 +21,7 @@ class Exercise(models.Model):
     data_set = models.ForeignKey(DataSet, related_name='exercises')
     reference_sound = models.ForeignKey('Sound', blank=True, null=True, related_name="%(class)s_related")
     reference_pitch_sound = models.FileField(blank=True, null=True, upload_to=exercise_upload_to)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name

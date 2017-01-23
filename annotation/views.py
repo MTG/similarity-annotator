@@ -29,7 +29,7 @@ def data_set_list(request):
 @login_required
 def exercise_list(request, dataset_id):
     data_set = DataSet.objects.get(id=dataset_id)
-    exercises_list = data_set.exercises.all()
+    exercises_list = data_set.exercises.all().order_by('-created_at')
     context = {'exercises_list': exercises_list, 'dataset_id':dataset_id}
     return render(request, 'annotationapp/exercises_list.html', context)
 
