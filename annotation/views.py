@@ -239,6 +239,9 @@ def annotation_action(request, sound_id, tier_id):
             state = 'I'
             if num_similarity > 0:
                 state = 'C'
+        elif added_annotations.count() > 0:
+            state = 'I'
+
         sound.annotation_state = state
         sound.save()
 
