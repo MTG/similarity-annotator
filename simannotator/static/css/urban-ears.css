@@ -35,6 +35,10 @@
   top: 10px !important;
 }
 
+.wavesurfer-region {
+  border: 1px solid rgba(150, 150, 150, 0.40);
+}
+
 .annotation {   
   padding-top: 20px;
   margin: 0px auto;
