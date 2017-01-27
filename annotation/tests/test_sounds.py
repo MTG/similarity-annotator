@@ -16,7 +16,7 @@ class CreateSoundTest(TestCase):
         self.data_set = DataSet.objects.create(name=data_set_name)
 
         exercise_name = 'test_exercise'
-        self.exercise = Exercise.objects.create(name=exercise_name, data_set=self.data_set  )
+        self.exercise = Exercise.objects.create(name=exercise_name, data_set=self.data_set)
 
     def test_sound_creation(self):
         sound_filename = 'test_sound.wav'
@@ -27,3 +27,7 @@ class CreateSoundTest(TestCase):
 
         self.assertTrue(sound in Sound.objects.all())
         self.assertNotEqual(sounds_before_creation, sounds_after_creation)
+        self.assertEqual(sound.original_filename, sound_original_filename)
+        self.assertEqual(sound.filename, sound_filename)
+
+
