@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 
@@ -50,9 +52,23 @@ class CreateSoundTest(TestCase):
         annotation_name = 'test_annotation'
         start_time = 10
         end_time = 20
-        reference_annotation = Annotation.objects.create(start_time=start_time, end_time=end_time, sound=self.sound,
-                                                         tier=self.tier, user=self.user)
+        Annotation.objects.create(name=annotation_name, start_time=start_time, end_time=end_time,
+                                  sound=self.reference_sound, tier=self.tier, user=self.user)
 
         exercise_annotations = annotation.utils.exercise_annotations_to_json(self.exercise.id)
+        exercise_annotations_json = json.loads(exercise_annotations)
 
-        self.assertTrue(type(exercise_annotations), 'json')
+        # the utils should retrieve a json serialisation
+        self.assertEqual(type(exercise_annotations), str)
+        # the sounds file names should be in the dictionary
+        self.assertTrue(self.sound.filename in exercise_annotations_json.keys())
+        self.assertTrue(self.reference_sound.filename in exercise_annotations_json.keys())
+        # the tier name should be a key in the sound
+        self.assertTrue(self.tier.name in exercise_annotations_json[self.reference_sound.filename].keys())
+        # it should be one annotation in the tier of the reference sound
+        self.assertEqual(len(exercise_annotations_json[self.reference_sound.filename][self.tier.name]), 1)
+        # the annotation should have the attributes defined in here
+        self.assertEqual(exercise_annotations_json[self.reference_sound.filename][self.tier.name][0]['start_time'],
+                         start_time)
+        self.assertEqual(exercise_annotations_json[self.reference_sound.filename][self.tier.name][0]['end_time'],
+                         end_time)
