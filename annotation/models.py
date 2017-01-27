@@ -39,7 +39,7 @@ class Tier(models.Model):
 
 
 class Sound(models.Model):
-    ANNOTATION_CHOICES =(
+    ANNOTATION_CHOICES = (
             ('E', 'empty'),
             ('I', 'incomplete'),
             ('C', 'complete')
