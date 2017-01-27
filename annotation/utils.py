@@ -33,7 +33,7 @@ def exercise_annotations_to_json(exercise_id):
         tiers = {}
         for tier in exercise.tiers.all():
 
-            annotations = {}
+            annotations = []
             for annotation in Annotation.objects.filter(sound=sound, tier=tier).all():
                 # check if there is an annotation similarity
                 try:
@@ -47,7 +47,7 @@ def exercise_annotations_to_json(exercise_id):
                                    'end_time': annotation.end_time,
                                    'similarity': similarity
                                    }
-                annotations[annotation.id] = annotation_dict
+                annotations.append(annotation_dict)
 
             tiers[tier.name] = annotations
 
