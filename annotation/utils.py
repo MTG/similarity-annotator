@@ -122,7 +122,7 @@ def decompress_files(dataset_name, exercise_name, zip_file_path):
     return exercise_files_path
 
 
-def get_or_create_sound_object(exercise, sound_filename, original_filename=None):
+def get_or_create_sound_object(exercise, sound_filename, original_filename):
     try:
         sound = Sound.objects.get(filename=sound_filename, exercise=exercise, original_filename=original_filename)
     except ObjectDoesNotExist:
