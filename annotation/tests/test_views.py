@@ -11,15 +11,15 @@ class ExerciseListViewTests(TestCase):
         self.data_set = DataSet.objects.create(name=data_set_name)
         exercise_name = 'test_exercise'
         self.exercise = Exercise.objects.create(data_set=self.data_set, name=exercise_name)
-        self.username = 'test'
-        self.password = '1234567'
 
-        self.user = User.objects.create(username=self.username)
-        self.user.set_password(self.password)
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
         self.user.save()
 
         self.test_client = Client()
-        self.test_client.login(username=self.username, password=self.password)
+        self.test_client.login(username=username, password=password)
 
     def test_exercise_list_succeed(self):
 
@@ -44,3 +44,28 @@ class ExerciseListViewTests(TestCase):
     def test_exercises_list_data_set_id(self):
         response = self.test_client.get(reverse('exercise_list', kwargs={'dataset_id': self.data_set.id}))
         self.assertEqual(response.context['dataset_id'], str(self.data_set.id))
+
+
+class DataSetListViewTests(TestCase):
+    def setUp(self):
+        data_set_name = 'test_data_set'
+        self.data_set = DataSet.objects.create(name=data_set_name)
+
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
+        self.user.save()
+
+        self.test_client = Client()
+        self.test_client.login(username=username, password=password)
+
+    def test_data_set_list_not_logged(self):
+        response = self.client.get(reverse('data_set_list'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('accounts/login' in response.url)
+
+    def test_data_set_list(self):
+        response = self.test_client.get(reverse('data_set_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.data_set in response.context['data_sets_list'])
