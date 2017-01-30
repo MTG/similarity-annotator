@@ -48,12 +48,12 @@ class CreateSoundTest(TestCase):
         self.assertEqual(sound.original_filename, sound_original_filename_2)
         self.assertEqual(sound.filename, sound_filename_2)
 
-    def test_download_annotations(self):
+    def test_download_annotations_for_exercise(self):
         annotation_name = 'test_annotation'
         start_time = 10
         end_time = 20
-        Annotation.objects.create(name=annotation_name, start_time=start_time, end_time=end_time,
-                                  sound=self.reference_sound, tier=self.tier, user=self.user)
+        reference_annotation = Annotation.objects.create(name=annotation_name, start_time=start_time, end_time=end_time,
+                                                         sound=self.reference_sound, tier=self.tier, user=self.user)
 
         exercise_annotations = annotation.utils.exercise_annotations_to_json(self.exercise.id)
         exercise_annotations_json = json.loads(exercise_annotations)
@@ -72,3 +72,27 @@ class CreateSoundTest(TestCase):
                          start_time)
         self.assertEqual(exercise_annotations_json[self.reference_sound.filename][self.tier.name][0]['end_time'],
                          end_time)
+
+        # test annotation similarities download
+        annotation_name_2 = 'test_annotation_2'
+        start_time_2 = 10
+        end_time_2 = 20
+        similarity_measure = 1
+        similar_annotation = Annotation.objects.create(name=annotation_name_2, start_time=start_time_2,
+                                                       end_time=end_time_2, sound=self.sound, tier=self.tier,
+                                                       user=self.user)
+        AnnotationSimilarity.objects.create(reference=reference_annotation, similar_sound=similar_annotation,
+                                            similarity_measure=similarity_measure, user=self.user)
+
+        exercise_annotations = annotation.utils.exercise_annotations_to_json(self.exercise.id)
+        exercise_annotations_json = json.loads(exercise_annotations)
+
+        # check if the annotation similarity is in the json serialisation
+        self.assertEqual(exercise_annotations_json[self.sound.filename][self.tier.name][0]['similarity']
+                         ['reference_annotation_start_time'], start_time)
+        self.assertEqual(exercise_annotations_json[self.sound.filename][self.tier.name][0]['similarity']
+                         ['reference_annotation_end_time'], end_time)
+
+
+
+
