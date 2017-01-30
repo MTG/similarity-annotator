@@ -1,16 +1,11 @@
 import os
-import io
 import json
-import zipfile
-import tempfile
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
-from django.core import serializers
 from django.http import HttpResponse, Http404, JsonResponse
-from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -30,7 +25,7 @@ def data_set_list(request):
 def exercise_list(request, dataset_id):
     data_set = DataSet.objects.get(id=dataset_id)
     exercises_list = data_set.exercises.all().order_by('-created_at')
-    context = {'exercises_list': exercises_list, 'dataset_id':dataset_id}
+    context = {'exercises_list': exercises_list, 'dataset_id': dataset_id}
     return render(request, 'annotationapp/exercises_list.html', context)
 
 
