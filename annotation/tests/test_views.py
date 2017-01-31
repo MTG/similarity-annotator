@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from annotation.models import DataSet, Exercise
+from annotation.models import DataSet, Exercise, Sound, Tier
 
 
 class ExerciseListViewTests(TestCase):
@@ -69,3 +69,39 @@ class DataSetListViewTests(TestCase):
         response = self.test_client.get(reverse('data_set_list'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.data_set in response.context['data_sets_list'])
+
+
+class TierListViewTests(TestCase):
+    def setUp(self):
+        data_set_name = 'test_data_set'
+        self.data_set = DataSet.objects.create(name=data_set_name)
+
+        exercise_name = 'test_exercise'
+        self.exercise = Exercise.objects.create(data_set=self.data_set, name=exercise_name)
+
+        tier_name = 'test_tier'
+        self.tier = Tier.objects.create(name=tier_name, exercise=self.exercise)
+
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
+        self.user.save()
+
+        self.test_client = Client()
+        self.test_client.login(username=username, password=password)
+
+        sound_filename = 'test_sound'
+        self.sound = Sound.objects.create(filename=sound_filename, original_filename=sound_filename,
+                                          exercise=self.exercise)
+
+    def test_tier_list_not_logged(self):
+        print("Dataset", self.data_set.id)
+        for dataset in DataSet.objects.all():
+            print(dataset.id)
+        print("Sound", self.sound.id)
+        for sound in Sound.objects.all():
+            print(sound.id)
+        response = self.client.get(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
+                                                                'sound_id': self.sound.id}))
+        self.assertEqual(response.status_code, 302)
