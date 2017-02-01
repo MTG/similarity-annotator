@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from annotation.models import DataSet, Exercise, Sound, Tier
 
 
@@ -96,12 +97,38 @@ class TierListViewTests(TestCase):
                                           exercise=self.exercise)
 
     def test_tier_list_not_logged(self):
-        print("Dataset", self.data_set.id)
-        for dataset in DataSet.objects.all():
-            print(dataset.id)
-        print("Sound", self.sound.id)
-        for sound in Sound.objects.all():
-            print(sound.id)
         response = self.client.get(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
                                                                 'sound_id': self.sound.id}))
         self.assertEqual(response.status_code, 302)
+
+    def test_tier_list(self):
+        response = self.test_client.get(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
+                                                                     'sound_id': self.sound.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.tier in response.context['tiers_list'])
+        self.assertEqual(self.exercise, response.context['exercise'])
+        self.assertEqual(self.sound, response.context['sound'])
+
+    def test_tier_list_reference_sound(self):
+        reference_sound = Sound.objects.create(filename='test_reference_sound', original_filename='',
+                                               exercise=self.exercise)
+        self.exercise.reference_sound = reference_sound
+        self.exercise.save()
+        response = self.test_client.get(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
+                                                                     'sound_id': reference_sound.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.tier in response.context['tiers_list'])
+        self.assertEqual(self.exercise, response.context['exercise'])
+        self.assertEqual(reference_sound, response.context['sound'])
+        self.assertTrue(response.context['reference_sound'])
+
+    def test_tier_list_post_empty(self):
+        response = self.test_client.post(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
+                                                                      'sound_id': self.sound.id}), {})
+        self.assertFormError(response, 'form', 'name', 'This field is required.')
+
+    def test_tier_list_post(self):
+        post_data = {'name': 'new_test_tier', 'parent_tier': None}
+        response = self.test_client.post(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
+                                                                      'sound_id': self.sound.id}), post_data)
+        self.assertEqual(response.status_code, 200)

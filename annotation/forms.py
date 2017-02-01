@@ -26,6 +26,7 @@ class ExerciseForm(forms.ModelForm):
         super(ExerciseForm, self).__init__(*args, **kwargs)
         self.fields['name'].required = True
 
+
 class TierForm(forms.ModelForm):
     class Meta:
         model = Tier
