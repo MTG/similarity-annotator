@@ -40,7 +40,7 @@ function UrbanEars() {
     });
 
     // Create wavesurfer (audio visualization component)
-    var height = 128;
+    var height = 64;
     this.wavesurfer = Object.create(WaveSurfer);
     this.wavesurfer.init({
         container: '.audio_visual',

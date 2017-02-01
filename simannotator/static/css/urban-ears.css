@@ -33,6 +33,7 @@
 .audio_visual wave canvas, .audio_visual_ref wave canvas {
   position: relative;
   top: 10px !important;
+  height: 128px;
 }
 
 .wavesurfer-region {
