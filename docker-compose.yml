@@ -6,14 +6,6 @@ services:
   gearman:
     image: kendu/gearman
 
-  gearman-worker:
-    build: .
-    command: python manage.py gm_worker_processing
-    volumes_from:
-      - web
-    depends_on:
-      - gearman
-
   web:
     build: .
     ports:

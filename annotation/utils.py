@@ -1,7 +1,6 @@
 import os
 import json
 import shutil
-import zipfile
 import decimal
 
 from django.conf import settings
@@ -56,26 +55,6 @@ def exercise_annotations_to_json(exercise_id):
     return json.dumps(sounds_annotations, cls=DecimalEncoder)
 
 
-def store_tmp_file(uploaded_file, exercise_name):
-    """
-    Stores the uploaded file to the TEMP folder
-    Args:
-        uploaded_file: an instance of InMemoryUploadedFile
-        dataset_name: name of the Dataset object
-        exercise_name: name of the Exercise object
-    Return:
-        path: path to newly saved-to-disk file
-    """
-    path = os.path.join(settings.TEMP_ROOT, exercise_name + '.zip')
-    try:
-        destination = open(path, 'w+b')
-        for chunk in uploaded_file.chunks():
-            destination.write(chunk)
-    finally:
-        destination.close()
-    return path
-
-
 def create_exercise_directory(data_set, exercise_name):
     """
     create directory for exercise audio files
@@ -87,38 +66,6 @@ def create_exercise_directory(data_set, exercise_name):
     exercise_files_path = os.path.join(data_set_files_path, exercise_name)
     if not os.path.exists(exercise_files_path):
         os.makedirs(exercise_files_path)
-    return exercise_files_path
-
-
-def decompress_files(dataset_name, exercise_name, zip_file_path):
-    """
-    Create directory for exercise audio files and decompress zip file into directory
-    Args:
-        dataset_name:
-        exercise_name:
-        zip_file_path:
-    Return:
-        exercise_files_path: path of files directory
-    """
-    # create directory for exercise audio files
-    exercise_files_path = os.path.join(settings.MEDIA_ROOT, dataset_name, exercise_name)
-    if not os.path.exists(exercise_files_path):
-        os.makedirs(exercise_files_path)
-
-    # decompress zip file into directory
-    zip_ref = zipfile.ZipFile(zip_file_path, 'r')
-    for member in zip_ref.namelist():
-        filename = os.path.basename(member)
-        # skip directory
-        if not filename:
-            continue
-        source = zip_ref.open(member)
-        target = open(os.path.join(exercise_files_path, filename), 'wb')
-        with source, target:
-            shutil.copyfileobj(source, target)
-
-    zip_ref.close()
-
     return exercise_files_path
 
 
