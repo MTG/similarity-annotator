@@ -41,8 +41,15 @@
     {% endfor %}
 </div>
 
-<div style="width: 100%">
-    <div class="right-align" style="margin-right:35px">
+<div style="width: 100%; text-align: right;">
+    <div class="right-align" style="margin-right:35px; display: inline;">
+    {% if request.GET.enable_spec %}
+      <a href="{% url 'sound_detail' exercise_id sound.id tier.id %}" class="btn">Disable Spectrogram</a>
+    {% else %}
+      <a href="{% url 'sound_detail' exercise_id sound.id tier.id %}?enable_spec=1" class="btn">Enable Sectrogam</a>
+    {% endif %}
+    </div>
+   <div class="right-align" style="margin-right:35px; display: inline;">
         <a href="/{{ exercise_id }}/sound_list" class="btn">Go back to sounds</a>
     </div>
 </div>
@@ -61,12 +68,28 @@
     <div class="labels_ref"></div>
     <div class="audio_visual_ref"></div>
     <div class="play_bar_ref"></div>
-    <input id="slider_ref" type="range" min="120" max="400" value="120" style="width: 100%" />
+    <div class="zoom">
+      <span>Zoom: </span>
+      <select id="zoom_ref">
+        <option value="">1x</option>
+        <option value="150">2x</option>
+        <!--<option value="100">3x</option>
+          <option value="150">4x</option>-->
+      </select>
+    </div>
     <span><b>Sound to annotate: </b></span>
     <div class="labels"></div>
     <div class="audio_visual"></div>
     <div class="play_bar"></div>
-    <input id="slider" type="range" min="120" max="400" value="120" style="width: 100%" />
+    <div class="zoom">
+      <span>Zoom: </span>
+      <select id="zoom">
+        <option value="">1x</option>
+        <option value="150">2x</option>
+        <!--<option value="100">3x</option>
+          <option value="150">4x</option>-->
+      </select>
+    </div>
     <div class="creation_stage_container"></div>
     <div class="submit_container">
       <form style="display: inline;" action="{% url 'sound_detail' sound.exercise.id sound.id tier.id%}" method="post">
@@ -84,7 +107,7 @@
 </div>
 {% endblock %}
 <script>
-  var dataUrl = '{% url 'annotation-action' sound.id tier.id %}';
+  var dataUrl = '{% url 'annotation-action' sound.id tier.id %}?enable_spec={{request.GET.enable_spec}}';
   var nextUrl = '{{ next_url }}';
 </script>
 </html>
