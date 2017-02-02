@@ -68,12 +68,26 @@
     <div class="labels_ref"></div>
     <div class="audio_visual_ref"></div>
     <div class="play_bar_ref"></div>
-    <input id="slider_ref" type="range" min="120" max="400" value="120" style="width: 100%" />
+    <div class="zoom">
+      <span>Zoom: </span>
+      <select id="zoom_ref">
+        <option value="100">1x</option>
+        <option value="200">2x</option>
+        <option value="400">4x</option>
+      </select>
+    </div>
     <span><b>Sound to annotate: </b></span>
     <div class="labels"></div>
     <div class="audio_visual"></div>
     <div class="play_bar"></div>
-    <input id="slider" type="range" min="120" max="400" value="120" style="width: 100%" />
+    <div class="zoom">
+      <span>Zoom: </span>
+      <select id="zoom">
+        <option value="100">1x</option>
+        <option value="200">2x</option>
+        <option value="400">4x</option>
+      </select>
+    </div>
     <div class="creation_stage_container"></div>
     <div class="submit_container">
       <form style="display: inline;" action="{% url 'sound_detail' sound.exercise.id sound.id tier.id%}" method="post">

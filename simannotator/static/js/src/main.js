@@ -103,19 +103,15 @@ function UrbanEars() {
 
 
     this.addEvents();
-    
+   
     var my = this;
-    var slider = document.querySelector('#slider');
-    slider.oninput = function () {
-        var zoomLevel = Number(slider.value);
-          my.wavesurfer.zoom(zoomLevel);
-    };
+    $("#zoom").change(function () {
+      my.wavesurfer.zoom(Number(this.value));
+    });
  
-    var sliderRef = document.querySelector('#slider_ref');
-    sliderRef.oninput = function () {
-        var zoomLevel = Number(sliderRef.value);
-          my.wavesurferRef.zoom(zoomLevel);
-    };
+    $("#zoom_ref").change(function () {
+      my.wavesurferRef.zoom(Number(this.value));
+    });
 }
 
 UrbanEars.prototype = {
@@ -189,6 +185,7 @@ UrbanEars.prototype = {
         this.wavesurferRef.on('ready', function () {
             my.refReady = true;
             my.loadSegments();
+            my.wavesurferRef.zoom(100);
         });
         
         // When a new sound file is loaded into the wavesurfer update the  play bar, update the 
@@ -197,6 +194,7 @@ UrbanEars.prototype = {
         this.wavesurfer.on('ready', function () {
            my.soundReady = true;
            my.loadSegments();
+           my.wavesurfer.zoom(100);
         });
 
     },
