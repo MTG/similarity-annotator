@@ -1,3 +1,5 @@
+import os
+
 from django.contrib import admin
 from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, DataSet, Tag
 
@@ -20,9 +22,15 @@ class TierAdmin(admin.ModelAdmin):
 
 
 class SoundAdmin(admin.ModelAdmin):
-    list_display = ('filename', 'exercise', 'is_discarded')
-    list_display_links = ('filename', 'exercise')
+    list_display = ('filename', 'exercise', 'is_discarded', 'sound_tier_list_url')
+    list_display_links = ('filename',)
     list_filter = ('exercise', 'is_discarded', )
+    search_fields = ['filename']
+
+    def sound_tier_list_url(self, obj):
+        url_name_to_show = os.path.splitext(obj.filename)[0]
+        return '<a href="/%s/%s/tiers_list/">%s</a>' % (obj.exercise.id, obj.id, url_name_to_show)
+    sound_tier_list_url.allow_tags = True
 
 
 class AnnotationAdmin(admin.ModelAdmin):

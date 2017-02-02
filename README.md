@@ -8,7 +8,7 @@ The web application is written in django framework and the interface for annotat
 Install [docker-compose] (https://docs.docker.com/compose/install/) and then just run:
 
     docker-compose build
-    docker-compose run
+    docker-compose start
 
 ## License
 All the software is distributed with the [Affero GPL v3 license] (http://www.gnu.org/licenses/agpl-3.0.en.html) except the CrowdCurio files that are
