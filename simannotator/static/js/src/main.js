@@ -106,11 +106,21 @@ function UrbanEars() {
    
     var my = this;
     $("#zoom").change(function () {
-      my.wavesurfer.zoom(Number(this.value));
+      if (this.value) {
+        my.wavesurfer.zoom(Number(this.value));
+      } else {
+        my.wavesurfer.zoom(false);
+      }
     });
  
     $("#zoom_ref").change(function () {
-      my.wavesurferRef.zoom(Number(this.value));
+      my.wavesurferRef.zoom(false);
+      if (this.value) {
+        my.wavesurferRef.zoom(Number(this.value));
+      } else {
+        my.wavesurfer.zoom(false);
+      }
+
     });
 }
 
@@ -185,7 +195,7 @@ UrbanEars.prototype = {
         this.wavesurferRef.on('ready', function () {
             my.refReady = true;
             my.loadSegments();
-            my.wavesurferRef.zoom(100);
+            my.wavesurferRef.zoom(false);
         });
         
         // When a new sound file is loaded into the wavesurfer update the  play bar, update the 
@@ -194,7 +204,7 @@ UrbanEars.prototype = {
         this.wavesurfer.on('ready', function () {
            my.soundReady = true;
            my.loadSegments();
-           my.wavesurfer.zoom(100);
+           my.wavesurfer.zoom(false);
         });
 
     },
