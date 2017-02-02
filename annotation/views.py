@@ -254,6 +254,9 @@ def annotation_action(request, sound_id, tier_id):
                 "alwaysShowTags": False
             }
         }
+        if request.GET.get('enable_spec', None):
+            out['task']['visualization'] = "spectrogram"
+
         out['task']['segments_ref'] = []
         for a in Annotation.objects.filter(sound=ref_sound, tier=tier).all():
             out['task']['segments_ref'].append({
