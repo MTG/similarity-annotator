@@ -138,14 +138,6 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
 
-def update_annotation(old_annotation, new_annotation, user):
-    old_annotation.start_time = new_annotation['start']
-    old_annotation.end_time = new_annotation['end']
-    old_annotation.name = new_annotation['annotation']
-    old_annotation.user = user
-    old_annotation.save()
-
-
 @login_required
 @csrf_exempt
 def annotation_action(request, sound_id, tier_id):
