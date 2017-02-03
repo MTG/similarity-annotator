@@ -4,14 +4,13 @@ import json
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.core.management import call_command
 from django.http import HttpResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
-from .forms import ExerciseForm, TierForm
-from .utils import store_tmp_file, exercise_annotations_to_json
+from .forms import TierForm
+from .utils import exercise_annotations_to_json
 
 
 @login_required
@@ -210,26 +209,6 @@ def download_annotations(request, sound_id):
 
     ret = sound.get_annotations_as_dict()
     return JsonResponse(ret)
-
-
-@login_required
-def upload(request, dataset_id):
-    if request.method == 'POST':
-        exercise_form = ExerciseForm(request.POST, files=request.FILES)
-        if exercise_form.is_valid():
-            exercise = exercise_form.save(commit=False)
-            dataset = DataSet.objects.get(id=dataset_id)
-            exercise.data_set = dataset
-            exercise.save()
-            exercise_name = request.POST['name']
-            tmp_path = store_tmp_file(request.FILES['zip_file'], exercise_name)
-            call_command('gm_client_unzip_sound_files', file_path=tmp_path, dataset_name=dataset.name,
-                         exercise_name=exercise_name)
-            return render(request, 'annotationapp/upload_success.html')
-    else:
-        exercise_form = ExerciseForm()
-    context = {'form': exercise_form, 'dataset_id': dataset_id}
-    return render(request, 'annotationapp/upload_form.html', context)
 
 
 @login_required
