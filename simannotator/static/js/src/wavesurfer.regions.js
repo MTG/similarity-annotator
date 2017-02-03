@@ -318,10 +318,10 @@ WaveSurfer.Region = {
         var width;
         if (pxPerSec) {
             width = Math.round(this.wavesurfer.getDuration() * pxPerSec);
-            //this.width = width;
+            this.width = width;
         }
         else {
-            width = this.width;
+          width = this.width;
         }
 
         if (this.start < 0) {
