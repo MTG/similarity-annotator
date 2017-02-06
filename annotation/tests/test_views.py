@@ -1,8 +1,10 @@
+import os
+
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.http import QueryDict
-from annotation.models import DataSet, Exercise, Sound, Tier
+from django.conf import settings
+from annotation.models import DataSet, Exercise, Sound, Tier, Annotation
 
 
 class ExerciseListViewTests(TestCase):
@@ -185,7 +187,7 @@ class SoundListViewTests(TestCase):
         self.assertEqual(exercise.reference_sound, reference_sound)
 
 
-class SoundDetailTestView(TestCase):
+class SoundDetailViewTests(TestCase):
     def setUp(self):
         data_set_name = 'test_data_set'
         self.data_set = DataSet.objects.create(name=data_set_name)
@@ -235,3 +237,52 @@ class SoundDetailTestView(TestCase):
                                                               'tier_id': self.tier.id, 'sound_id': self.sound.id}))
         sound = Sound.objects.get(id=self.sound.id)
         self.assertFalse(sound.is_discarded)
+
+
+class AnnotationActionViewTests(TestCase):
+    def setUp(self):
+        data_set_name = 'test_data_set'
+        self.data_set = DataSet.objects.create(name=data_set_name)
+
+        exercise_name = 'test_exercise'
+        self.exercise = Exercise.objects.create(data_set=self.data_set, name=exercise_name)
+
+        tier_name = 'test_tier'
+        self.tier = Tier.objects.create(name=tier_name, exercise=self.exercise)
+
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
+        self.user.save()
+
+        self.test_client = Client()
+        self.test_client.login(username=username, password=password)
+
+        sound_filename = 'test_sound'
+        self.sound = Sound.objects.create(filename=sound_filename, original_filename=sound_filename,
+                                          exercise=self.exercise)
+
+        self.reference_sound = Sound.objects.create(filename='reference_sound', original_filename='', exercise=self.exercise)
+        self.exercise.reference_sound = self.reference_sound
+        self.exercise.save()
+
+    def test_annotation_action_get_empty(self):
+        response = self.test_client.get(reverse('annotation-action', kwargs={'sound_id': self.sound.id,
+                                                                             'tier_id': self.tier.id}))
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        # no segments are created
+        self.assertEqual(response_data['task']['segments'], [])
+
+        # create annotation in reference sound that should be in the response
+        reference_annotation = Annotation.objects.create(name='reference_annotation', start_time=1.000, end_time=2.000,
+                                                         sound=self.reference_sound, tier=self.tier, user=self.user)
+        response = self.test_client.get(reverse('annotation-action', kwargs={'sound_id': self.sound.id,
+                                                                             'tier_id': self.tier.id}))
+        self.assertEqual(response.json()['task']['segments_ref'][0]['annotation'], reference_annotation.name)
+        self.assertEqual(float(response.json()['task']['segments_ref'][0]['start']), reference_annotation.start_time)
+        self.assertEqual(float(response.json()['task']['segments_ref'][0]['end']), reference_annotation.end_time)
+        self.assertEqual(response.json()['task']['url'], os.path.join(settings.MEDIA_URL, self.data_set.name,
+                                                                      self.exercise.name, self.sound.filename))
+
