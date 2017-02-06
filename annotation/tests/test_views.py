@@ -132,3 +132,54 @@ class TierListViewTests(TestCase):
         response = self.test_client.post(reverse('tier_list', kwargs={'exercise_id': self.exercise.id,
                                                                       'sound_id': self.sound.id}), post_data)
         self.assertEqual(response.status_code, 200)
+
+
+class SoundListViewTests(TestCase):
+    def setUp(self):
+        data_set_name = 'test_data_set'
+        self.data_set = DataSet.objects.create(name=data_set_name)
+
+        exercise_name = 'test_exercise'
+        self.exercise = Exercise.objects.create(data_set=self.data_set, name=exercise_name)
+
+        tier_name = 'test_tier'
+        self.tier = Tier.objects.create(name=tier_name, exercise=self.exercise)
+
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
+        self.user.save()
+
+        self.test_client = Client()
+        self.test_client.login(username=username, password=password)
+
+        sound_filename = 'test_sound'
+        self.sound = Sound.objects.create(filename=sound_filename, original_filename=sound_filename,
+                                          exercise=self.exercise)
+
+    def test_sound_list_not_logged(self):
+        response = self.client.get(reverse('sound_list', kwargs={'exercise_id': self.exercise.id}))
+        self.assertEqual(response.status_code, 302)
+
+    def test_sound_list_get_no_reference(self):
+        response = self.test_client.get(reverse('sound_list', kwargs={'exercise_id': self.exercise.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.sound in response.context['sounds_list'])
+        self.assertFalse('reference_sound' in response.context.keys())
+
+    def test_sound_list_get_reference(self):
+        reference_sound = Sound.objects.create(filename='reference_sound', original_filename='', exercise=self.exercise)
+        self.exercise.reference_sound = reference_sound
+        self.exercise.save()
+        response = self.test_client.get(reverse('sound_list', kwargs={'exercise_id': self.exercise.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(reference_sound == response.context['reference_sound'])
+
+    def test_sound_list_post(self):
+        reference_sound = Sound.objects.create(filename='reference_sound', original_filename='', exercise=self.exercise)
+        post_data = {'reference sound': reference_sound.id}
+        response = self.test_client.post(reverse('sound_list', kwargs={'exercise_id': self.exercise.id}), post_data)
+        self.assertEqual(response.status_code, 200)
+        exercise = Exercise.objects.get(id=self.exercise.id)
+        self.assertEqual(exercise.reference_sound, reference_sound)
