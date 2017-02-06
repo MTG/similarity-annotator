@@ -25,11 +25,14 @@ class Command(BaseCommand):
             return 0
 
         for sound in Sound.objects.filter(exercise__in=Exercise.objects.filter(data_set__name=data_set_name)):
-            print("SOUND: %s" % sound.filename)
+            print("SOUND: %s %s" % (sound.id, sound.filename))
             # only download annotations for sound that are not the reference of the exercise
             if sound != sound.exercise.reference_sound:
-                # take the original filename as the destination in which to download the file
-                annotation_file_path = os.path.splitext(sound.original_filename)[0] + '.json'
-                annotations = sound.get_annotations_as_dict()
-                with open(annotation_file_path, 'w') as outfile:
-                    json.dump(annotations, outfile)
+                try:
+                    # take the original filename as the destination in which to download the file
+                    annotation_file_path = os.path.splitext(sound.original_filename)[0] + '.json'
+                    annotations = sound.get_annotations_as_dict()
+                    with open(annotation_file_path, 'w') as outfile:
+                        json.dump(annotations, outfile)
+                except Exception as e:
+                    print(e.message)
