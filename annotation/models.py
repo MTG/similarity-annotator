@@ -30,7 +30,11 @@ class Exercise(models.Model):
 
 class Tier(models.Model):
     name = models.CharField(max_length=50)
+    # If tiers are related using parent_tier, then annotations are copied to
+    # all parent and child tiers, if they are related using special_parent_tier
+    # then annotations are copied only to child tiers
     parent_tier = models.ForeignKey('self', blank=True, null=True, related_name='child_tiers')
+    special_parent_tier = models.ForeignKey('self', blank=True, null=True, related_name='special_child_tiers')
     exercise = models.ForeignKey(Exercise, related_name='tiers')
     entire_sound = models.BooleanField(default=False)
     point_annotations = models.BooleanField(default=False)

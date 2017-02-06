@@ -181,6 +181,11 @@ def annotation_action(request, sound_id, tier_id):
                     related_annotations = related_annotations.filter(tier=child).all()
                     for rel in related_annotations:
                         update_annotation(rel, a, request.user)
+                for child in tier.special_child_tiers.all():
+                    related_annotations = related_annotations.filter(tier=child).all()
+                    for rel in related_annotations:
+                        update_annotation(rel, a, request.user)
+
 
                 # Update the annotation in the current tier
                 update_annotation(new_annotation, a, request.user)
