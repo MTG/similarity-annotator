@@ -114,7 +114,7 @@ class Sound(models.Model):
 
             if a_obj and a_obj.count():
                 new_annotation = a_obj[0]
-                # Update the annotatons in the parent tier and child
+                # Update the annotations in the parent tier and child
                 related_annotations = Annotation.objects.filter(sound=self, start_time=new_annotation.start_time,
                                                                 end_time=new_annotation.end_time,
                                                                 name=new_annotation.name)
@@ -133,11 +133,11 @@ class Sound(models.Model):
                 new_annotation = Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                                            tier=tier, name=a['annotation'], user=user)
                 if tier.parent_tier:
-                    parent_annotation = Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
-                           tier=tier.parent_tier, name=a['annotation'], user=user)
+                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
+                                              tier=tier.parent_tier, name=a['annotation'], user=user)
                 for child in tier.child_tiers.all():
-                    child_annotation = Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
-                           tier=child, name=a['annotation'], user=user)
+                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
+                                              tier=child, name=a['annotation'], user=user)
 
             # Re-create all AnnotationSimilarity for this user
             new_annotation.annotationsimilarity_set.filter(user=user).delete()
@@ -153,8 +153,7 @@ class Sound(models.Model):
         for a in old_annotations.all():
             if a.id not in added:
                 # Delete annotation in the parent tier and child
-                related_annotations = Annotation.objects.filter(sound=self, start_time=a.start_time,
-                                                                end_time=a.end_time, name=a.name)
+                Annotation.objects.filter(sound=self, start_time=a.start_time, end_time=a.end_time, name=a.name)
 
         # create annotations in child tiers
         if tier.child_tiers.all():
@@ -181,12 +180,14 @@ class Sound(models.Model):
 
         return True
 
-    def update_annotation_vals(self, old_annotation, new_annotation, user):
+    @staticmethod
+    def update_annotation_vals(old_annotation, new_annotation, user):
         old_annotation.start_time = new_annotation['start']
         old_annotation.end_time = new_annotation['end']
         old_annotation.name = new_annotation['annotation']
         old_annotation.user = user
         old_annotation.save()
+
 
 class Annotation(models.Model):
     name = models.CharField(max_length=200)
