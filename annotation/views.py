@@ -202,11 +202,3 @@ def download_annotations(request, sound_id):
     ret = sound.get_annotations_as_dict()
     return JsonResponse(ret)
 
-
-@login_required
-def download(request, exercise_id):
-    annotations_json = exercise_annotations_to_json(exercise_id)
-    exercise = Exercise.objects.get(id=exercise_id)
-    response = HttpResponse(annotations_json, content_type='application/json')
-    response['Content-Disposition'] = 'attachment; filename=' + exercise.name + '.json'
-    return response
