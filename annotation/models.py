@@ -9,6 +9,7 @@ def exercise_upload_to(instance, filename):
 
 
 class DataSet(models.Model):
+    users = models.ManyToManyField(User, related_name="datasets")
     name = models.CharField(max_length=50)
 
     def __str__(self):

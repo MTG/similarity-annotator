@@ -21,7 +21,7 @@ from .utils import store_tmp_file, exercise_annotations_to_json
 
 @login_required
 def data_set_list(request):
-    data_sets_list = DataSet.objects.all()
+    data_sets_list = request.user.datasets.all()
     context = {'data_sets_list': data_sets_list}
     return render(request, 'annotationapp/data_sets_list.html', context)
 
