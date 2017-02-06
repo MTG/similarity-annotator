@@ -121,14 +121,14 @@ class Sound(models.Model):
                 if tier.parent_tier:
                     related_annotations = related_annotations.filter(tier=tier.parent_tier).all()
                     for rel in related_annotations:
-                        update_annotation(rel, a, user)
+                        self.update_annotation_vals(rel, a, user)
                 for child in tier.child_tiers.all():
                     related_annotations = related_annotations.filter(tier=child).all()
                     for rel in related_annotations:
-                        update_annotation(rel, a, user)
+                        self.update_annotation_vals(rel, a, user)
 
                 # Update the annotation in the current tier
-                update_annotation(new_annotation, a, user)
+                self.update_annotation_vals(new_annotation, a, user)
             else:
                 new_annotation = Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                                            tier=tier, name=a['annotation'], user=user)
@@ -155,8 +155,38 @@ class Sound(models.Model):
                 # Delete annotation in the parent tier and child
                 related_annotations = Annotation.objects.filter(sound=self, start_time=a.start_time,
                                                                 end_time=a.end_time, name=a.name)
+
+        # create annotations in child tiers
+        if tier.child_tiers.all():
+            for child_tier in tier.child_tiers.all():
+                if Annotation.objects.filter(sound=self, tier=child_tier).count() == 0:
+                    for k in added.keys():
+                        Annotation.objects.create(start_time=added[k]['start'], end_time=added[k]['end'], sound=self,
+                                                  tier=child_tier, user=user)
+
+        # update annotation_state of sound
+        num_ref_annotations = Annotation.objects.filter(sound=self.exercise.reference_sound, tier=tier).count()
+        added_annotations = Annotation.objects.filter(sound=self, tier=tier)
+        num_similarity = AnnotationSimilarity.objects.filter(similar_sound__in=added_annotations).count()
+        state = 'E'
+        if num_ref_annotations == added_annotations.count():
+            state = 'I'
+            if num_similarity > 0:
+                state = 'C'
+        elif added_annotations.count() > 0:
+            state = 'I'
+
+        self.annotation_state = state
+        self.save()
+
         return True
 
+    def update_annotation_vals(self, old_annotation, new_annotation, user):
+        old_annotation.start_time = new_annotation['start']
+        old_annotation.end_time = new_annotation['end']
+        old_annotation.name = new_annotation['annotation']
+        old_annotation.user = user
+        old_annotation.save()
 
 class Annotation(models.Model):
     name = models.CharField(max_length=200)
