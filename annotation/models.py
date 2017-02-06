@@ -74,6 +74,12 @@ class Sound(models.Model):
 
 
 class Annotation(models.Model):
+    ANNOTATION_TYPE =(
+            ('S', 'segment'),
+            ('U', 'upbeat'),
+            ('D', 'downbeat')
+    )
+
     name = models.CharField(max_length=200)
     start_time = models.DecimalField(max_digits=6, decimal_places=3)
     end_time = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
@@ -82,6 +88,7 @@ class Annotation(models.Model):
     user = models.ForeignKey(User, related_name='annotations')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    annotation_type = models.CharField(max_length=2, choices=ANNOTATION_TYPE, default='S')
 
     def __str__(self):
         return self.name

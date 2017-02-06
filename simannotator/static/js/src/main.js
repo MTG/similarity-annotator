@@ -260,6 +260,19 @@ UrbanEars.prototype = {
       }
 
     },
+    createPointSegment: function(upbeat){
+      var currTime = this.wavesurfer.getCurrentTime();
+      var region = this.wavesurfer.addRegion({
+                start: currTime, 
+                end: currTime + 0.01,
+            });
+      if (upbeat) {
+        region.upbeat = true;
+      } else {
+        region.downbeat = true;
+      }
+      this.stagesRef.createRegionSwitchToStageThree(region);
+    },
     loadSegments: function(){
       var my = this;
       if (this.refReady && this.soundReady){
@@ -416,6 +429,12 @@ function main() {
     document.onkeypress = function(event) {
       if(document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)){
         urbanEars.createSegment();
+      }
+      if(document.activeElement.className != 'annotation_inp' && event.keyCode == 'd'.charCodeAt(0)){
+        urbanEars.createPointSegment(false);
+      }
+      if(document.activeElement.className != 'annotation_inp' && event.keyCode == 'u'.charCodeAt(0)){
+        urbanEars.createPointSegment(true);
       }
     }
 
