@@ -175,27 +175,6 @@ def annotation_action(request, sound_id, tier_id):
 
 
 @login_required
-def get_annotations(request, sound_id, tier_id):
-    sound = get_object_or_404(Sound, id=sound_id)
-    tier = get_object_or_404(Tier, id=tier_id)
-    annotations = Annotation.objects.filter(sound=sound, tier=tier)
-    ret = []
-    for i in annotations.all():
-        references = i.annotationsimilarity_set.all()
-        annotation = {
-            'annotation_id': i.id,
-            'startTime': i.start_time,
-            'endTime': i.end_time,
-            'name': i.name
-            }
-        if len(references):
-            reference = references[0]
-            annotation['referenceId'] = reference.reference_id
-        ret.append(annotation)
-    return JsonResponse({'status': 'success', 'annotations': ret})
-
-
-@login_required
 def download_annotations(request, sound_id):
     sound = get_object_or_404(Sound, id=sound_id)
 
