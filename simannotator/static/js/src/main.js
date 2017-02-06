@@ -267,9 +267,9 @@ UrbanEars.prototype = {
                 end: currTime + 0.01,
             });
       if (upbeat) {
-        region.upbeat = true;
+        region.annotation = "down_beat";
       } else {
-        region.downbeat = true;
+        region.annotation = "up_beat";
       }
       this.stagesRef.createRegionSwitchToStageThree(region);
     },
