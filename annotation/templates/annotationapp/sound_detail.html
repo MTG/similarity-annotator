@@ -35,9 +35,7 @@
 </div>
 <div class="row prompt">
     {% for other_tier in other_tiers %}
-        {% if other_tier != tier %}
-            <h5 class="center"><a href="/{{ exercise_id }}/sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
-        {% endif %}
+        <h5 class="center"><a href="/{{ exercise_id }}/sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
     {% endfor %}
 </div>
 

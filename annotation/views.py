@@ -8,7 +8,7 @@ from django.http import HttpResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
+from .models import Annotation, Exercise, Sound, Tier, DataSet, Tag
 from .forms import TierForm
 from .utils import exercise_annotations_to_json
 
@@ -114,7 +114,7 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
         sound.save()
         return redirect('/' + exercise_id + '/sound_list')
     tier = get_object_or_404(Tier, id=tier_id)
-    other_tiers = sound.exercise.tiers.all()
+    other_tiers = sound.exercise.tiers.all().exclude(id=tier_id)
     context = {'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/sound_detail.html', context)
 
