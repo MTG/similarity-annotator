@@ -36,7 +36,7 @@ class CreateSoundTest(TestCase):
         self.exercise.reference_sound = self.reference_sound
         self.exercise.save()
 
-    # Update anotations to test annotation_state update correctly
+    # Update annotations to test annotation_state update correctly
     def test_update_annotations(self):
         annotations = [{'id': 1, 'start': 1, 'end': 2, 'annotation': 'name', 'similarity': 'no'}]
         self.reference_sound.update_annotations(self.tier, annotations, self.user)
@@ -50,12 +50,11 @@ class CreateSoundTest(TestCase):
 
         self.assertEqual(self.sound.annotation_state, 'I')
         annotations = [{'id': 4, 'start': 1, 'end': 2, 'reference': 3,
-            'similarity': 'yes', 'annotation': 'name', 'similValue': 1}]
+                        'similarity': 'yes', 'annotation': 'name', 'similValue': 1}]
 
         self.sound.update_annotations(self.tier, annotations, self.user)
         self.assertEqual(self.sound.annotations.count(), 1)
         self.assertEqual(self.sound.annotation_state, 'C')
-
 
     def test_sound_creation(self):
         sound_filename_2 = 'test_sound_2.wav'
