@@ -183,3 +183,55 @@ class SoundListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         exercise = Exercise.objects.get(id=self.exercise.id)
         self.assertEqual(exercise.reference_sound, reference_sound)
+
+
+class SoundDetailTestView(TestCase):
+    def setUp(self):
+        data_set_name = 'test_data_set'
+        self.data_set = DataSet.objects.create(name=data_set_name)
+
+        exercise_name = 'test_exercise'
+        self.exercise = Exercise.objects.create(data_set=self.data_set, name=exercise_name)
+
+        tier_name = 'test_tier'
+        self.tier = Tier.objects.create(name=tier_name, exercise=self.exercise)
+
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
+        self.user.save()
+
+        self.test_client = Client()
+        self.test_client.login(username=username, password=password)
+
+        sound_filename = 'test_sound'
+        self.sound = Sound.objects.create(filename=sound_filename, original_filename=sound_filename,
+                                          exercise=self.exercise)
+
+    def test_sound_detail(self):
+        response = self.test_client.get(reverse('sound_detail', kwargs={'exercise_id': self.exercise.id,
+                                                                        'tier_id': self.tier.id,
+                                                                        'sound_id': self.sound.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['sound'], self.sound)
+        self.assertEqual(response.context['tier'], self.tier)
+        # the current tier shouldn't be in other tiers list
+        self.assertFalse(self.tier in response.context['other_tiers'])
+        tier_2 = Tier.objects.create(name='tier_2', exercise=self.exercise)
+        response = self.test_client.get(reverse('sound_detail', kwargs={'exercise_id': self.exercise.id,
+                                                                        'tier_id': self.tier.id,
+                                                                        'sound_id': self.sound.id}))
+        self.assertTrue(tier_2 in response.context['other_tiers'])
+
+    def test_sound_detail_discard_sound(self):
+        # the sound is not discarded by default, so by post should change to is_discarded=True
+        self.test_client.post(reverse('sound_detail', kwargs={'exercise_id': self.exercise.id,
+                                                              'tier_id': self.tier.id, 'sound_id': self.sound.id}))
+        sound = Sound.objects.get(id=self.sound.id)
+        self.assertTrue(sound.is_discarded)
+        # if is_discarded=True, a post request should change it to is_discarded=False
+        self.test_client.post(reverse('sound_detail', kwargs={'exercise_id': self.exercise.id,
+                                                              'tier_id': self.tier.id, 'sound_id': self.sound.id}))
+        sound = Sound.objects.get(id=self.sound.id)
+        self.assertFalse(sound.is_discarded)
