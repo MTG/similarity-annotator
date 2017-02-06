@@ -265,6 +265,7 @@ UrbanEars.prototype = {
       var region = this.wavesurfer.addRegion({
                 start: currTime, 
                 end: currTime + 0.01,
+                point_annotations: true,
             });
       if (upbeat) {
         region.annotation = "down_beat";
