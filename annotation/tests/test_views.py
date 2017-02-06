@@ -4,7 +4,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from annotation.models import DataSet, Exercise, Sound, Tier, Annotation
+from annotation.models import DataSet, Exercise, Sound, Tier, Annotation, AnnotationSimilarity
 
 
 class ExerciseListViewTests(TestCase):
@@ -285,4 +285,55 @@ class AnnotationActionViewTests(TestCase):
         self.assertEqual(float(response.json()['task']['segments_ref'][0]['end']), reference_annotation.end_time)
         self.assertEqual(response.json()['task']['url'], os.path.join(settings.MEDIA_URL, self.data_set.name,
                                                                       self.exercise.name, self.sound.filename))
+
+
+class DownloadAnnotationsViewTests(TestCase):
+    def setUp(self):
+        data_set_name = 'test_data_set'
+        self.data_set = DataSet.objects.create(name=data_set_name)
+
+        exercise_name = 'test_exercise'
+        self.exercise = Exercise.objects.create(data_set=self.data_set, name=exercise_name)
+
+        tier_name = 'test_tier'
+        self.tier = Tier.objects.create(name=tier_name, exercise=self.exercise)
+
+        username = 'test'
+        password = '1234567'
+        self.user = User.objects.create(username=username)
+        self.user.set_password(password)
+        self.user.save()
+
+        self.test_client = Client()
+        self.test_client.login(username=username, password=password)
+
+        sound_filename = 'test_sound'
+        self.sound = Sound.objects.create(filename=sound_filename, original_filename=sound_filename,
+                                          exercise=self.exercise)
+
+        self.reference_sound = Sound.objects.create(filename='reference_sound', original_filename='',
+                                                    exercise=self.exercise)
+        self.exercise.reference_sound = self.reference_sound
+        self.exercise.save()
+
+        self.annotation = Annotation.objects.create(name='test_annotation', start_time=1.000, end_time=2.000,
+                                                         sound=self.sound, tier=self.tier, user=self.user)
+        self.reference_annotation = Annotation.objects.create(name='reference_annotation', start_time=1.000,
+                                                              end_time=2.000,  sound=self.reference_sound,
+                                                              tier=self.tier, user=self.user)
+
+    def test_download_annotations(self):
+        annotation_similarity = AnnotationSimilarity.objects.create(reference=self.reference_annotation,
+                                                                    similar_sound=self.annotation,
+                                                                    similarity_measure=10, user=self.user)
+        response = self.test_client.get(reverse('download-annotations', kwargs={'sound_id': self.sound.id}))
+
+        self.assertEqual(response.json()[self.tier.name][0]['start_time'], self.annotation.start_time)
+        self.assertEqual(response.json()[self.tier.name][0]['end_time'], self.annotation.end_time)
+        self.assertEqual(response.json()[self.tier.name][0]['ref_start_time'],
+                         self.reference_annotation.start_time)
+        self.assertEqual(response.json()[self.tier.name][0]['ref_end_time'], self.reference_annotation.end_time)
+        self.assertEqual(response.json()[self.tier.name][0]['value'], annotation_similarity.similarity_measure)
+
+
 
