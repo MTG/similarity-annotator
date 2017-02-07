@@ -3,9 +3,6 @@ services:
   db:
     image: postgres
 
-  gearman:
-    image: kendu/gearman
-
   web:
     build: .
     ports:
