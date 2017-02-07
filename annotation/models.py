@@ -153,7 +153,7 @@ class Sound(models.Model):
         for a in old_annotations.all():
             if a.id not in added:
                 # Delete annotation in the parent tier and child
-                Annotation.objects.filter(sound=self, start_time=a.start_time, end_time=a.end_time, name=a.name)
+                Annotation.objects.filter(sound=self, start_time=a.start_time, end_time=a.end_time, name=a.name).delete()
 
         # create annotations in child tiers
         if tier.child_tiers.all():
