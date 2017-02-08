@@ -114,10 +114,13 @@ STATICFILES_DIRS = [
 STATIC_URL = '/static/'
 
 deploy_env = os.environ.get('DEPLOY_ENV')
+allowed_host = os.environ.get('DJANGO_ALLOWED_HOST')
 import dj_database_url
 if deploy_env == 'prod':
     debug = False
     ALLOWED_HOSTS = ['localhost', 'asplab-web1', 'asplab-web1.s.upf.edu', 'simannotator.mtg.upf.edu']
+    if allowed_host:
+        ALLOWED_HOSTS.append(allowed_host)
 else:
     debug = True
 
