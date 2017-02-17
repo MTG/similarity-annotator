@@ -44,7 +44,7 @@
     {% if request.GET.enable_spec %}
       <a href="{% url 'sound_detail' exercise_id sound.id tier.id %}" class="btn">Disable Spectrogram</a>
     {% else %}
-      <a href="{% url 'sound_detail' exercise_id sound.id tier.id %}?enable_spec=1" class="btn">Enable Sectrogam</a>
+      <a href="{% url 'sound_detail' exercise_id sound.id tier.id %}?enable_spec=1" class="btn">Enable Spectrogram</a>
     {% endif %}
     </div>
    <div class="right-align" style="margin-right:35px; display: inline;">
@@ -53,8 +53,8 @@
 </div>
     
 <div class="annotation">
-  <span><b>Reference Pitch Sound:</b></span>
   {% if sound.exercise.reference_pitch_sound %}
+      <span><b>Reference Pitch Sound:</b></span>
       <div>
         <audio controls=controls>
           <source src="{{ MEDIA_URL }}{{ sound.exercise.reference_pitch_sound }}" type="audio/mpeg">

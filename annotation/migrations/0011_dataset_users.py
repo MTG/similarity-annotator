@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('annotation', '0010_tier_point_annotations'),
+        ('annotation', '0009_exercise_created_at'),
     ]
 
     operations = [
