@@ -13,8 +13,5 @@ urlpatterns = [
         views.ref_sound_detail, name='ref_sound_detail'),
     url(r'^annotation_action/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',
         views.annotation_action, name='annotation-action'),
-    url(r'^get_annotations/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$', views.get_annotations, name='get-annotations'),
-    url(r'^download_annotations/(?P<sound_id>[0-9]+)$', views.download_annotations, name='download-annotations'),
-    url(r'^(?P<dataset_id>[0-9]+)/upload/', views.upload, name='upload'),
-    url(r'^(?P<exercise_id>[0-9]+)/download/', views.download, name='download')
+    url(r'^download_annotations/(?P<sound_id>[0-9]+)$', views.download_annotations, name='download-annotations')
 ]

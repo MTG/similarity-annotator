@@ -1,30 +1,8 @@
 from django import forms
-from django.core.exceptions import ValidationError
-from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Exercise, Tier
-
-import zipfile
+from .models import Tier
 
 
-class ExerciseForm(forms.ModelForm):
-    zip_file = forms.FileField(
-        label='Select a zip file with the sounds',
-    )
-
-    class Meta:
-        model = Exercise
-        fields = ['name', 'reference_pitch_sound']
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', })}
-
-    def clean_zip_file(self):
-        zip_file = self.cleaned_data['zip_file']
-        if not zipfile.is_zipfile(zip_file):
-            raise ValidationError("The file type is not correct")
-
-    def __init__(self, *args, **kwargs):
-        super(ExerciseForm, self).__init__(*args, **kwargs)
-        self.fields['name'].required = True
 
 class TierForm(forms.ModelForm):
     class Meta:

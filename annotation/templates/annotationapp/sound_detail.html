@@ -35,9 +35,7 @@
 </div>
 <div class="row prompt">
     {% for other_tier in other_tiers %}
-        {% if other_tier != tier %}
-            <h5 class="center"><a href="/{{ exercise_id }}/sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
-        {% endif %}
+        <h5 class="center"><a href="/{{ exercise_id }}/sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
     {% endfor %}
 </div>
 
@@ -72,9 +70,8 @@
       <span>Zoom: </span>
       <select id="zoom_ref">
         <option value="">1x</option>
-        <option value="150">2x</option>
-        <!--<option value="100">3x</option>
-          <option value="150">4x</option>-->
+        <option value="2">2x</option>
+        <option value="4">4x</option>
       </select>
     </div>
     <span><b>Sound to annotate: </b></span>
@@ -85,9 +82,8 @@
       <span>Zoom: </span>
       <select id="zoom">
         <option value="">1x</option>
-        <option value="150">2x</option>
-        <!--<option value="100">3x</option>
-          <option value="150">4x</option>-->
+        <option value="2">2x</option>
+        <option value="4">4x</option>
       </select>
     </div>
     <div class="creation_stage_container"></div>

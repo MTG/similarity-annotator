@@ -16,6 +16,8 @@
 function UrbanEars() {
     this.wavesurfer;
     this.wavesurferRef;
+    this.initialPxPerSecRef;
+    this.initialPxPerSec;
     this.playBar;
     this.playBarRef;
     this.stages;
@@ -106,20 +108,19 @@ function UrbanEars() {
    
     var my = this;
     $("#zoom").change(function () {
+      var pxPerSec = my.initialPxPerSec / my.wavesurfer.getDuration();
       if (this.value) {
-        my.wavesurfer.zoom(Number(this.value));
-      } else {
-        my.wavesurfer.zoom(false);
-      }
+        pxPerSec = pxPerSec * Number(this.value);
+      } 
+      my.wavesurfer.zoom(pxPerSec);
     });
  
     $("#zoom_ref").change(function () {
-      my.wavesurferRef.zoom(false);
+      var pxPerSec = my.initialPxPerSecRef / my.wavesurferRef.getDuration();
       if (this.value) {
-        my.wavesurferRef.zoom(Number(this.value));
-      } else {
-        my.wavesurfer.zoom(false);
-      }
+        pxPerSec = pxPerSec * Number(this.value);
+      } 
+      my.wavesurferRef.zoom(pxPerSec);
 
     });
 }
@@ -196,6 +197,7 @@ UrbanEars.prototype = {
             my.refReady = true;
             my.loadSegments();
             my.wavesurferRef.zoom(false);
+            my.initialPxPerSecRef = my.wavesurferRef.drawer.wrapper.scrollWidth;
         });
         
         // When a new sound file is loaded into the wavesurfer update the  play bar, update the 
@@ -205,6 +207,7 @@ UrbanEars.prototype = {
            my.soundReady = true;
            my.loadSegments();
            my.wavesurfer.zoom(false);
+           my.initialPxPerSec = my.wavesurfer.drawer.wrapper.scrollWidth;
         });
 
     },
