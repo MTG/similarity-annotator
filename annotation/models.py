@@ -131,6 +131,10 @@ class Sound(models.Model):
                     related_annotations = related_annotations.filter(tier=child).all()
                     for rel in related_annotations:
                         self.update_annotation_vals(rel, a, user)
+                for child in tier.special_child_tiers.all():
+                    related_annotations = related_annotations.filter(tier=child).all()
+                    for rel in related_annotations:
+                        self.update_annotation_vals(rel, a, user)
 
                 # Update the annotation in the current tier
                 self.update_annotation_vals(new_annotation, a, user)
@@ -143,6 +147,11 @@ class Sound(models.Model):
                 for child in tier.child_tiers.all():
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                               tier=child, name=a['annotation'], user=user)
+
+                for child in tier.special_child_tiers.all():
+                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
+                                              tier=child, name=a['annotation'], user=user)
+
 
             # Re-create all AnnotationSimilarity for this user
             new_annotation.annotationsimilarity_set.filter(user=user).delete()
