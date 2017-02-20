@@ -17,7 +17,7 @@ class ExerciseAdmin(admin.ModelAdmin):
 
 
 class TierAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'exercise', 'entire_sound')
+    list_display = ('id', 'name', 'data_set', 'exercise', 'entire_sound')
     list_display_links = ('name',)
 
     def get_form(self, request, obj=None, **kwargs):
@@ -30,6 +30,11 @@ class TierAdmin(admin.ModelAdmin):
             tier = Tier.objects.get(pk=self.tier_id)
             kwargs["queryset"] = tier.exercise.tiers
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    @staticmethod
+    def data_set(obj):
+        return obj.exercise.data_set
+
 
 class SoundAdmin(admin.ModelAdmin):
     list_display = ('filename', 'data_set', 'exercise', 'is_discarded', 'sound_tier_list_url')
