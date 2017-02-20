@@ -4,13 +4,12 @@ import json
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Annotation, Exercise, Sound, Tier, DataSet, Tag
+from .models import Exercise, Sound, Tier, DataSet, Tag
 from .forms import TierForm
-from .utils import exercise_annotations_to_json
 
 
 @login_required

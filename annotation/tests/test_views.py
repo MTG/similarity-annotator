@@ -68,7 +68,14 @@ class DataSetListViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue('accounts/login' in response.url)
 
-    def test_data_set_list(self):
+    def test_data_set_list_no_user(self):
+        response = self.test_client.get(reverse('data_set_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(self.data_set in response.context['data_sets_list'])
+
+    def test_data_set_list_user(self):
+        self.data_set.users.add(self.user)
+        self.data_set.save()
         response = self.test_client.get(reverse('data_set_list'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.data_set in response.context['data_sets_list'])
