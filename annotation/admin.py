@@ -17,8 +17,12 @@ class ExerciseAdmin(admin.ModelAdmin):
 
 
 class TierAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'exercise', 'entire_sound')
+    list_display = ('id', 'name', 'data_set', 'exercise', 'entire_sound')
     list_display_links = ('name',)
+
+    @staticmethod
+    def data_set(obj):
+        return obj.exercise.data_set
 
 
 class SoundAdmin(admin.ModelAdmin):
