@@ -20,6 +20,16 @@ class TierAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'exercise', 'entire_sound')
     list_display_links = ('name',)
 
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            self.tier_id = obj.id
+        return super(TierAdmin, self).get_form(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "parent_tier":
+            tier = Tier.objects.get(pk=self.tier_id)
+            kwargs["queryset"] = tier.exercise.tiers
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class SoundAdmin(admin.ModelAdmin):
     list_display = ('filename', 'data_set', 'exercise', 'is_discarded', 'sound_tier_list_url')
