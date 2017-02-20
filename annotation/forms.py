@@ -3,15 +3,15 @@ from django import forms
 from .models import Tier
 
 
-
 class TierForm(forms.ModelForm):
     class Meta:
         model = Tier
-        fields = ['name', 'parent_tier']
+        fields = ['name', 'parent_tier', 'point_annotations']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'style': 'width: 8em;',
                                                   'placeholder': 'Name'}),
                    'parent_tier': forms.Select(attrs={'class': 'form-control', 'style': 'width: 8em;',
-                                                      'placeholder': 'parent_tier'})}
+                                                      'placeholder': 'parent_tier'}),
+                   'point_annotations': forms.CheckboxInput()}
 
     def __init__(self, *args, **kwargs):
         ids = kwargs.get('parent_tier_ids', None)

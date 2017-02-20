@@ -39,9 +39,12 @@ def tier_list(request, exercise_id, sound_id):
             parent_tier_id = request.POST['parent_tier']
             if parent_tier_id:
                 parent_tier = Tier.objects.get(id=parent_tier_id)
-                Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+                tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
             else:
-                Tier.objects.create(name=tier_name, exercise=exercise)
+                tier = Tier.objects.create(name=tier_name, exercise=exercise)
+            if 'point_annotations' in request.POST:
+                tier.point_annotations = True
+                tier.save()
     else:
         tiers_list_ids = tiers_list.values_list('id')
         tier_form = TierForm(parent_tier_ids=tiers_list_ids)
