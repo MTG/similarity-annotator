@@ -22,7 +22,7 @@ class TierAdmin(admin.ModelAdmin):
 
 
 class SoundAdmin(admin.ModelAdmin):
-    list_display = ('filename', 'exercise', 'is_discarded', 'sound_tier_list_url')
+    list_display = ('filename', 'data_set', 'exercise', 'is_discarded', 'sound_tier_list_url')
     list_display_links = ('filename',)
     list_filter = ('exercise', 'is_discarded', )
     search_fields = ['filename']
@@ -31,6 +31,10 @@ class SoundAdmin(admin.ModelAdmin):
         url_name_to_show = os.path.splitext(obj.filename)[0]
         return '<a href="/%s/%s/tiers_list/">%s</a>' % (obj.exercise.id, obj.id, url_name_to_show)
     sound_tier_list_url.allow_tags = True
+
+    @staticmethod
+    def data_set(obj):
+        return obj.exercise.data_set
 
 
 class AnnotationAdmin(admin.ModelAdmin):
