@@ -22,6 +22,8 @@ $( document ).ready(function() {
             {% csrf_token %}
             <h5>Create new tier:</h5>
             <p>{{ form.name }} </p>
+            <h5>Select if single timestamp annotations</h5>
+            <p>{{ form.point_annotations }}</p>
             <h5>Select parent tier if desired:</h5>
             <p>{{ form.parent_tier }} </p>
         <button type="submit" class="btn btn-info">Create</button>
