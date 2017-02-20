@@ -37,6 +37,7 @@ class Tier(models.Model):
     special_parent_tier = models.ForeignKey('self', blank=True, null=True, related_name='special_child_tiers')
     exercise = models.ForeignKey(Exercise, related_name='tiers')
     entire_sound = models.BooleanField(default=False)
+    point_annotations = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
