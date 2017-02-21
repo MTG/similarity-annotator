@@ -18,16 +18,7 @@ $( document ).ready(function() {
 {% block title %} List of tiers for sound {{ sound.filename }} {% endblock %}
 
 {% block links %}
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <h5>Create new tier:</h5>
-            <p>{{ form.name }} </p>
-            <h5>Select if single timestamp annotations</h5>
-            <p>{{ form.point_annotations }}</p>
-            <h5>Select parent tier if desired:</h5>
-            <p>{{ form.parent_tier }} </p>
-        <button type="submit" class="btn btn-info">Create</button>
-        </form>
+    <input type="button" onclick="location.href='/{{ exercise.id }}/{{ sound.id }}/tier_creation/';" value="Create a tier" />
 {% endblock %}
 
 {% block content %}

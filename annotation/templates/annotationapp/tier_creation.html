@@ -1,0 +1,40 @@
+{% extends 'annotationapp/annotationapp_base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<script type="text/javascript" src="/static/js/lib/jquery-2.2.3.min.js"></script>
+<style>.highlight-tier {background-color: #ddd; border-radius: 4px;}</style>
+<script>
+$( document ).ready(function() {
+  $('.show-parent').mouseover(function(){
+    $(".tier-" + $( this ).data('parent')).addClass('highlight-tier');
+  }).mouseout(function() {
+    $(".tier-" + $( this ).data('parent')).removeClass('highlight-tier');
+  });
+})
+</script>
+{% endblock %}
+
+{% block title %} Tier creation for exercise {{ exercise.name }} {% endblock %}
+
+{% block content %}
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h5>Create new tier:</h5>
+            <p>{{ form.name }} </p>
+            <h5>Select if single timestamp annotations</h5>
+            <p>{{ form.point_annotations }}</p>
+            <h5>Select sync tier (optional):</h5>
+            <p>{{ form.parent_tier }} </p>
+            <h5>Select parent tier (optional):</h5>
+            <p>{{ form.special_parent_tier }} </p>
+        <button type="submit" class="btn btn-info">Create</button>
+        </form>
+{% endblock %}
+
+{% block logout %}
+    <button>
+    <a href="/accounts/logout">logout</a>
+    </button>
+{% endblock %}
+
