@@ -29,6 +29,19 @@ def exercise_list(request, dataset_id):
 
 
 @login_required
+def tier_delete(request, exercise_id, tier_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+    tier = exercise.tiers.get(id=tier_id)
+    if request.method == 'POST':
+        tier.delete()
+        return redirect(reverse('sound_list', kwargs={
+            'exercise_id': exercise_id
+        }))
+    context = {'exercise': exercise, 'tier': tier}
+    return render(request, 'annotationapp/tier_delete.html', context)
+
+
+@login_required
 def tier_edit(request, exercise_id, tier_id):
     exercise = Exercise.objects.get(id=exercise_id)
     tiers_list = exercise.tiers.all()
