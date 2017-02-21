@@ -2,6 +2,8 @@ import os
 import json
 import shutil
 import decimal
+import sndhdr
+import pydub
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -79,16 +81,34 @@ def get_or_create_sound_object(exercise, sound_filename, original_filename=None)
     return sound
 
 
+def check_if_sound_is_wav(original_file):
+    response = False
+    # if it is a mp3 file it should return None
+    if sndhdr.what(original_file)[0] == 'wav':
+        response = True
+    return response
+
+
+def create_mp3_copy(file_to_compress):
+    sound_file_destination = os.path.splitext(file_to_compress)[0] + '.mp3'
+    try:
+        sound = pydub.AudioSegment.from_wav(file_to_compress)
+        sound.export(sound_file_destination, format="mp3")
+    except Exception as e:
+        print(e)
+    return os.path.basename(sound_file_destination)
+
+
 def copy_sound_into_media(src, data_set_name, exercise_name, sound_filename):
     """
     Copy files from source to destination
     """
     dst = os.path.join(settings.MEDIA_ROOT, data_set_name, exercise_name, sound_filename)
     shutil.copyfile(src, dst)
-    if dst.startswith("/media/"):
-        dst = dst[7:]
+    if check_if_sound_is_wav(src):
+        sound_filename = create_mp3_copy(dst)
 
-    return dst
+    return sound_filename
 
 
 def create_annotations(annotations_file_path, sound, username, reference=False):

@@ -111,8 +111,9 @@ class Command(BaseCommand):
                 reference_sound_filename = os.path.basename(reference_sound_file_relative_path)
 
                 # copy the sound into media
-                annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
-                                                       reference_sound_filename)
+                reference_sound_filename = annotation.utils.copy_sound_into_media(source_path, dataset_name,
+                                                                                  exercise_name,
+                                                                                  reference_sound_filename)
 
                 reference_sound = annotation.utils.get_or_create_sound_object(exercise, reference_sound_filename,
                                                                               source_path)
@@ -140,7 +141,8 @@ class Command(BaseCommand):
                     sound_filename = os.path.basename(sound_file_relative_path)
 
                     # copy the sound into media
-                    annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name, sound_filename)
+                    sound_filename = annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
+                                                                            sound_filename)
 
                     sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path)
 

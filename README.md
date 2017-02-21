@@ -5,6 +5,40 @@ The web application is written in django framework and the interface for annotat
 
 ## Installation and run
 
+### Getting ffmpeg set up
+
+You may use **libav or ffmpeg**.
+
+Mac (using [homebrew](http://brew.sh)):
+
+```bash
+# libav
+brew install libav --with-libvorbis --with-sdl --with-theora
+
+####    OR    #####
+
+# ffmpeg
+brew install ffmpeg --with-libvorbis --with-ffplay --with-theora
+```
+
+Linux (using aptitude):
+
+```bash
+# libav
+apt-get install libav-tools libavcodec-extra-53
+
+####    OR    #####
+
+# ffmpeg
+apt-get install ffmpeg libavcodec-extra-53
+```
+
+Windows:
+
+1. Download and extract libav from [Windows binaries provided here](http://builds.libav.org/windows/).
+2. Add the libav `/bin` folder to your PATH envvar
+3. `pip install pydub`
+
 Install [docker-compose] (https://docs.docker.com/compose/install/) and then just run:
 
     docker-compose build
