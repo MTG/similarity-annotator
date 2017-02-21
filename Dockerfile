@@ -12,3 +12,4 @@ ADD . /code/
 
 RUN python manage.py collectstatic --no-input
 
+RUN apt-get install ffmpeg
