@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse
 
 from .models import Exercise, Sound, Tier, DataSet, Tag
 from .forms import TierForm
@@ -25,6 +26,35 @@ def exercise_list(request, dataset_id):
     exercises_list = data_set.exercises.all().order_by('-created_at')
     context = {'exercises_list': exercises_list, 'dataset_id': dataset_id}
     return render(request, 'annotationapp/exercises_list.html', context)
+
+
+@login_required
+def tier_edit(request, exercise_id, tier_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+    tiers_list = exercise.tiers.all()
+    tier = tiers_list.get(id=tier_id)
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            parent_tier_id = request.POST['parent_tier']
+            if parent_tier_id:
+                parent_tier = Tier.objects.get(id=parent_tier_id)
+                tier.parent_tier=parent_tier
+
+            tier.name = tier_name
+            tier.exercise = exercise
+            if 'point_annotations' in request.POST:
+                tier.point_annotations = True
+            tier.save()
+            return redirect(reverse('sound_list', kwargs={
+                'exercise_id': exercise_id
+            }))
+    else:
+        tiers_list_ids = tiers_list.values_list('id')
+        tier_form = TierForm(instance=tier, parent_tier_ids=tiers_list_ids)
+    context = {'exercise': exercise, 'tier': tier, 'form': tier_form}
+    return render(request, 'annotationapp/tier_creation.html', context)
 
 
 @login_required
@@ -206,6 +236,6 @@ def tier_creation(request, exercise_id, sound_id):
     else:
         tiers_list_ids = tiers_list.values_list('id')
         tier_form = TierForm(parent_tier_ids=tiers_list_ids)
-    context = {'form': tier_form, 'exercise': exercise}
+    context = {'form': tier_form, 'exercise': exercise, 'create': True}
     return render(request, 'annotationapp/tier_creation.html', context)
 
