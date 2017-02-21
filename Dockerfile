@@ -12,4 +12,5 @@ ADD . /code/
 
 RUN python manage.py collectstatic --no-input
 
+RUN add-apt-repository ppa:mc3man/trusty-media
 RUN apt-get install ffmpeg
