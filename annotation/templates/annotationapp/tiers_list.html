@@ -3,7 +3,7 @@
 
 {% block extra_head %}
 <script type="text/javascript" src="/static/js/lib/jquery-2.2.3.min.js"></script>
-<style>.highlight-tier {background-color: #ddd; border-radius: 4px;}</style>
+<style>.icn {width: 20px;} .highlight-tier {background-color: #ddd; border-radius: 4px;}</style>
 <script>
 $( document ).ready(function() {
   $('.show-parent').mouseover(function(){
@@ -30,8 +30,10 @@ $( document ).ready(function() {
             <li class="tier-{{ tier.id }}">
               <a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a>
               {% if tier.special_parent_tier %}
-              <img src="{% static 'img/branch.png'%}" class="show-parent" data-parent="{{tier.special_parent_tier.id}}"/>
+              <img src="{% static 'img/branch.png'%}" class="show-parent icn" data-parent="{{tier.special_parent_tier.id}}"/>
               {% endif %}
+              <a href="{% url 'tier_edit' exercise.id tier.id %}"><img src="{% static 'img/edit.png'%}" class="icn" /></a>
+              <a href="{% url 'tier_delete' exercise.id tier.id %}"><img src="{% static 'img/delete.png'%}" class="icn"/></a>
             </li>
             {% endif %}
         {% endfor %}
