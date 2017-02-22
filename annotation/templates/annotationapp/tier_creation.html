@@ -5,11 +5,56 @@
 <script type="text/javascript" src="/static/js/lib/jquery-2.2.3.min.js"></script>
 <style>.highlight-tier {background-color: #ddd; border-radius: 4px;}</style>
 <script>
+var checkTiersUrl = "{% url 'check_tiers_ajax' exercise.id %}";
+
+function updateTierOptions(){
+  var sync = $('#id_parent_tier').val();
+  var parent = $('#id_special_parent_tier').val();
+  var isPoint = $('#id_point_annotations').is(":checked");
+  $.ajax({
+    url: checkTiersUrl, 
+    data: {sync: sync, parent: parent, point: isPoint, exercise: {{exercise.id}}}, 
+    method: "POST", 
+    success: function(data){
+      // Append options for parent tier
+      $("#id_special_parent_tier").empty();
+      $("#id_special_parent_tier").append($("<option value>--------</option>"));
+      data.parent_tiers.forEach(function(element){
+        var opt = $("<option></option>").attr("value", element[0]).text(element[1])
+        if (parent == element[0]){
+          opt.attr("selected", "selected")
+        }
+        $("#id_special_parent_tier").append(opt);
+      });
+      
+      // Append options for sync tier
+      $("#id_parent_tier").empty();
+      $("#id_parent_tier").append($("<option value>--------</option>"));
+      data.sync_tiers.forEach(function(element){
+        var opt = $("<option></option>").attr("value", element[0]).text(element[1])
+        if (sync == element[0]){
+          opt.attr("selected", "selected")
+        }
+        $("#id_parent_tier").append(opt);
+      });
+    }
+  });
+}
 $( document ).ready(function() {
   $('.show-parent').mouseover(function(){
     $(".tier-" + $( this ).data('parent')).addClass('highlight-tier');
   }).mouseout(function() {
     $(".tier-" + $( this ).data('parent')).removeClass('highlight-tier');
+  });
+
+  $('#id_parent_tier').on('change', function(){
+    updateTierOptions();
+  });
+  $('#id_special_parent_tier').on('change', function(){
+    updateTierOptions();
+  });
+  $('#id_point_annotations').on('change', function(){
+    updateTierOptions();
   });
 })
 </script>

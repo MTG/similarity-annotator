@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^(?P<exercise_id>[0-9]+)/(?P<sound_id>[0-9]+)/tiers_list/$', views.tier_list, name='tier_list'),
     url(r'^(?P<exercise_id>[0-9]+)/(?P<tier_id>[0-9]+)/edit/$', views.tier_edit, name='tier_edit'),
     url(r'^(?P<exercise_id>[0-9]+)/(?P<tier_id>[0-9]+)/delete/$', views.tier_delete, name='tier_delete'),
+    url(r'^(?P<exercise_id>[0-9]+)/check_tiers_ajax/$', views.check_tiers_ajax, name='check_tiers_ajax'),
     url(r'^(?P<exercise_id>[0-9]+)/sound_detail/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',
         views.sound_detail, name='sound_detail'),
     url(r'^(?P<exercise_id>[0-9]+)/ref_sound_detail/(?P<sound_id>[0-9]+)/(?P<tier_id>[0-9]+)$',

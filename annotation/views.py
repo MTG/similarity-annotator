@@ -42,6 +42,32 @@ def tier_delete(request, exercise_id, tier_id):
 
 
 @login_required
+@csrf_exempt
+def check_tiers_ajax(request, exercise_id):
+    if request.method == 'POST':
+        point = request.POST.get('point')
+        parent = request.POST.get('parent', None)
+        sync = request.POST.get('sync', None)
+
+        exercise = Exercise.objects.get(id=exercise_id)
+        tiers_list = exercise.tiers
+        parent_list = exercise.tiers
+        if point == 'true':
+            parent_list = parent_list.exclude(point_annotations=False)
+            tiers_list = tiers_list.exclude(point_annotations=False)
+        if parent:
+            tiers_list = tiers_list.exclude(id=parent)
+        if sync:
+            parent_list = parent_list.exclude(id=sync)
+
+        ret = {
+            'sync_tiers': list(tiers_list.values_list('id', 'name')),
+            'parent_tiers': list(parent_list.values_list('id', 'name'))
+            }
+        return JsonResponse(ret)
+
+
+@login_required
 def tier_edit(request, exercise_id, tier_id):
     exercise = Exercise.objects.get(id=exercise_id)
     tiers_list = exercise.tiers.all()
