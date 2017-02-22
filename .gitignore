@@ -4,4 +4,4 @@ simannotator/development_settings.py
 media/
 tmp/
 *.swp
-.coverage/
+.coverage
