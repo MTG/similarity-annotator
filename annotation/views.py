@@ -59,6 +59,8 @@ def tier_edit(request, exercise_id, tier_id):
             tier.exercise = exercise
             if 'point_annotations' in request.POST:
                 tier.point_annotations = True
+            else:
+                tier.point_annotations = False
             tier.save()
             return redirect(reverse('sound_list', kwargs={
                 'exercise_id': exercise_id
