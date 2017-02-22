@@ -96,8 +96,11 @@ function UrbanEars() {
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    //this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef, false);
-    this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef);
+    if(pointAn == "False"){
+        this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef);
+    } else {
+        this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef, false);
+    }
     this.stages.create();
 
     // Create Workflow btns (submit and exit)
