@@ -83,6 +83,10 @@ def tier_edit(request, exercise_id, tier_id):
 
             tier.name = tier_name
             tier.exercise = exercise
+
+            # if point_annotations attribute is changed, delete previous annotations
+            if ('point_annotations' in request.POST) != tier.point_annotations:
+                tier.annotations.all().delete()
             if 'point_annotations' in request.POST:
                 tier.point_annotations = True
             else:

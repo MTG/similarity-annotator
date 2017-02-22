@@ -153,7 +153,6 @@ class Sound(models.Model):
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                               tier=child, name=a['annotation'], user=user)
 
-
             # Re-create all AnnotationSimilarity for this user
             new_annotation.annotationsimilarity_set.filter(user=user).delete()
             if a['similarity'] == 'yes':
