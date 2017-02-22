@@ -421,7 +421,7 @@ AnnotationStages.prototype = {
         // Swap regions 
         this.swapRegion(newStage, region);
 
-        if (this.wavesurferRef || this.editEnable){
+       if (this.editEnable != false && this.wavesurferRef ) {
           // Update the dom of which ever stage the user is switching to
           var newContent = null;
           if (this.alwaysShowTags){
@@ -743,7 +743,7 @@ AnnotationStages.prototype = {
 
     // Attach event handlers for wavesurfer events
     addWaveSurferEvents: function() {
-       if (this.wavesurferRef || this.editEnable) {
+       if (this.editEnable != false && this.wavesurferRef ) {
           this.wavesurfer.enableDragSelection();
           this.wavesurfer.on('region-update-end', this.trackMovement.bind(this));
           this.wavesurfer.on('region-update-end', this.createRegionSwitchToStageThree.bind(this));
