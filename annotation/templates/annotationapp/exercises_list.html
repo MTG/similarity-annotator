@@ -1,5 +1,5 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
-{% block title %} List of exercises {% endblock %}
+{% block title %} {{ data_set.name }}: list of exercises {% endblock %}
 {% block content %}
     {% if exercises_list %}
         <ul class="pagination">
@@ -10,6 +10,12 @@
     {% else %}
         <p>No exercises available.</p>
     {% endif %}
+{% endblock %}
+
+{% block links %}
+    <button>
+    <a href="/">Back</a>
+    </button>
 {% endblock %}
 
 {% block logout %}
