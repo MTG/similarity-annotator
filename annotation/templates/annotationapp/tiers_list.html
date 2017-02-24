@@ -15,7 +15,8 @@ $( document ).ready(function() {
 </script>
 {% endblock %}
 
-{% block title %} List of tiers for sound {{ sound.filename }} {% endblock %}
+{% block title %} <a href="/{{ exercise.data_set.id }}/">
+    {{ exercise.data_set.name }} </a> : <a href="/{{ exercise.id }}/sound_list/"> {{ exercise.name }} </a>: {{ sound.filename }}: list of tiers {% endblock %}
 
 {% block links %}
     <input type="button" onclick="location.href='/{{ exercise.id }}/{{ sound.id }}/tier_creation/';" value="Create a tier" />
