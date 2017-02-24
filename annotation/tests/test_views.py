@@ -46,7 +46,7 @@ class ExerciseListViewTests(TestCase):
 
     def test_exercises_list_data_set_id(self):
         response = self.test_client.get(reverse('exercise_list', kwargs={'dataset_id': self.data_set.id}))
-        self.assertEqual(response.context['dataset_id'], str(self.data_set.id))
+        self.assertEqual(response.context['data_set'], self.data_set)
 
 
 class DataSetListViewTests(TestCase):

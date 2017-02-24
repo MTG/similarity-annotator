@@ -1,6 +1,7 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
 
-{% block title %} List of sounds for exercise {{ exercise.name }} {% endblock %}
+{% block title %} <a href="/{{ exercise.data_set.id }}/">
+    {{ exercise.data_set.name }} </a> : <b> {{ exercise.name }} </b>: list of sounds{% endblock %}
 
 {% block content %}
     {% if display_filter != 'all' and display_filter != 'discarded'%}

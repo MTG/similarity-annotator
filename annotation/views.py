@@ -24,7 +24,7 @@ def data_set_list(request):
 def exercise_list(request, dataset_id):
     data_set = DataSet.objects.get(id=dataset_id)
     exercises_list = data_set.exercises.all().order_by('-created_at')
-    context = {'exercises_list': exercises_list, 'dataset_id': dataset_id}
+    context = {'exercises_list': exercises_list, 'data_set': data_set}
     return render(request, 'annotationapp/exercises_list.html', context)
 
 
@@ -79,7 +79,16 @@ def tier_edit(request, exercise_id, tier_id):
             parent_tier_id = request.POST['parent_tier']
             if parent_tier_id:
                 parent_tier = Tier.objects.get(id=parent_tier_id)
-                tier.parent_tier=parent_tier
+                tier.parent_tier = parent_tier
+            else:
+                tier.parent_tier = None
+
+            special_parent_tier_id = request.POST['special_parent_tier']
+            if special_parent_tier_id:
+                special_aprent_tier = Tier.objects.get(id=special_parent_tier_id)
+                tier.special_parent_tier = special_aprent_tier
+            else:
+                tier.special_parent_tier = None
 
             tier.name = tier_name
             tier.exercise = exercise
@@ -274,9 +283,13 @@ def tier_creation(request, exercise_id, sound_id):
                 tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
             else:
                 tier = Tier.objects.create(name=tier_name, exercise=exercise)
+            special_parent_tier_id = request.POST['special_parent_tier']
+            if special_parent_tier_id:
+                special_parent_tier = Tier.objects.get(id=special_parent_tier_id)
+                tier.special_parent_tier = special_parent_tier
             if 'point_annotations' in request.POST:
                 tier.point_annotations = True
-                tier.save()
+            tier.save()
             return redirect('/' + exercise_id + '/' + sound_id + '/tiers_list')
     else:
         tiers_list_ids = tiers_list.values_list('id')

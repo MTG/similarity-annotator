@@ -15,7 +15,8 @@ $( document ).ready(function() {
 </script>
 {% endblock %}
 
-{% block title %} List of tiers for sound {{ sound.filename }} {% endblock %}
+{% block title %} <a href="/{{ exercise.data_set.id }}/">
+    {{ exercise.data_set.name }} </a> : <a href="/{{ exercise.id }}/sound_list/"> {{ exercise.name }} </a>: {{ sound.filename }}: list of tiers {% endblock %}
 
 {% block links %}
     <input type="button" onclick="location.href='/{{ exercise.id }}/{{ sound.id }}/tier_creation/';" value="Create a tier" />
@@ -24,18 +25,19 @@ $( document ).ready(function() {
 {% block content %}
     {% if tiers_list %}
         {% for tier in tiers_list %}
-            {% if reference_sound %}
-                <li><a href="/{{ exercise.id }}/ref_sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a></li>
-            {% else %}
             <li class="tier-{{ tier.id }}">
+            {% if reference_sound %}
+                <a href="/{{ exercise.id }}/ref_sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a>
+            {% else %}
               <a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a>
+            {% endif %}
               {% if tier.special_parent_tier %}
               <img src="{% static 'img/branch.png'%}" class="show-parent icn" data-parent="{{tier.special_parent_tier.id}}"/>
               {% endif %}
               <a href="{% url 'tier_edit' exercise.id tier.id %}"><img src="{% static 'img/edit.png'%}" class="icn" /></a>
               <a href="{% url 'tier_delete' exercise.id tier.id %}"><img src="{% static 'img/delete.png'%}" class="icn"/></a>
             </li>
-            {% endif %}
+
         {% endfor %}
     {% else %}
         <p>There are no tiers</p>
