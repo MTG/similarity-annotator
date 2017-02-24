@@ -373,6 +373,7 @@ WaveSurfer.Region = {
                 cursor: this.resize ? 'col-resize' : 'default',
             });
         }
+        this.wavesurfer.fireEvent('zoom-end');
     },
 
     /* Bind audio events. */

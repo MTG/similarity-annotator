@@ -44,13 +44,14 @@ WaveSurfer.Labels = {
         }.bind(this));
 
         // Replace the label container with a empty one when the wavesurfer is redrawn
-        wavesurfer.on('redraw', this.render.bind(this));
+        //wavesurfer.on('redraw', this.render.bind(this));
         // Destory the wrapper when the wavesurfer is destroyed
         wavesurfer.on('destroy', this.destroy.bind(this));
         // Add a label when a region is created
         wavesurfer.on('region-created', this.add.bind(this));
         // Update a label when its region is updated
         wavesurfer.on('region-updated', this.rearrange.bind(this));
+        wavesurfer.on('zoom-end', this.render.bind(this));
     },
 
     // Remove the wrapper element
@@ -103,7 +104,21 @@ WaveSurfer.Labels = {
             width: this.drawer.wrapper.scrollWidth * this.pixelRatio + 'px',
             left: 0
         });
+
+        if (this.wavesurfer.regions) {
+            var regions = [];
+
+            for (var id in this.labels) {
+              regions.push(this.labels[id].region.id);
+            }
+            for (var id in this.wavesurfer.regions.list) {
+                if (!(id in regions)) {
+                    this.add(this.wavesurfer.regions.list[id]);
+                }
+            }
+        }
     },
+
 
     updateScroll: function () {
         this.wrapper.scrollLeft = this.drawer.wrapper.scrollLeft;
