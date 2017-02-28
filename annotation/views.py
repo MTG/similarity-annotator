@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
@@ -9,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 
-from .models import Exercise, Sound, Tier, DataSet, Tag
+from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
 from .forms import TierForm
 
 
@@ -24,7 +25,24 @@ def data_set_list(request):
 def exercise_list(request, dataset_id):
     data_set = DataSet.objects.get(id=dataset_id)
     exercises_list = data_set.exercises.all().order_by('-created_at')
-    context = {'exercises_list': exercises_list, 'data_set': data_set}
+    # get data set statistics
+    number_of_sounds = Sound.objects.filter(exercise__in=Exercise.objects.filter(data_set=data_set)).count()
+    number_of_completed_sounds = Sound.objects.filter(exercise__in=Exercise.objects.filter(data_set=data_set)).\
+        filter(annotation_state='C').count()
+    current_date = datetime.datetime.today()
+    last_week_segments = Annotation.objects.filter(
+        created_at__range=[current_date - datetime.timedelta(days=7), current_date]).count()
+    total_segments = Annotation.objects.all().count()
+    last_week_similarity_annotations = AnnotationSimilarity.objects.filter(
+        created_at__range=[current_date - datetime.timedelta(days=7), current_date]).count()
+    total_annotation_similarities = AnnotationSimilarity.objects.all().count()
+    context = {'exercises_list': exercises_list, 'data_set': data_set,
+               'number_of_completed_sounds': number_of_completed_sounds,
+               'number_of_sounds': number_of_sounds,
+               'last_week_segments': last_week_segments,
+               'total_segments': total_segments,
+               'last_week_similarity_annotations': last_week_similarity_annotations,
+               'total_annotation_similarities': total_annotation_similarities}
     return render(request, 'annotationapp/exercises_list.html', context)
 
 
