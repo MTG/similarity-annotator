@@ -34,8 +34,8 @@ $( document ).ready(function() {
               {% if tier.special_parent_tier %}
               <img src="{% static 'img/branch.png'%}" class="show-parent icn" data-parent="{{tier.special_parent_tier.id}}"/>
               {% endif %}
-              <a href="{% url 'tier_edit' exercise.id tier.id %}"><img src="{% static 'img/edit.png'%}" class="icn" /></a>
-              <a href="{% url 'tier_delete' exercise.id tier.id %}"><img src="{% static 'img/delete.png'%}" class="icn"/></a>
+              <a href="{% url 'tier_edit' exercise.id tier.id sound.id %}"><img src="{% static 'img/edit.png'%}" class="icn" /></a>
+              <a href="{% url 'tier_delete' exercise.id tier.id sound.id %}"><img src="{% static 'img/delete.png'%}" class="icn"/></a>
             </li>
 
         {% endfor %}

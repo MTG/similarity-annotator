@@ -29,15 +29,16 @@ def exercise_list(request, dataset_id):
 
 
 @login_required
-def tier_delete(request, exercise_id, tier_id):
+def tier_delete(request, exercise_id, tier_id, sound_id):
     exercise = Exercise.objects.get(id=exercise_id)
     tier = exercise.tiers.get(id=tier_id)
     if request.method == 'POST':
         tier.delete()
-        return redirect(reverse('sound_list', kwargs={
-            'exercise_id': exercise_id
-        }))
-    context = {'exercise': exercise, 'tier': tier}
+        return redirect(reverse('tier_list', kwargs={
+            'exercise_id': exercise_id,
+            'sound_id': sound_id
+            }))
+    context = {'exercise': exercise, 'tier': tier, 'sound_id': sound_id}
     return render(request, 'annotationapp/tier_delete.html', context)
 
 
@@ -68,7 +69,7 @@ def check_tiers_ajax(request, exercise_id):
 
 
 @login_required
-def tier_edit(request, exercise_id, tier_id):
+def tier_edit(request, exercise_id, tier_id, sound_id):
     exercise = Exercise.objects.get(id=exercise_id)
     tiers_list = exercise.tiers.all()
     tier = tiers_list.get(id=tier_id)
@@ -101,9 +102,10 @@ def tier_edit(request, exercise_id, tier_id):
             else:
                 tier.point_annotations = False
             tier.save()
-            return redirect(reverse('sound_list', kwargs={
-                'exercise_id': exercise_id
-            }))
+            return redirect(reverse('tier_list', kwargs={
+                'exercise_id': exercise_id,
+                'sound_id': sound_id
+                }))
     else:
         tiers_list_ids = tiers_list.values_list('id')
         tier_form = TierForm(instance=tier, parent_tier_ids=tiers_list_ids)
