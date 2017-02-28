@@ -13,9 +13,18 @@
 {% endblock %}
 
 {% block links %}
-    <button>
-    <a href="/">Back</a>
-    </button>
+
+    <div>
+    <h4>Data set statistics:</h4>
+    </div>
+    <ul>
+        <li><b>{{ number_of_completed_sounds }} </b> annotated sounds of <b>{{ number_of_sounds }}</b></li>
+        <li><b>{{ last_week_segments }} </b> segments created last week </li>
+        <li><b>{{ total_segments }}</b> segments</li>
+        <li><b>{{ last_week_similarity_annotations }}</b> annotations created last week</li>
+        <li><b>{{ total_annotation_similarities }}</b> annotations</li>
+    </ul>
+
 {% endblock %}
 
 {% block logout %}
