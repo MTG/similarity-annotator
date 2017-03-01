@@ -281,7 +281,7 @@ StageThreeView.prototype = {
  * Dependencies:
  *   jQuey, urban-ears.css, Wavesurfer (lib/wavesurfer.js), Message (src/message.js)
  */
-function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef, editEnable) {
+function AnnotationStages(wavesurfer, wavesurferRef, editEnable) {
     this.currentStage = 0;
     this.currentRegion = null;
     this.stageOneView = new StageOneView();
@@ -289,7 +289,6 @@ function AnnotationStages(wavesurfer, hiddenImage, wavesurferRef, editEnable) {
     this.stageThreeView = new StageThreeView();
     this.wavesurferRef = wavesurferRef;
     this.wavesurfer = wavesurfer;
-    this.hiddenImage = hiddenImage;
     this.deletedAnnotations = [];
     this.city = '';
     this.previousF1Score = 0;
@@ -421,7 +420,7 @@ AnnotationStages.prototype = {
         // Swap regions 
         this.swapRegion(newStage, region);
 
-       if (this.editEnable != false && this.wavesurferRef ) {
+       if (this.editEnable != false ) {
           // Update the dom of which ever stage the user is switching to
           var newContent = null;
           if (this.alwaysShowTags){
@@ -675,18 +674,6 @@ AnnotationStages.prototype = {
         }
     },
 
-    // Show a percentage of the hiddenImage
-    showImage: function(f1Score) {
-        this.hiddenImage.showRandomParts(f1Score);
-    },
-
-    // Return true if the user should have the city revealed to them
-    aboveThreshold: function() {
-        var hasFeedback = this.wavesurfer.params.feedback === 'hiddenImage' ||
-                          this.wavesurfer.params.feedback === 'notify';
-        return hasFeedback && this.previousF1Score >= 0.65;
-    },
-
 
     // Event Handler: triggered when region is first started to be created, adds action to event list
     trackBeginingOfRegionCreation: function(region) {
@@ -720,13 +707,6 @@ AnnotationStages.prototype = {
         if (regionEnd) {
             eventData.region_end = regionEnd;
         }
-        // If the user has silent, notify, or hiddenImage feedback, recored the 
-        // current f1 score with the event data
-        if (this.wavesurfer.params.feedback !== 'none') {
-            eventData.f1 = this.previousF1Score;
-            eventData.number_tiles = (this.wavesurfer.params.feedback === 'hiddenImage') ?
-                                        Math.floor(this.previousF1Score * 10) : 0;
-        }
         this.events.push(eventData);
     },
 
@@ -743,7 +723,7 @@ AnnotationStages.prototype = {
 
     // Attach event handlers for wavesurfer events
     addWaveSurferEvents: function() {
-       if (this.editEnable != false && this.wavesurferRef ) {
+       if (this.editEnable != false ) {
           this.wavesurfer.enableDragSelection();
           this.wavesurfer.on('region-update-end', this.trackMovement.bind(this));
           this.wavesurfer.on('region-update-end', this.createRegionSwitchToStageThree.bind(this));
