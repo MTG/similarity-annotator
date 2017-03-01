@@ -454,6 +454,5 @@ function main() {
 
     // Load the first audio annotation task
     urbanEars.loadNextTask();
-return urbanEars;
 }
-var u = main();
+main();
