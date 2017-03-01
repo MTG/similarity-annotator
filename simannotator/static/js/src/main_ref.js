@@ -271,10 +271,20 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-      if(event.keyCode == 'i'.charCodeAt(0)){
-        urbanEars.createSegment();
-      }
+        if(pointAn=="False") {
+            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)) {
+                urbanEars.createSegment();
+            }
+        } else {
+            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'd'.charCodeAt(0)) {
+                urbanEars.createPointSegment(false);
+            }
+            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'u'.charCodeAt(0)) {
+                urbanEars.createPointSegment(true);
+            }
+        }
     }
+
     // Load the first audio annotation task
     urbanEars.loadNextTask();
 }
