@@ -273,7 +273,7 @@ UrbanEars.prototype = {
                 start: currTime, 
                 end: currTime + 0.01,
                 point_annotations: true,
-                drag: false,
+                drag: true,
                 resize: pointAn,
       });
       if (upbeat) {
