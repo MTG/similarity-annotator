@@ -96,7 +96,7 @@ function UrbanEars() {
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    if(pointAn == "False"){
+    if(pointAn){
         this.stages = new AnnotationStages(this.wavesurfer, this.wavesurferRef);
     } else {
         this.stages = new AnnotationStages(this.wavesurfer, this.wavesurferRef, false);
@@ -274,7 +274,7 @@ UrbanEars.prototype = {
                 end: currTime + 0.01,
                 point_annotations: true,
                 drag: false,
-                resize: false,      
+                resize: pointAn,
       });
       if (upbeat) {
         region.annotation = "down_beat";
@@ -309,6 +309,7 @@ UrbanEars.prototype = {
             start: section.start,
             end: section.end,
             id: section.id,
+            resize: pointAn,
             annotation: section.annotation,
             similValue: section.similValue,
             similarity: section.similarity,
@@ -437,7 +438,7 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-        if(pointAn=="False") {
+        if (pointAn) {
             if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)) {
                 urbanEars.createSegment();
             }
@@ -453,5 +454,6 @@ function main() {
 
     // Load the first audio annotation task
     urbanEars.loadNextTask();
+return urbanEars;
 }
-main();
+var u = main();

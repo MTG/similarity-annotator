@@ -105,7 +105,7 @@
 <script>
   var dataUrl = '{% url 'annotation-action' sound.id tier.id %}?enable_spec={{request.GET.enable_spec}}';
   var nextUrl = '{{ next_url }}';
-  var pointAn = '{{tier.point_annotations}}';
+  var pointAn = {% if tier.point_annotations %}false{% else %}true{% endif %};
 </script>
 </html>
 
