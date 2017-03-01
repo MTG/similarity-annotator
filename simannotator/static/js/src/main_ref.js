@@ -65,7 +65,11 @@ function UrbanEars() {
     
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages = new AnnotationStages(this.wavesurfer, this.hiddenImage, null, true);
+    if(pointAn == "False"){
+        this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef);
+    } else {
+        this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef, false);
+    }
     this.stages.create();
 
     // Create Workflow btns (submit and exit)
@@ -105,30 +109,45 @@ UrbanEars.prototype = {
       var lastEnd = 0;
       var added = false;
       segments.forEach(function(section){
-          if (added == false && section.start > currTime && lastEnd != parseFloat(section.start)){
-             var region = my.wavesurfer.addRegion({
+          if (added == false && section.start > currTime && lastEnd != section.start){
+            var region = my.wavesurfer.addRegion({
               start: lastEnd,
-              end: parseFloat(section.start),
+              end: section.start,
+              stick_neighboards: true,
             });
-            my.stages2.createRegionSwitchToStageThree(region);
+            my.stagesRef.createRegionSwitchToStageThree(region);
+            added = true;
+          }else if (added == false && section.start < currTime && section.end > currTime) {
+            var region = my.wavesurfer.addRegion({
+              start: currTime,
+              end: section.end,
+              stick_neighboards: true,
+            });
+            my.stagesRef.createRegionSwitchToStageThree(region);
+            var oldSection =  my.wavesurfer.regions.list[section.id];
+            oldSection.end = currTime;
+            oldSection.updateRender();
+            my.wavesurfer.fireEvent('region-updated', oldSection);
             added = true;
           }
-          lastEnd = parseFloat(section.end);
+          lastEnd = section.end;
       });
       if (added === false) {
           if (currTime > lastEnd) {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: currTime,
+                  stick_neighboards: true,
               });
-              my.stages2.createRegionSwitchToStageThree(region);
+              my.stagesRef.createRegionSwitchToStageThree(region);
           }
           else {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: lastEnd + 1,
+                  stick_neighboards: true,
               });
-              my.stages2.createRegionSwitchToStageThree(region);
+              my.stagesRef.createRegionSwitchToStageThree(region);
           }
       }
 
@@ -237,6 +256,23 @@ UrbanEars.prototype = {
                 this.post(content);
             }
         }
+    },
+
+    createPointSegment: function(upbeat){
+      var currTime = this.wavesurfer.getCurrentTime();
+      var region = this.wavesurfer.addRegion({
+                start: currTime,
+                end: currTime + 0.01,
+                point_annotations: true,
+                drag: false,
+                resize: false,
+      });
+      if (upbeat) {
+        region.annotation = "down_beat";
+      } else {
+        region.annotation = "up_beat";
+      }
+      this.stagesRef.createRegionSwitchToStageThree(region);
     },
 
     // Make POST request, passing back the content data. On success load in the next task
