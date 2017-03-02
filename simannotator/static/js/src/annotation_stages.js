@@ -113,11 +113,11 @@ StageThreeView.prototype = {
 
     // Replace the annotation elements with the new elements that contain the
     // options in the lists like annotationTags
-    updateTagContents: function(similaritySegment, annotationTags) {
+    updateTagContents: function(similaritySegment, similarityKeys, annotationTags) {
         $('.tag_container', this.dom).empty();
         var similarity = this.createSimilarityOptions(similaritySegment);
         // For now the only support type is text input
-        var annotation = this.createAnnotationType(annotationTags);
+        var annotation = this.createAnnotationType(similarityKeys, annotationTags);
         $('.tag_container', this.dom).append([similarity, annotation]);
     },
 
@@ -157,7 +157,7 @@ StageThreeView.prototype = {
 
 
     // Create annotation elements
-    createAnnotationType: function(annotationTags) {
+    createAnnotationType: function(similarityKeys, annotationTags) {
         var my = this;
 
         var annotation = $('<div>');
@@ -174,31 +174,37 @@ StageThreeView.prototype = {
             class: 'annotation_inp',
         });
 
-        var similValueLabel = $('<div>', {
-            class: 'stage_3_label',
-            text: 'Value:',
-        });
-
         var similValueContainer = $('<div>', {
-            class: 'simil_value_container'
+              class: 'simil_value_container'
         });
-        var input2 = $('<input>', {
-            class: 'simil-val-inp',
-        });
+        
+        
+        similarityKeys.forEach(function(k) {
+          var tagsContainer = $('<div>');
+          similValueContainer.append(tagsContainer);
+          
+          var similValueLabel = $('<div>', {
+              class: 'stage_3_label',
+              text: k,
+          });
+  
+          var input2 = $('<input>', {
+              class: 'simil-val-inp',
+              'data-key': k,
+          });
+          similValueContainer.append(similValueLabel);
+          similValueContainer.append(input2);
 
-        var tagsContainer = $('<div>');
-        similValueContainer.append(tagsContainer);
-
-
-        annotationTags.forEach(function (tagName) {
-            var tag = $('<button>', {
-                class: 'annotation_tag btn',
-                text: tagName,
-            });
-            tag.click(function () {
-                input2.val(tagName);
-            });
-            tagsContainer.append(tag);
+          annotationTags.forEach(function (tagName) {
+              var tag = $('<button>', {
+                  class: 'annotation_tag btn',
+                  text: tagName,
+              });
+              tag.click(function () {
+                  input2.val(tagName);
+              });
+              tagsContainer.append(tag);
+          });
         });
         
         var manyValues = $('<div>', {
@@ -211,14 +217,16 @@ StageThreeView.prototype = {
 
         // When a proximity tag is clicked fire the 'change-tag' event with what annotation tag it is
         btn.click(function () {
-            $(my).trigger('change-tag', [{annotation: input.val(), similValue: input2.val()}]);
+          var inps = {};  
+          $('.simil-val-inp').each(function(n, inp) {
+            inps[inp.getAttribute('data-key')] = inp.value;
+          });
+          $(my).trigger('change-tag', [{annotation: input.val(), similValue: inps}]);
         });
         annotationContainer.append(annotationLabel);
         annotationContainer.append(input);
         annotationContainer.append(btn);
-        similValueContainer.append(similValueLabel);
-        similValueContainer.append(input2);
-
+        
         return annotation.append([similValueContainer, annotationContainer, manyValues]);
     },
 
@@ -256,7 +264,9 @@ StageThreeView.prototype = {
             $('.simil-vals-list', this.dom).append(values);
         }
         if (region.similValue) {
-            $('.simil-val-inp', this.dom).val(region.similValue);
+            $('.simil-val-inp', this.dom).each(function(k, inp){
+              inp.value = region.similValue[inp.getAttribute('data-key')];
+            });
         }
 
         if (region.annotation) {
@@ -491,17 +501,18 @@ AnnotationStages.prototype = {
     },
 
     // Reset field values and update the proximity tags, annotation tages and annotation 
-    reset: function(similaritySegment, annotationTags, alwaysShowTags) {
+    reset: function(similaritySegment, similarityKeys, annotationTags, alwaysShowTags) {
         this.clear();
         // Update all Tags' Contents
         this.alwaysShowTags = alwaysShowTags || false;
-        this.updateContentsTags(similaritySegment, annotationTags);
+        this.updateContentsTags(similaritySegment, similarityKeys, annotationTags);
     },
 
     // Update stage 3 dom with new proximity tags and annotation tags
-    updateContentsTags: function(similaritySegment, annotationTags) {
+    updateContentsTags: function(similaritySegment, similarityKeys, annotationTags) {
         this.stageThreeView.updateTagContents(
             similaritySegment,
+            similarityKeys,
             annotationTags
         );
     },

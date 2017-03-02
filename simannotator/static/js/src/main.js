@@ -348,13 +348,15 @@ UrbanEars.prototype = {
 
             // Update the different tags the user can use to annotate, also update the solutions to the
             // annotation task if the user is suppose to recieve feedback
-            var similaritySegment= my.currentTask.similaritySegment;
+            var similaritySegment = my.currentTask.similaritySegment;
+            var similarityKeys = my.currentTask.similarityKeys;
             var annotationTags = my.currentTask.annotationTags;
             var recordingIndex = my.currentTask.recordingIndex || 1;
             var numRecordings = my.currentTask.numRecordings || 1;
             var alwaysShowTags = my.currentTask.alwaysShowTags;
             my.stages.reset(
                 similaritySegment,
+                similarityKeys,
                 annotationTags,
                 alwaysShowTags
             );
