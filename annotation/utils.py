@@ -41,7 +41,7 @@ def exercise_annotations_to_json(exercise_id):
                     annotation_similarity = AnnotationSimilarity.objects.get(similar_sound=annotation)
                     similarity = {'reference_annotation_start_time': annotation_similarity.reference.start_time,
                                   'reference_annotation_end_time': annotation_similarity.reference.end_time,
-                                  'similarity_value': annotation_similarity.similarity_measure
+                                  'similarity': annotation_similarity.similarity
                                   }
                 except ObjectDoesNotExist:
                     similarity = None
@@ -148,7 +148,7 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
                         # create annotation similarity with both annotations
                         annotation_similarity = AnnotationSimilarity.objects.create(
                             reference=reference_sound_annotation, similar_sound=annotation,
-                            similarity_measure=annotation_data["value"], user=user)
+                            similarity=annotation_data["value"], user=user)
                         print("Created AnnotationSimilarity %s from on sound %s in exercise %s" %
                               (annotation_similarity.id, sound.filename, sound.exercise.name))
 

@@ -2,6 +2,7 @@ import os
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import JSONField
 
 
 def exercise_upload_to(instance, filename):
@@ -72,7 +73,7 @@ class Sound(models.Model):
                         'start_time': float(i.start_time),
                         'ref_end_time': float(s.reference.end_time),
                         'end_time': float(i.end_time),
-                        'value': s.similarity_measure
+                        'value': s.similarity
                         })
         return ret
 
@@ -96,7 +97,7 @@ class Sound(models.Model):
                 references = references.all()
                 many_values = []
                 for ref in references:
-                    many_values.append(ref.similarity_measure)
+                    many_values.append(ref.similarity)
 
                 if len(many_values) > 1:
                     annotation['manyValues'] = many_values
@@ -104,7 +105,7 @@ class Sound(models.Model):
                 if len(references):
                     reference = references[0]
                     annotation['similarity'] = "yes"
-                    annotation['similValue'] = reference.similarity_measure
+                    annotation['similValue'] = reference.similarity
                     annotation['reference'] = reference.reference_id
             ret.append(annotation)
 
@@ -220,7 +221,7 @@ class Annotation(models.Model):
 class AnnotationSimilarity(models.Model):
     reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
     similar_sound = models.ForeignKey(Annotation)
-    similarity_measure = models.IntegerField("similarity_measure")
+    similarity = JSONField(blank=True, null=True, default=dict)
     user = models.ForeignKey(User, related_name='similarity_measures')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
