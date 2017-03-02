@@ -159,8 +159,7 @@ class Sound(models.Model):
             if a['similarity'] == 'yes':
                 ref = Annotation.objects.get(id=int(a['reference']))
                 AnnotationSimilarity.objects.create(reference=ref, similar_sound=new_annotation,
-                                                    similarity_measure=float(a['similValue']),
-                                                    user=user)
+                                                    similarity=a['similValue'], user=user)
 
             added[new_annotation.id] = {'start': a['start'], 'end': a['end']}
 

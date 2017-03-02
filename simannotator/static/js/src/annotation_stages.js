@@ -364,8 +364,8 @@ AnnotationStages.prototype = {
                   Message.notifyAlert('Make shure to select a similarity section'); 
                   return false;
                 }else if (region.similarity == 'yes'){
-                  if (region.similValue === '' || isNaN(region.similValue)){
-                    Message.notifyAlert('Make shure the annotations is a valid number for similarity segments'); 
+                  if (region.similValue === ''){
+                    Message.notifyAlert('You need to provide a value for similarity annotations');
                     return false;
                   }
                 }
