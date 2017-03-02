@@ -244,17 +244,7 @@ UrbanEars.prototype = {
                 annotations: this.stages.getAnnotations(),
             };
 
-            if (this.stages.aboveThreshold()) {
-                // If the user is suppose to receive feedback and got enough of the annotations correct
-                // display the city the clip was recorded for 2 seconds and then submit their work
-                var my = this;
-                this.stages.displaySolution();
-                setTimeout(function() {
-                    my.post(content);
-                }, 2000);
-            } else {
-                this.post(content);
-            }
+            this.post(content);
         }
     },
 
