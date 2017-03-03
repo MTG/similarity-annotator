@@ -264,7 +264,7 @@ def annotation_action(request, sound_id, tier_id):
                 "feedback": "none",
                 "visualization": "waveform",
                 "similaritySegment": ["yes", "no"],
-                "similarityKeys": ["values"],
+                "similarityKeys": tier.similarity_keys,
                 "annotationTags": list(tags),
                 "alwaysShowTags": False
             }

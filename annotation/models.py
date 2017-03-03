@@ -28,6 +28,8 @@ class Exercise(models.Model):
     def __str__(self):
         return self.name
 
+def default_keys():
+    return ["values", ]
 
 class Tier(models.Model):
     name = models.CharField(max_length=50)
@@ -39,6 +41,7 @@ class Tier(models.Model):
     exercise = models.ForeignKey(Exercise, related_name='tiers')
     entire_sound = models.BooleanField(default=False)
     point_annotations = models.BooleanField(default=False)
+    similarity_keys = JSONField(blank=True, null=True, default=default_keys)
 
     def __str__(self):
         return self.name
