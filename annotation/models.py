@@ -28,8 +28,10 @@ class Exercise(models.Model):
     def __str__(self):
         return self.name
 
+
 def default_keys():
-    return ["values", ]
+    return ["value", ]
+
 
 class Tier(models.Model):
     name = models.CharField(max_length=50)
