@@ -332,7 +332,7 @@ class DownloadAnnotationsViewTests(TestCase):
     def test_download_annotations(self):
         annotation_similarity = AnnotationSimilarity.objects.create(reference=self.reference_annotation,
                                                                     similar_sound=self.annotation,
-                                                                    similarity_measure=10, user=self.user)
+                                                                    similarity={'value': 10}, user=self.user)
         response = self.test_client.get(reverse('download-annotations', kwargs={'sound_id': self.sound.id}))
 
         self.assertEqual(response.json()[self.tier.name][0]['start_time'], self.annotation.start_time)
@@ -340,7 +340,7 @@ class DownloadAnnotationsViewTests(TestCase):
         self.assertEqual(response.json()[self.tier.name][0]['ref_start_time'],
                          self.reference_annotation.start_time)
         self.assertEqual(response.json()[self.tier.name][0]['ref_end_time'], self.reference_annotation.end_time)
-        self.assertEqual(response.json()[self.tier.name][0]['value'], annotation_similarity.similarity_measure)
+        self.assertEqual(response.json()[self.tier.name][0]['value'], annotation_similarity.similarity)
 
 
 

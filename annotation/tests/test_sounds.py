@@ -98,12 +98,12 @@ class CreateSoundTest(TestCase):
         annotation_name_2 = 'test_annotation_2'
         start_time_2 = 10
         end_time_2 = 20
-        similarity_measure = 1
+        similarity_measure = {'value': 1}
         similar_annotation = Annotation.objects.create(name=annotation_name_2, start_time=start_time_2,
                                                        end_time=end_time_2, sound=self.sound, tier=self.tier,
                                                        user=self.user)
         AnnotationSimilarity.objects.create(reference=reference_annotation, similar_sound=similar_annotation,
-                                            similarity_measure=similarity_measure, user=self.user)
+                                            similarity=similarity_measure, user=self.user)
 
         exercise_annotations = annotation.utils.exercise_annotations_to_json(self.exercise.id)
         exercise_annotations_json = json.loads(exercise_annotations)
