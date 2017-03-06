@@ -79,7 +79,7 @@ class CreateSoundTest(TestCase):
         exercise_annotations_json = json.loads(exercise_annotations)
 
         # the utils should retrieve a json serialisation
-        self.assertEqual(type(exercise_annotations), str)
+        self.assertTrue(isinstance(exercise_annotations, str))
         # the sounds file names should be in the dictionary
         self.assertTrue(self.sound.filename in exercise_annotations_json.keys())
         self.assertTrue(self.reference_sound.filename in exercise_annotations_json.keys())
