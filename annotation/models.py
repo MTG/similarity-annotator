@@ -150,12 +150,12 @@ class Sound(models.Model):
 
         # check if all annotations in special parent tier have a correspondence in the special child tier. This would
         # mean parent annotations shouldn't be modified.
+        deny_special_parent_modification = False
         if tier.special_parent_tier:
             special_parent_related_annotations = Annotation.objects.filter(sound=self,
                                                                            tier=tier.special_parent_tier).all()
             deny_special_parent_modification = self.check_annotations_correspondence(
-                special_parent_related_annotations,
-                annotations)
+                special_parent_related_annotations, annotations)
 
         for a in annotations:
             a_obj = None
