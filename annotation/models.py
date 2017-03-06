@@ -1,8 +1,10 @@
 import os
+from decimal import Decimal
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
+from django.db.models import Q
 
 
 def exercise_upload_to(instance, filename):
@@ -78,7 +80,7 @@ class Sound(models.Model):
                         'start_time': float(i.start_time),
                         'ref_end_time': float(s.reference.end_time),
                         'end_time': float(i.end_time),
-                        'similarity': s.similarity
+                        'similarity': s.similarityspecial_parent_related_annotations
                         })
         return ret
 
@@ -116,9 +118,45 @@ class Sound(models.Model):
 
         return ret
 
+    @staticmethod
+    def check_annotations_correspondence(old_annotations, new_annotations):
+        """
+        Check if all start times and end times in old annotations exist in new_annotations
+        Args:
+            old_annotations: Query with the old annotations
+            new_annotations: List of the new annotations
+
+        Returns:
+
+        """
+        new_start_times = [Decimal(str(a['start'])) for a in new_annotations]
+        new_end_times = [Decimal(str(a['end'])) for a in new_annotations]
+        there_is_start_time_correspondence = True
+        there_is_end_time_correspondence = True
+
+        for special_parent_annotation_start_time in old_annotations.values_list('start_time', flat=True):
+            if special_parent_annotation_start_time not in new_start_times:
+                there_is_start_time_correspondence = False
+
+        for special_parent_annotation_end_time in old_annotations.values_list('end_time', flat=True):
+            if special_parent_annotation_end_time not in new_end_times:
+                there_is_end_time_correspondence = False
+
+        return there_is_end_time_correspondence and there_is_start_time_correspondence
+
     def update_annotations(self, tier, annotations, user):
         added = {}
         old_annotations = Annotation.objects.filter(sound=self, tier=tier)
+
+        # check if all annotations in special parent tier have a correspondence in the special child tier. This would
+        # mean parent annotations shouldn't be modified.
+        if tier.special_parent_tier:
+            special_parent_related_annotations = Annotation.objects.filter(sound=self,
+                                                                           tier=tier.special_parent_tier).all()
+            deny_special_parent_modification = self.check_annotations_correspondence(
+                special_parent_related_annotations,
+                annotations)
+
         for a in annotations:
             a_obj = None
             if isinstance(a['id'], int):
@@ -126,22 +164,36 @@ class Sound(models.Model):
 
             if a_obj and a_obj.count():
                 new_annotation = a_obj[0]
-                # Update the annotations in the parent tier and child
-                related_annotations = Annotation.objects.filter(sound=self, start_time=new_annotation.start_time,
-                                                                end_time=new_annotation.end_time,
-                                                                name=new_annotation.name)
+
+                # Update the annotations in the sync tiers
+                parent_related_annotations = Annotation.objects.filter(sound=self, start_time=new_annotation.start_time,
+                                                                       end_time=new_annotation.end_time,
+                                                                       name=new_annotation.name)
                 if tier.parent_tier:
-                    related_annotations = related_annotations.filter(tier=tier.parent_tier).all()
-                    for rel in related_annotations:
+                    parent_related_annotations = parent_related_annotations.filter(tier=tier.parent_tier).all()
+                    for rel in parent_related_annotations:
                         self.update_annotation_vals(rel, a, user)
                 for child in tier.child_tiers.all():
-                    related_annotations = related_annotations.filter(tier=child).all()
-                    for rel in related_annotations:
+                    parent_related_annotations = parent_related_annotations.filter(tier=child).all()
+                    for rel in parent_related_annotations:
                         self.update_annotation_vals(rel, a, user)
-                for child in tier.special_child_tiers.all():
-                    related_annotations = related_annotations.filter(tier=child).all()
-                    for rel in related_annotations:
-                        self.update_annotation_vals(rel, a, user)
+
+                # Update the annotations in the special parent tier
+                special_parent_start_time_annotations = Annotation.objects.filter(sound=self,
+                                                                                  start_time=new_annotation.start_time,
+                                                                                  tier=tier.special_parent_tier)
+                special_parent_end_time_annotations = Annotation.objects.filter(sound=self,
+                                                                                end_time=new_annotation.end_time,
+                                                                                tier=tier.special_parent_tier)
+                if tier.special_parent_tier and not deny_special_parent_modification:
+                    for rel in special_parent_start_time_annotations:
+                        a_copy = a.copy()
+                        a_copy['end'] = rel.end_time
+                        self.update_annotation_vals(rel, a_copy, user)
+                    for rel in special_parent_end_time_annotations:
+                        a_copy = a.copy()
+                        a_copy['start'] = rel.start_time
+                        self.update_annotation_vals(rel, a_copy, user)
 
                 # Update the annotation in the current tier
                 self.update_annotation_vals(new_annotation, a, user)
