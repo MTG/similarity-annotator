@@ -340,7 +340,7 @@ class DownloadAnnotationsViewTests(TestCase):
         self.assertEqual(response.json()[self.tier.name][0]['ref_start_time'],
                          self.reference_annotation.start_time)
         self.assertEqual(response.json()[self.tier.name][0]['ref_end_time'], self.reference_annotation.end_time)
-        self.assertEqual(response.json()[self.tier.name][0]['value'], annotation_similarity.similarity)
+            self.assertEqual(response.json()[self.tier.name][0]['similarity'], annotation_similarity.similarity)
 
 
 
