@@ -4,7 +4,7 @@ from .models import Tier
 
 
 class TierForm(forms.ModelForm):
-    dimentions = forms.CharField(label='Dimentions', required=False)
+    dimensions = forms.CharField(label='Dimensions', required=False)
 
     class Meta:
         model = Tier
@@ -26,8 +26,8 @@ class TierForm(forms.ModelForm):
             self.fields['parent_tier'].queryset = Tier.objects.filter(id__in=parent_ids)
             self.fields['special_parent_tier'].queryset = Tier.objects.filter(id__in=parent_ids)
         if self.instance:
-            self.fields['dimentions'].initial = ', '.join(self.instance.similarity_keys)
+            self.fields['dimensions'].initial = ', '.join(self.instance.similarity_keys)
 
-    def clean_dimentions(self):
-        return [s.strip() for s in self.cleaned_data['dimentions'].split(',')]
+    def clean_dimensions(self):
+        return [s.strip() for s in self.cleaned_data['dimensions'].split(',')]
 
