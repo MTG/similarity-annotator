@@ -111,6 +111,7 @@ def tier_edit(request, exercise_id, tier_id, sound_id):
 
             tier.name = tier_name
             tier.exercise = exercise
+            tier.similarity_keys = tier_form.cleaned_data['dimentions']
 
             # if point_annotations attribute is changed, delete previous annotations
             if ('point_annotations' in request.POST) != tier.point_annotations:
@@ -141,14 +142,19 @@ def tier_list(request, exercise_id, sound_id):
             tier_name = request.POST['name']
             exercise = Exercise.objects.get(id=exercise_id)
             parent_tier_id = request.POST['parent_tier']
+            parent_tier = None
+
             if parent_tier_id:
                 parent_tier = Tier.objects.get(id=parent_tier_id)
-                tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
-            else:
-                tier = Tier.objects.create(name=tier_name, exercise=exercise)
+
+            tier = Tier.objects.create(name=tier_name, exercise=exercise,
+                    parent_tier=parent_tier)
+            tier.similarity_keys = tier_form.cleaned_data['dimentions']
+
             if 'point_annotations' in request.POST:
                 tier.point_annotations = True
-                tier.save()
+
+            tier.save()
     else:
         tiers_list_ids = tiers_list.values_list('id')
         tier_form = TierForm(parent_tier_ids=tiers_list_ids)

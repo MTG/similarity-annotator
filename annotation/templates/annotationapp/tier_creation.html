@@ -73,6 +73,8 @@ $( document ).ready(function() {
             <p>{{ form.parent_tier }} </p>
             <h5>Select parent tier (optional):</h5>
             <p>{{ form.special_parent_tier }} </p>
+            <h5>Select dimentions (separated with comma):</h5>
+            <p>{{ form.dimentions }} </p>
             <button type="submit" class="btn btn-info">{% if create %}Create{% else %}Edit{% endif %}</button>
         </form>
 {% endblock %}
