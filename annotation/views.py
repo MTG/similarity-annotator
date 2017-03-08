@@ -316,6 +316,7 @@ def tier_creation(request, exercise_id, sound_id):
                 tier.special_parent_tier = special_parent_tier
             if 'point_annotations' in request.POST:
                 tier.point_annotations = True
+            tier.similarity_keys = tier_form.cleaned_data['dimensions']
             tier.save()
             return redirect('/' + exercise_id + '/' + sound_id + '/tiers_list')
     else:
