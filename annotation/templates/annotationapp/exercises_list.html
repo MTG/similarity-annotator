@@ -1,5 +1,5 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
-{% block title %} List of exercises {% endblock %}
+{% block title %} {{ data_set.name }}: list of exercises {% endblock %}
 {% block content %}
     {% if exercises_list %}
         <ul class="pagination">
@@ -13,7 +13,18 @@
 {% endblock %}
 
 {% block links %}
-    <input type="button" onclick="location.href='/{{ dataset_id }}/upload/';" value="Create an exercise" />
+
+    <div>
+    <h4>{{ data_set.name }} statistics:</h4>
+    </div>
+    <ul>
+        <li><b>{{ number_of_completed_sounds }} </b> annotated sounds of <b>{{ number_of_sounds }}</b></li>
+        <li><b>{{ last_week_segments }} </b> segments created last week </li>
+        <li><b>{{ total_segments }}</b> segments</li>
+        <li><b>{{ last_week_similarity_annotations }}</b> annotations created last week</li>
+        <li><b>{{ total_annotation_similarities }}</b> annotations</li>
+    </ul>
+
 {% endblock %}
 
 {% block logout %}
