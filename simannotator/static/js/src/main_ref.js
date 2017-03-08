@@ -65,7 +65,7 @@ function UrbanEars() {
     
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    if(pointAn == "False"){
+    if(pointAn){
         this.stages = new AnnotationStages(this.wavesurfer, null, true);
     } else {
         this.stages = new AnnotationStages(this.wavesurfer, null, false);
@@ -101,7 +101,7 @@ UrbanEars.prototype = {
 
     },
 
-        createSegment: function(){
+    createSegment: function(){
       var my = this;
       var currTime = my.wavesurfer.getCurrentTime();
       var segments = my.stages.getAnnotations();
@@ -123,7 +123,7 @@ UrbanEars.prototype = {
               end: section.end,
               stick_neighboards: true,
             });
-            my.stagesRef.createRegionSwitchToStageThree(region);
+            my.stages.createRegionSwitchToStageThree(region);
             var oldSection =  my.wavesurfer.regions.list[section.id];
             oldSection.end = currTime;
             oldSection.updateRender();
@@ -139,7 +139,7 @@ UrbanEars.prototype = {
                   end: currTime,
                   stick_neighboards: true,
               });
-              my.stagesRef.createRegionSwitchToStageThree(region);
+              my.stages.createRegionSwitchToStageThree(region);
           }
           else {
               var region = my.wavesurfer.addRegion({
@@ -147,11 +147,12 @@ UrbanEars.prototype = {
                   end: lastEnd + 1,
                   stick_neighboards: true,
               });
-              my.stagesRef.createRegionSwitchToStageThree(region);
+              my.stages.createRegionSwitchToStageThree(region);
           }
       }
 
     },
+    
  
     loadSegments: function(){
       var my = this;
@@ -297,7 +298,7 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-        if(pointAn=="False") {
+        if (pointAn) {
             if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)) {
                 urbanEars.createSegment();
             }
