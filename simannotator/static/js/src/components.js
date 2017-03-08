@@ -92,6 +92,8 @@ PlayBar.prototype = {
         playButton.click(function () {
             my.trackEvent('click-' + (my.wavesurfer.isPlaying() ? 'pause' : 'play'));
             my.wavesurfer.playPause();
+            $('.currently_playing').removeClass('currently_playing');
+            playButton.addClass('currently_playing');
         });
         
         // Create audio timer text
@@ -156,7 +158,8 @@ PlayBar.prototype = {
 
         // Play and pause on spacebar keydown
         $(document).on("keydown", function (event) {
-            if (event.keyCode === 32) {
+            var current = my.playBarDom[0].hasClass('currently_playing');
+            if (event.keyCode === 32 && current) {
                 event.preventDefault();
                 my.trackEvent('spacebar-' + (my.wavesurfer.isPlaying() ? 'pause' : 'play'));
                 my.wavesurfer.playPause();
