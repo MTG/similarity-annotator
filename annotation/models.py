@@ -195,6 +195,30 @@ class Sound(models.Model):
                         a_copy['start'] = rel.start_time
                         self.update_annotation_vals(rel, a_copy, user)
 
+                # Update the annotations in special child tiers
+                if tier.special_child_tiers.all():
+                    start_to_be_changed = end_to_be_changed = None
+                    annotation_to_be_changed = Annotation.objects.get(id=a['id'])
+                    if annotation_to_be_changed.start_time != a['start']:
+                        start_to_be_changed = annotation_to_be_changed.start_time
+                    if annotation_to_be_changed.end_time != a['end']:
+                        end_to_be_changed = annotation_to_be_changed.end_time
+                    for special_child in tier.special_child_tiers.all():
+                        if start_to_be_changed:
+                            if Annotation.objects.filter(sound=self, tier=special_child,
+                                                         start_time=start_to_be_changed).all():
+                                child_annotation = Annotation.objects.filter(sound=self, tier=special_child,
+                                                                             start_time=start_to_be_changed).all()[0]
+                                child_annotation.start_time = a['start']
+                                child_annotation.save()
+                        if end_to_be_changed:
+                            if Annotation.objects.filter(sound=self, tier=special_child,
+                                                         end_time=end_to_be_changed).all():
+                                child_annotation = Annotation.objects.filter(sound=self, tier=special_child,
+                                                                             end_time=end_to_be_changed).all()[0]
+                                child_annotation.end_time = a['end']
+                                child_annotation.save()
+
                 # Update the annotation in the current tier
                 self.update_annotation_vals(new_annotation, a, user)
             else:
