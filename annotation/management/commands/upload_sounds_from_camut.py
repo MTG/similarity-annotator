@@ -46,7 +46,7 @@ class Command(BaseCommand):
             # CREATE EXERCISE
 
             try:
-                exercise = Exercise.objects.get(exercise_id=exercise_id)
+                exercise = Exercise.objects.get(exercise_id=exercise_id, data_set=data_set)
             except ObjectDoesNotExist:
                 exercise = Exercise.objects.create(name=exercise_name, data_set=data_set, exercise_id=exercise_id)
                 annotation.utils.create_exercise_directory(dataset_name, exercise_name)
@@ -71,7 +71,9 @@ class Command(BaseCommand):
                             tier = Tier.objects.create(name=tier_name, exercise=exercise)
                         if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
                             tier.entire_sound = True
-                            tier.save()
+                        if 'similarity_dimensions' in tier_data:
+                            tier.similarity_keys = tier_data['similarity_dimensions']
+                        tier.save()
                         print("Created tier %s in exercise %s" % (tier.name, exercise.name))
 
                     # CREATE TAGS IF DEFINED IN THE RUBRIC FILE
