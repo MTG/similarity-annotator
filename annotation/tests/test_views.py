@@ -225,8 +225,7 @@ class SoundDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['sound'], self.sound)
         self.assertEqual(response.context['tier'], self.tier)
-        # the current tier shouldn't be in other tiers list
-        self.assertFalse(self.tier in response.context['other_tiers'])
+        self.assertTrue(self.tier in response.context['other_tiers'])
         tier_2 = Tier.objects.create(name='tier_2', exercise=self.exercise)
         response = self.test_client.get(reverse('sound_detail', kwargs={'exercise_id': self.exercise.id,
                                                                         'tier_id': self.tier.id,
