@@ -45,6 +45,7 @@ class Tier(models.Model):
     entire_sound = models.BooleanField(default=False)
     point_annotations = models.BooleanField(default=False)
     similarity_keys = JSONField(blank=True, null=True, default=default_keys)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
