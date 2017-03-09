@@ -64,6 +64,13 @@ class Tier(models.Model):
             t.extend(child.get_child_tiers())
         return t
 
+    def get_special_parent_tiers(self):
+        t = []
+        if self.special_parent_tier:
+            t.append(self.special_parent_tier)
+            t.extend(self.special_parent_tier.get_special_parent_tiers())
+        return t
+
 
 class Sound(models.Model):
     ANNOTATION_CHOICES = (
@@ -192,22 +199,24 @@ class Sound(models.Model):
                     for rel in parent_related_annotations:
                         self.update_annotation_vals(rel, a, user)
 
-                # Update the annotations in the special parent tier
-                special_parent_start_time_annotations = Annotation.objects.filter(sound=self,
-                                                                                  start_time=new_annotation.start_time,
-                                                                                  tier=tier.special_parent_tier)
-                special_parent_end_time_annotations = Annotation.objects.filter(sound=self,
-                                                                                end_time=new_annotation.end_time,
-                                                                                tier=tier.special_parent_tier)
-                if tier.special_parent_tier and not deny_special_parent_modification:
-                    for rel in special_parent_start_time_annotations:
-                        a_copy = a.copy()
-                        a_copy['end'] = rel.end_time
-                        self.update_annotation_vals(rel, a_copy, user)
-                    for rel in special_parent_end_time_annotations:
-                        a_copy = a.copy()
-                        a_copy['start'] = rel.start_time
-                        self.update_annotation_vals(rel, a_copy, user)
+                # Update the annotations in the special parent tier and the corresponding special parent tiers
+                for special_parent_tier in tier.get_special_parent_tiers():
+                    special_parent_start_time_annotations = Annotation.objects.filter(sound=self,
+                                                                                      start_time=new_annotation.
+                                                                                      start_time,
+                                                                                      tier=special_parent_tier)
+                    special_parent_end_time_annotations = Annotation.objects.filter(sound=self,
+                                                                                    end_time=new_annotation.end_time,
+                                                                                    tier=special_parent_tier)
+                    if not deny_special_parent_modification:
+                        for rel in special_parent_start_time_annotations:
+                            a_copy = a.copy()
+                            a_copy['end'] = rel.end_time
+                            self.update_annotation_vals(rel, a_copy, user)
+                        for rel in special_parent_end_time_annotations:
+                            a_copy = a.copy()
+                            a_copy['start'] = rel.start_time
+                            self.update_annotation_vals(rel, a_copy, user)
 
                 # Update the annotations in special child tiers
                 if tier.special_child_tiers.all():
