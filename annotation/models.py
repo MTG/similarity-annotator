@@ -251,12 +251,12 @@ class Sound(models.Model):
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                               tier=tier.parent_tier, name=a['annotation'], user=user)
                 for child in tier.get_child_tiers():
-                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
-                                              tier=child, name=a['annotation'], user=user)
+                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'], tier=child,
+                                              user=user)
 
                 for child in tier.get_special_child_tiers():
-                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
-                                              tier=child, name=a['annotation'], user=user)
+                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'], tier=child,
+                                              user=user)
 
             # Re-create all AnnotationSimilarity for this user
             new_annotation.annotationsimilarity_set.filter(user=user).delete()
