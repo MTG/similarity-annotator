@@ -135,7 +135,7 @@ def tier_edit(request, exercise_id, tier_id, sound_id):
 @login_required
 def tier_list(request, exercise_id, sound_id):
     exercise = Exercise.objects.get(id=exercise_id)
-    tiers_list = exercise.tiers.all()
+    tiers_list = exercise.tiers.all().order_by('created_at')
     if request.method == 'POST':
         tier_form = TierForm(request.POST)
         if tier_form.is_valid():
@@ -147,8 +147,7 @@ def tier_list(request, exercise_id, sound_id):
             if parent_tier_id:
                 parent_tier = Tier.objects.get(id=parent_tier_id)
 
-            tier = Tier.objects.create(name=tier_name, exercise=exercise,
-                    parent_tier=parent_tier)
+            tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
             tier.similarity_keys = tier_form.cleaned_data['dimensions']
 
             if 'point_annotations' in request.POST:
