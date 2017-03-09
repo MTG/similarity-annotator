@@ -101,7 +101,7 @@ class Sound(models.Model):
                         'start_time': float(i.start_time),
                         'ref_end_time': float(s.reference.end_time),
                         'end_time': float(i.end_time),
-                        'similarity': s.similarityspecial_parent_related_annotations
+                        'similarity': s.similarity
                         })
         return ret
 
