@@ -4,7 +4,6 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Q
 
 
 def exercise_upload_to(instance, filename):
@@ -49,6 +48,24 @@ class Tier(models.Model):
 
     def __str__(self):
         return self.name
+
+
+def get_special_child_tiers(tier, list_of_special_child_tiers=[]):
+    if not tier.special_child_tiers.all():
+        return list_of_special_child_tiers
+    for special_child in tier.special_child_tiers.all():
+        list_of_special_child_tiers.append(special_child)
+        get_special_child_tiers(special_child, list_of_special_child_tiers)
+    return list_of_special_child_tiers
+
+
+def get_child_tiers(tier, list_of_child_tiers=[]):
+    if not tier.child_tiers.all():
+        return list_of_child_tiers
+    for child in tier.child_tiers.all():
+        list_of_child_tiers.append(child)
+        get_special_child_tiers(child, list_of_child_tiers)
+    return list_of_child_tiers
 
 
 class Sound(models.Model):
@@ -203,7 +220,7 @@ class Sound(models.Model):
                         start_to_be_changed = annotation_to_be_changed.start_time
                     if annotation_to_be_changed.end_time != a['end']:
                         end_to_be_changed = annotation_to_be_changed.end_time
-                    for special_child in tier.special_child_tiers.all():
+                    for special_child in get_special_child_tiers(tier, []):
                         if start_to_be_changed:
                             if Annotation.objects.filter(sound=self, tier=special_child,
                                                          start_time=start_to_be_changed).all():
@@ -227,11 +244,11 @@ class Sound(models.Model):
                 if tier.parent_tier:
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                               tier=tier.parent_tier, name=a['annotation'], user=user)
-                for child in tier.child_tiers.all():
+                for child in get_child_tiers(tier, []):
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                               tier=child, name=a['annotation'], user=user)
 
-                for child in tier.special_child_tiers.all():
+                for child in get_special_child_tiers(tier, []):
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                               tier=child, name=a['annotation'], user=user)
 
