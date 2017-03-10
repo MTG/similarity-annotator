@@ -29,5 +29,20 @@ class TierForm(forms.ModelForm):
             self.fields['dimensions'].initial = ', '.join(self.instance.similarity_keys)
 
     def clean_dimensions(self):
-        return [s.strip() for s in self.cleaned_data['dimensions'].split(',')]
+        if self.cleaned_data['dimensions']:
+            return [s for s in self.cleaned_data['dimensions'].split(',')]
+        else:
+            return None
+
+    def is_valid(self):
+        valid = super(TierForm, self).is_valid()
+
+        if not valid:
+            return valid
+
+        if self.cleaned_data['dimensions']:
+            return True
+        else:
+            self._errors['invalid_dimensions'] = "You should provide at least one dimension"
+            False
 

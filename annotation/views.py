@@ -135,7 +135,7 @@ def tier_edit(request, exercise_id, tier_id, sound_id):
 @login_required
 def tier_list(request, exercise_id, sound_id):
     exercise = Exercise.objects.get(id=exercise_id)
-    tiers_list = exercise.tiers.all()
+    tiers_list = exercise.tiers.all().order_by('created_at')
     if request.method == 'POST':
         tier_form = TierForm(request.POST)
         if tier_form.is_valid():
@@ -147,8 +147,7 @@ def tier_list(request, exercise_id, sound_id):
             if parent_tier_id:
                 parent_tier = Tier.objects.get(id=parent_tier_id)
 
-            tier = Tier.objects.create(name=tier_name, exercise=exercise,
-                    parent_tier=parent_tier)
+            tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
             tier.similarity_keys = tier_form.cleaned_data['dimensions']
 
             if 'point_annotations' in request.POST:
@@ -226,7 +225,7 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
         sound.save()
         return redirect('/' + exercise_id + '/sound_list')
     tier = get_object_or_404(Tier, id=tier_id)
-    other_tiers = sound.exercise.tiers.all().exclude(id=tier_id)
+    other_tiers = sound.exercise.tiers.all().order_by('created_at')
     context = {'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/sound_detail.html', context)
 
@@ -245,7 +244,7 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
 
     tier = Tier.objects.get(id=tier_id)
-    other_tiers = sound.exercise.tiers.all()
+    other_tiers = sound.exercise.tiers.all().order_by('created_at')
     context = {'form': tier_form, 'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
@@ -316,6 +315,7 @@ def tier_creation(request, exercise_id, sound_id):
                 tier.special_parent_tier = special_parent_tier
             if 'point_annotations' in request.POST:
                 tier.point_annotations = True
+            tier.similarity_keys = tier_form.cleaned_data['dimensions']
             tier.save()
             return redirect('/' + exercise_id + '/' + sound_id + '/tiers_list')
     else:
