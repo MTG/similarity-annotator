@@ -244,7 +244,7 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
 
     tier = Tier.objects.get(id=tier_id)
-    other_tiers = sound.exercise.tiers.all()
+    other_tiers = sound.exercise.tiers.all().order_by('created_at')
     context = {'form': tier_form, 'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
