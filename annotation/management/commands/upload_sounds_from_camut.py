@@ -84,6 +84,8 @@ class Command(BaseCommand):
                             tier.entire_sound = True
                         if 'similarity_dimensions' in tier_data:
                             tier.similarity_keys = tier_data['similarity_dimensions']
+                        if 'point_annotations' in tier_data:
+                            tier.point_annotations = True
                         tier.save()
                         print("Created tier %s in exercise %s" % (tier.name, exercise.name))
 
