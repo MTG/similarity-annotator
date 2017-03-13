@@ -84,8 +84,9 @@ def get_or_create_sound_object(exercise, sound_filename, original_filename=None)
 def check_if_sound_is_wav(original_file):
     response = False
     # if it is a mp3 file it should return None
-    if sndhdr.what(original_file)[0] == 'wav':
-        response = True
+    if sndhdr.what(original_file):
+        if sndhdr.what(original_file)[0] == 'wav':
+            response = True
     return response
 
 
