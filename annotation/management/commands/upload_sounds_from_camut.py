@@ -61,12 +61,23 @@ class Command(BaseCommand):
                     try:
                         tier = Tier.objects.get(name=tier_name, exercise=exercise)
                     except ObjectDoesNotExist:
-                        if 'parent_tier' in tier_data:
-                            try:
-                                parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
-                            except ObjectDoesNotExist:
-                                parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise)
-                            tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+                        if 'parent_tier' in tier_data or 'special_parent_tier' in tier_data:
+                            tier = Tier.objects.create(name=tier_name, exercise=exercise)
+                            if 'parent_tier' in tier_data:
+                                try:
+                                    parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
+                                except ObjectDoesNotExist:
+                                    parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise)
+                                tier.parent_tier = parent_tier
+                            if 'special_parent_tier' in tier_data:
+                                try:
+                                    special_parent_tier = Tier.objects.get(name=tier_data['special_parent_tier'],
+                                                                           exercise=exercise)
+                                except ObjectDoesNotExist:
+                                    special_parent_tier = Tier.objects.create(name=tier_data['special_parent_tier'],
+                                                                              exercise=exercise)
+                                tier.special_parent_tier = special_parent_tier
+                            tier.save()
                         else:
                             tier = Tier.objects.create(name=tier_name, exercise=exercise)
                         if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
