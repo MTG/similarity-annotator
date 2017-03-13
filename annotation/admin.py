@@ -11,7 +11,7 @@ class DataSetAdmin(admin.ModelAdmin):
 
 
 class ExerciseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'data_set')
     list_display_links = ('name', )
     list_filter = ('id', 'name')
 
