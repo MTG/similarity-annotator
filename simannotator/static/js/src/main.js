@@ -440,16 +440,18 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-        if (pointAn) {
-            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)) {
-                urbanEars.createSegment();
-            }
-        } else {
-            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'd'.charCodeAt(0)) {
-                urbanEars.createPointSegment(false);
-            }
-            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'u'.charCodeAt(0)) {
-                urbanEars.createPointSegment(true);
+        if (document.activeElement.className != 'annotation_inp' && document.activeElement.className != 'simil-val-inp') {
+            if (pointAn) {
+                if (event.keyCode == 'i'.charCodeAt(0)) {
+                    urbanEars.createSegment();
+                }
+            } else {
+                if (event.keyCode == 'd'.charCodeAt(0)) {
+                    urbanEars.createPointSegment(false);
+                }
+                if (event.keyCode == 'u'.charCodeAt(0)) {
+                    urbanEars.createPointSegment(true);
+                }
             }
         }
     }
