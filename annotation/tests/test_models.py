@@ -218,3 +218,26 @@ class SoundModelTests(TestCase):
         self.assertEqual(tier_annotations[0]['end'], sync_tier_annotations[0]['end'])
         self.assertEqual(tier_annotations[0]['start'], new_annotations[0]['start'])
         self.assertEqual(tier_annotations[0]['end'], new_annotations[0]['end'])
+
+    def test_update_annotations_when_parent_tier(self):
+        parent_tier = Tier.objects.create(name='parent', exercise=self.exercise)
+        son_tier = Tier.objects.create(name='son', exercise=self.exercise, special_parent_tier=parent_tier)
+
+        new_annotations = [{
+            "annotation": "",
+            "start": 1,
+            "end": 2,
+            "id": "",
+            "similarity": "",
+        }]
+
+        # create annotation in parent should also create annotation in son
+        self.sound.update_annotations(parent_tier, new_annotations, self.user)
+        parent_tier_annotations = self.sound.get_annotations_for_tier(parent_tier)
+        son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
+        self.assertEqual(len(parent_tier_annotations), len(son_tier_annotations))
+        self.assertEqual(parent_tier_annotations[0]['start'], son_tier_annotations[0]['start'])
+        self.assertEqual(parent_tier_annotations[0]['end'], son_tier_annotations[0]['end'])
+        self.assertEqual(son_tier_annotations[0]['start'], new_annotations[0]['start'])
+        self.assertEqual(son_tier_annotations[0]['end'], new_annotations[0]['end'])
+        
