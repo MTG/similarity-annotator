@@ -85,10 +85,10 @@ class SoundModelTests(TestCase):
 
         self.reference_sound_2 = Sound.objects.create(filename='reference sound', exercise=self.exercise,
                                                       original_filename='')
-        self.sound_2 = Sound.objects.create(filename='test sound', exercise=self.exercise, original_filename='')
+        self.sound = Sound.objects.create(filename='test sound', exercise=self.exercise, original_filename='')
 
     def test_get_annotations_from_sound(self):
-        annotations = self.sound_2.get_annotations_as_dict()
+        annotations = self.sound.get_annotations_as_dict()
 
         self.assertTrue(isinstance(annotations, dict))
         self.assertEqual(annotations, {})
@@ -98,9 +98,9 @@ class SoundModelTests(TestCase):
         # create annotations
         start_time = 1
         end_time = 2
-        annotation_1 = Annotation.objects.create(start_time=start_time, end_time=end_time, sound=self.sound_2,
+        annotation_1 = Annotation.objects.create(start_time=start_time, end_time=end_time, sound=self.sound,
                                                  tier=tier, user=self.user)
-        annotations = self.sound_2.get_annotations_as_dict()
+        annotations = self.sound.get_annotations_as_dict()
 
         self.assertTrue(isinstance(annotations, dict))
         self.assertTrue('test tier' in annotations.keys())
@@ -111,17 +111,52 @@ class SoundModelTests(TestCase):
     def test_get_annotations_for_tier(self):
         # create tier for annotations
         tier = Tier.objects.create(name='test tier', exercise=self.exercise)
-        annotations = self.sound_2.get_annotations_for_tier(tier)
+        annotations = self.sound.get_annotations_for_tier(tier)
         self.assertFalse(annotations)
 
         # create annotations
         start_time = 1
         end_time = 2
-        annotation_1 = Annotation.objects.create(start_time=start_time, end_time=end_time, sound=self.sound_2,
+        annotation_1 = Annotation.objects.create(start_time=start_time, end_time=end_time, sound=self.sound,
                                                  tier=tier, user=self.user)
-        annotations = self.sound_2.get_annotations_for_tier(tier)
+        annotations = self.sound.get_annotations_for_tier(tier)
         self.assertTrue(isinstance(annotations, list))
         self.assertTrue(isinstance(annotations[0], dict))
         self.assertEqual(annotations[0]['start'], annotation_1.start_time)
         self.assertEqual(annotations[0]['end'], annotation_1.end_time)
         self.assertEqual(annotations[0]['annotation'], annotation_1.name)
+
+    def test_update_annotations(self):
+        # create annotation data as it is done in the interface
+        new_annotations = [{
+            "annotation": "",
+            "end": 20,
+            "id": "",
+            "similarity": "",
+            "start": 10
+        }]
+        tier = Tier.objects.create(name='test tier', exercise=self.exercise)
+        self.sound.update_annotations(tier, new_annotations, self.user)
+        # as the annotation didn't exist previously, a new annotation should be created
+        self.assertTrue(self.sound.annotations.all())
+        self.assertEqual(self.sound.annotations.all()[0].start_time, new_annotations[0]["start"])
+        self.assertEqual(self.sound.annotations.all()[0].end_time, new_annotations[0]["end"])
+        self.assertFalse(self.sound.annotations.all()[0].name)
+
+        # update previous annotation
+        new_annotations = [{
+            "annotation": "new",
+            "end": 20,
+            "id": self.sound.annotations.all()[0].id,
+            "similarity": "",
+            "start": 10
+        }]
+        self.sound.update_annotations(tier, new_annotations, self.user)
+
+        self.assertEqual(self.sound.annotations.all().count(), 1)
+        self.assertEqual(self.sound.annotations.all()[0].start_time, new_annotations[0]["start"])
+        self.assertEqual(self.sound.annotations.all()[0].end_time, new_annotations[0]["end"])
+        self.assertEqual(self.sound.annotations.all()[0].name, new_annotations[0]["annotation"])
+
+
+
