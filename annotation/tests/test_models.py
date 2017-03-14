@@ -158,5 +158,63 @@ class SoundModelTests(TestCase):
         self.assertEqual(self.sound.annotations.all()[0].end_time, new_annotations[0]["end"])
         self.assertEqual(self.sound.annotations.all()[0].name, new_annotations[0]["annotation"])
 
+    def test_update_annotations_when_sync_tier(self):
+        tier = Tier.objects.create(name='parent', exercise=self.exercise)
+        sync_tier = Tier.objects.create(name='son', exercise=self.exercise, parent_tier=tier)
 
+        new_annotations = [{
+            "annotation": "",
+            "end": 20,
+            "id": "",
+            "similarity": "",
+            "start": 10
+        }]
 
+        self.sound.update_annotations(tier, new_annotations, self.user)
+
+        # One annotation should be created in both tiers, as they are sync
+
+        tier_annotations = self.sound.get_annotations_for_tier(tier)
+        sync_tier_annotations = self.sound.get_annotations_for_tier(sync_tier)
+
+        self.assertEqual(len(tier_annotations), len(sync_tier_annotations))
+        self.assertEqual(tier_annotations[0]['start'], sync_tier_annotations[0]['start'])
+        self.assertEqual(tier_annotations[0]['end'], sync_tier_annotations[0]['end'])
+
+        # If an annotation in one tier is modified, it should be also modified in the sync tier
+
+        new_annotations = [{
+            "annotation": "",
+            "id": self.sound.annotations.filter(tier=tier).all()[0].id,
+            "start": 5,
+            "end": 20,
+            "similarity": ""
+        }]
+        self.sound.update_annotations(tier, new_annotations, self.user)
+
+        tier_annotations = self.sound.get_annotations_for_tier(tier)
+        sync_tier_annotations = self.sound.get_annotations_for_tier(sync_tier)
+        self.assertEqual(len(tier_annotations), len(sync_tier_annotations))
+        self.assertEqual(tier_annotations[0]['start'], sync_tier_annotations[0]['start'])
+        self.assertEqual(tier_annotations[0]['end'], sync_tier_annotations[0]['end'])
+        self.assertEqual(tier_annotations[0]['start'], new_annotations[0]['start'])
+        self.assertEqual(tier_annotations[0]['end'], new_annotations[0]['end'])
+
+        # The sync modification should work both ways
+
+        new_annotations = [{
+            "annotation": "",
+            "id": self.sound.annotations.filter(tier=sync_tier).all()[0].id,
+            "start": 5,
+            "end": 10,
+            "similarity": ""
+        }]
+
+        self.sound.update_annotations(sync_tier, new_annotations, self.user)
+        tier_annotations = self.sound.get_annotations_for_tier(tier)
+        sync_tier_annotations = self.sound.get_annotations_for_tier(sync_tier)
+        self.assertEqual(len(tier_annotations), len(sync_tier_annotations))
+        self.assertEqual(tier_annotations[0]['start'], sync_tier_annotations[0]['start'])
+        self.assertEqual(tier_annotations[0]['end'], sync_tier_annotations[0]['end'])
+        self.assertEqual(tier_annotations[0]['start'], new_annotations[0]['start'])
+        self.assertEqual(tier_annotations[0]['end'], new_annotations[0]['end'])
