@@ -107,3 +107,21 @@ class SoundModelTests(TestCase):
         self.assertEqual(len(annotations['test tier']), 1)
         self.assertEqual(annotations['test tier'][0]['start_time'], annotation_1.start_time)
         self.assertEqual(annotations['test tier'][0]['end_time'], annotation_1.end_time)
+
+    def test_get_annotations_for_tier(self):
+        # create tier for annotations
+        tier = Tier.objects.create(name='test tier', exercise=self.exercise)
+        annotations = self.sound_2.get_annotations_for_tier(tier)
+        self.assertFalse(annotations)
+
+        # create annotations
+        start_time = 1
+        end_time = 2
+        annotation_1 = Annotation.objects.create(start_time=start_time, end_time=end_time, sound=self.sound_2,
+                                                 tier=tier, user=self.user)
+        annotations = self.sound_2.get_annotations_for_tier(tier)
+        self.assertTrue(isinstance(annotations, list))
+        self.assertTrue(isinstance(annotations[0], dict))
+        self.assertEqual(annotations[0]['start'], annotation_1.start_time)
+        self.assertEqual(annotations[0]['end'], annotation_1.end_time)
+        self.assertEqual(annotations[0]['annotation'], annotation_1.name)
