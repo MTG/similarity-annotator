@@ -95,14 +95,21 @@ class Sound(models.Model):
 
             ret[tier.name] = []
             for i in annotations.all():
-                for s in i.annotationsimilarity_set.all():
+                if i.annotationsimilarity_set.all():
+                    for s in i.annotationsimilarity_set.all():
+                        ret[tier.name].append({
+                            'ref_start_time': float(s.reference.start_time),
+                            'start_time': float(i.start_time),
+                            'ref_end_time': float(s.reference.end_time),
+                            'end_time': float(i.end_time),
+                            'similarity': s.similarity
+                            })
+                else:
                     ret[tier.name].append({
-                        'ref_start_time': float(s.reference.start_time),
                         'start_time': float(i.start_time),
-                        'ref_end_time': float(s.reference.end_time),
                         'end_time': float(i.end_time),
-                        'similarity': s.similarity
-                        })
+                        'name': i.name
+                    })
         return ret
 
     def get_annotations_for_tier(self, tier, user=False):
