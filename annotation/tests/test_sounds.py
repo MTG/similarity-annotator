@@ -49,7 +49,8 @@ class CreateSoundTest(TestCase):
         self.assertEqual(self.sound.annotations.count(), 1)
 
         self.assertEqual(self.sound.annotation_state, 'I')
-        annotations = [{'id': 4, 'start': 1, 'end': 2, 'reference': 3,
+
+        annotations = [{'id': 5, 'start': 1, 'end': 2, 'reference': 4,
                         'similarity': 'yes', 'annotation': 'name', 'similValue': 1}]
 
         self.sound.update_annotations(self.tier, annotations, self.user)
