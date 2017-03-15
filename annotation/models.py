@@ -195,8 +195,7 @@ class Sound(models.Model):
 
                 # Update the annotations in the sync tiers
                 parent_related_annotations = Annotation.objects.filter(sound=self, start_time=new_annotation.start_time,
-                                                                       end_time=new_annotation.end_time,
-                                                                       name=new_annotation.name)
+                                                                       end_time=new_annotation.end_time)
                 if tier.parent_tier:
                     parent_related_annotations = parent_related_annotations.filter(tier=tier.parent_tier).all()
                     for rel in parent_related_annotations:
@@ -250,13 +249,13 @@ class Sound(models.Model):
                                 child_annotation.save()
 
                 # Update the annotation in the current tier
-                self.update_annotation_vals(new_annotation, a, user)
+                self.update_annotation_vals(new_annotation, a, user, True)
             else:
                 new_annotation = Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                                            tier=tier, name=a['annotation'], user=user)
                 if tier.parent_tier:
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
-                                              tier=tier.parent_tier, name=a['annotation'], user=user)
+                                              tier=tier.parent_tier, user=user)
                 for child in tier.get_child_tiers():
                     Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'], tier=child,
                                               user=user)
@@ -306,11 +305,12 @@ class Sound(models.Model):
         return True
 
     @staticmethod
-    def update_annotation_vals(old_annotation, new_annotation, user):
+    def update_annotation_vals(old_annotation, new_annotation, user, modify_name=False):
         old_annotation.start_time = new_annotation['start']
         old_annotation.end_time = new_annotation['end']
-        old_annotation.name = new_annotation['annotation']
         old_annotation.user = user
+        if modify_name:
+            old_annotation.name = new_annotation['annotation']
         old_annotation.save()
 
 
