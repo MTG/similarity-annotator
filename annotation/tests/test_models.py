@@ -220,9 +220,26 @@ class SoundModelTests(TestCase):
         self.assertEqual(tier_annotations[0]['end'], new_annotations[0]['end'])
 
     def test_update_annotations_when_parent_tier(self):
+        """
+        Checks if the behavior of creating annotations from one tier to another for 'special_parent' relationship
+        works as expected.
+        The behavior should be the following:
+            Creation:
+            1. if annotation is created in parent tier, a new annotation is created in son
+            2. if annotation is created in son tier, no annotation is created in parent
+            Modification:
+            3. if annotation is modified in parent, the annotations in sons sharing the parent start/end times are
+              modified as well.
+            4. when annotation in son is modified, if its start/end times are the ones shared with annotation in parent,
+              the parent annotation is modified as well Otherwise nothing is modified in parent
+        This behavior is propagated through the whole tree of related tiers.
+        Returns:
+
+        """
         parent_tier = Tier.objects.create(name='parent', exercise=self.exercise)
         son_tier = Tier.objects.create(name='son', exercise=self.exercise, special_parent_tier=parent_tier)
 
+        # CREATION
         new_annotations = [{
             "annotation": "",
             "start": 1,
@@ -231,7 +248,8 @@ class SoundModelTests(TestCase):
             "similarity": "",
         }]
 
-        # create annotation in parent should also create annotation in son
+        # 1.
+        # create annotation in parent should also create annotation in son, with the same start/end times
         self.sound.update_annotations(parent_tier, new_annotations, self.user)
         parent_tier_annotations = self.sound.get_annotations_for_tier(parent_tier)
         son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
@@ -240,4 +258,96 @@ class SoundModelTests(TestCase):
         self.assertEqual(parent_tier_annotations[0]['end'], son_tier_annotations[0]['end'])
         self.assertEqual(son_tier_annotations[0]['start'], new_annotations[0]['start'])
         self.assertEqual(son_tier_annotations[0]['end'], new_annotations[0]['end'])
+
+        # 2.
+        # create annotation in son tier shouldn't create annotation in parent
+        new_annotations = [{
+            "annotation": "new son",
+            "start": 3,
+            "end": 4,
+            "id": "",
+            "similarity": "",
+        }]
+
+        self.sound.update_annotations(son_tier, new_annotations, self.user)
+        parent_tier_annotations = self.sound.get_annotations_for_tier(parent_tier)
+        son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
+        # number of annotations in both tiers should be different
+        self.assertNotEqual(len(parent_tier_annotations), len(son_tier_annotations))
+
+        # 3.
+        # if annotation in parent is modified, he annotations in sons sharing the parent start/end times are
+        # modified as well
+
+        parent_annotation = [{
+            "annotation": "parent",
+            "start": 100,
+            "end": 200,
+            "id": "",
+            "similarity": "",
+        }]
+        self.sound.update_annotations(parent_tier, parent_annotation, self.user)
+        # first check is annotation is created in son
+        son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
+        self.assertEqual(son_tier_annotations[0]['start'], parent_annotation[0]['start'])
+        # then modify annotation in parent
+        modify_annotation = [{
+            "annotation": "changed parent",
+            "start": 50,
+            "end": 200,
+            "id": 7,
+            "similarity": "",
+        }]
+        self.sound.update_annotations(parent_tier, modify_annotation, self.user)
+        son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
+        # the annotation should be modified in the son tier as well
+        self.assertEqual(son_tier_annotations[0]['start'], modify_annotation[0]['start'])
+
+        # 4.
+        # if an annotation is modified in son tier but the start/end times shared with the annotations in parent tier
+        # are kept, annotations in parent shouldn't be modified
+
+        shared_start_time = 5
+        shared_end_time = 10
+        parent_annotations = [{
+            "annotation": "parent",
+            "start": shared_start_time,
+            "end": shared_end_time,
+            "id": "",
+            "similarity": "",
+        }]
+
+        son_annotations = [{
+            "annotation": "son 1",
+            "start": shared_start_time,
+            "end": 6,
+            "id": 7,
+            "similarity": "",
+        },
+            {
+            "annotation": "son 2",
+            "start": 7,
+            "end": shared_end_time,
+            "id": 7,
+            "similarity": "",
+            }]
+
+        self.sound.update_annotations(parent_tier, parent_annotations, self.user)
+        # check if annotation is created in son tier
+        son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
+        self.assertEqual(son_tier_annotations[0]['start'], shared_start_time)
+        self.assertEqual(son_tier_annotations[0]['end'], shared_end_time)
+
+        # we modify one of the annotations in son tier and create a new one. The start /end times of the parent are kept
+        self.sound.update_annotations(son_tier, son_annotations, self.user)
+        parent_tier_annotations = self.sound.get_annotations_for_tier(parent_tier)
+        son_tier_annotations = self.sound.get_annotations_for_tier(son_tier)
+        # the annotation in parent shouldn't be changed
+        self.assertEqual(parent_tier_annotations[0]['start'], shared_start_time)
+        self.assertEqual(parent_tier_annotations[0]['end'], shared_end_time)
+        # we should have only two annotations in son, with the times specified
+        self.assertEqual(len(son_tier_annotations), 2)
+        self.assertEqual(son_tier_annotations[1]['start'], shared_start_time)
+        self.assertEqual(son_tier_annotations[0]['end'], shared_end_time)
+
         

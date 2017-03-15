@@ -50,7 +50,7 @@ class CreateSoundTest(TestCase):
 
         self.assertEqual(self.sound.annotation_state, 'I')
 
-        annotations = [{'id': 11, 'start': 1, 'end': 2, 'reference': 10,
+        annotations = [{'id': 18, 'start': 1, 'end': 2, 'reference': 17,
                         'similarity': 'yes', 'annotation': 'name', 'similValue': 1}]
 
         self.sound.update_annotations(self.tier, annotations, self.user)
@@ -87,8 +87,7 @@ class CreateSoundTest(TestCase):
         # the tier name should be a key in the sound
         self.assertTrue(self.tier.name in exercise_annotations_json[self.reference_sound.filename].keys())
         # there should be one annotation in the tier of the reference sound
-        self.assertEqual(len(exercise_annotations_json[self.reference_sound.filename][self.tier.name]),
-                1)
+        self.assertEqual(len(exercise_annotations_json[self.reference_sound.filename][self.tier.name]), 1)
         # the annotation should have the attributes defined in here
         self.assertEqual(exercise_annotations_json[self.reference_sound.filename][self.tier.name][0]['start_time'],
                          start_time)
