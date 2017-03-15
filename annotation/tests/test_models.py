@@ -350,4 +350,3 @@ class SoundModelTests(TestCase):
         self.assertEqual(son_tier_annotations[1]['start'], shared_start_time)
         self.assertEqual(son_tier_annotations[0]['end'], shared_end_time)
 
-        
