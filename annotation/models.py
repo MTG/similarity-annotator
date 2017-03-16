@@ -168,7 +168,7 @@ class Sound(models.Model):
         added_annotations = Annotation.objects.filter(sound=self, tier=tier)
         num_similarity = AnnotationSimilarity.objects.filter(similar_sound__in=added_annotations).count()
         state = 'E'
-        if num_ref_annotations == added_annotations.count():
+        if num_ref_annotations <= added_annotations.count():
             state = 'I'
             if num_similarity > 0:
                 state = 'C'
