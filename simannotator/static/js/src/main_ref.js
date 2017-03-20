@@ -15,12 +15,12 @@
  */
 function UrbanEars() {
     this.wavesurfer;
+    this.initialPxPerSec;
     this.playBar;
     this.stages;
     this.workflowBtns;
     this.currentTask;
     this.taskStartTime;
-    this.hiddenImage;
     this.soundReady = false;
     this.refReady = false;
     // Boolean, true if currently sending http post request 
@@ -54,11 +54,6 @@ function UrbanEars() {
         container: '.labels'
     });
 
-    // Create hiddenImage, an image that is slowly revealed to a user as they annotate 
-    // (only for this.currentTask.feedback === 'hiddenImage')
-    this.hiddenImage = new HiddenImg('.hidden_img', 100);
-    this.hiddenImage.create();
-
     // Create the play button and time that appear below the wavesurfer
     this.playBar = new PlayBar(this.wavesurfer, '.play_bar');
     this.playBar.create();
@@ -76,6 +71,15 @@ function UrbanEars() {
     this.workflowBtns = new WorkflowBtns();
     this.workflowBtns.create();
 
+    var my = this;
+    $("#zoom_ref").change(function () {
+      var pxPerSec = my.initialPxPerSec / my.wavesurfer.getDuration();
+      if (this.value) {
+        pxPerSec = pxPerSec * Number(this.value);
+      } 
+      my.wavesurfer.zoom(pxPerSec);
+    });
+ 
     this.addEvents();
 }
 
@@ -97,6 +101,8 @@ UrbanEars.prototype = {
         // Also if the user is suppose to get hidden image feedback, append that component to the page
         this.wavesurfer.on('ready', function () {
            my.loadSegments();
+           my.wavesurfer.zoom(false);
+           my.initialPxPerSec = my.wavesurfer.drawer.wrapper.scrollWidth;
         });
 
     },
@@ -213,7 +219,6 @@ UrbanEars.prototype = {
 
             // Update the visualization type and the feedback type and load in the new audio clip
             my.wavesurfer.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
-            my.wavesurfer.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
             my.wavesurfer.load(my.currentTask.url);
         };
 
