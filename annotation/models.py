@@ -74,11 +74,7 @@ class Tier(models.Model):
             t.extend(self.special_parent_tier.get_special_parent_tiers())
         return t
 
-    def get_sync_tiers(self):
-        """
-        Search for sync tiers (defined in the model as parent tier) and all special child and parents of each sync tier
-        Returns: list of tiers
-        """
+    def get_sync_parent(self):
         t = []
         if self.parent_tier:
             for sync_tier in self.parent_tier.get_special_child_tiers():
@@ -87,13 +83,25 @@ class Tier(models.Model):
                 t.append(special_parent_tier)
             t.append(self.parent_tier)
             t.extend(self.parent_tier.get_sync_tiers())
+        return t
+
+    def get_sync_childs(self):
+        t = []
         for child in self.child_tiers.all():
             for sync_tier in child.get_special_child_tiers():
                 t.append(sync_tier)
             for special_parent_tier in child.get_special_parent_tiers():
                 t.append(special_parent_tier)
             t.append(child)
-            t.extend(child.get_child_tiers())
+            t.extend(child.get_sync_childs())
+        return t
+
+    def get_sync_tiers(self):
+        """
+        Search for sync tiers (defined in the model as parent tier) and all special child and parents of each sync tier
+        Returns: list of tiers
+        """
+        t = self.get_sync_childs() + self.get_sync_parent()
         return t
 
 
@@ -219,11 +227,20 @@ class Sound(models.Model):
                 new_annotation = a_obj[0]
 
                 # Update the annotations in the sync tiers
-                parent_related_annotations = Annotation.objects.filter(sound=self, start_time=new_annotation.start_time,
-                                                                       end_time=new_annotation.end_time)
                 for sync_tier in tier.get_sync_tiers():
-                    sync_related_annotations = parent_related_annotations.filter(tier=sync_tier).all()
-                    for rel in sync_related_annotations:
+                    parent_start_time_annotations = Annotation.objects.filter(sound=self,
+                                                                              start_time=new_annotation.start_time,
+                                                                              tier=sync_tier)
+                    parent_end_time_annotations = Annotation.objects.filter(sound=self,
+                                                                            end_time=new_annotation.end_time,
+                                                                            tier=sync_tier)
+                    for rel in parent_start_time_annotations:
+                        a_copy = a.copy()
+                        a_copy['start'] = rel.start_time
+                        self.update_annotation_vals(rel, a, user)
+                    for rel in parent_end_time_annotations:
+                        a_copy = a.copy()
+                        a_copy['end'] = rel.end_time
                         self.update_annotation_vals(rel, a, user)
 
                 # Update the annotations in the special parent tier and the corresponding special parent tiers
