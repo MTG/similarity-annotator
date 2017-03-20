@@ -53,22 +53,47 @@ class Tier(models.Model):
     def get_special_child_tiers(self):
         t = []
         for special_child in self.special_child_tiers.all():
+            # add also sync tiers
+            for sync_tier in special_child.child_tiers.all():
+                t.append(sync_tier)
+            if special_child.parent_tier:
+                t.append(special_child.parent_tier)
             t.append(special_child)
             t.extend(special_child.get_special_child_tiers())
-        return t
-
-    def get_child_tiers(self):
-        t = []
-        for child in self.child_tiers.all():
-            t.append(child)
-            t.extend(child.get_child_tiers())
         return t
 
     def get_special_parent_tiers(self):
         t = []
         if self.special_parent_tier:
+            # add also sync tiers
+            for sync_tier in self.special_parent_tier.child_tiers.all():
+                t.append(sync_tier)
+            if self.special_parent_tier.parent_tier:
+                t.append(self.special_parent_tier.parent_tier)
             t.append(self.special_parent_tier)
             t.extend(self.special_parent_tier.get_special_parent_tiers())
+        return t
+
+    def get_sync_tiers(self):
+        """
+        Search for sync tiers (defined in the model as parent tier) and all special child and parents of each sync tier
+        Returns: list of tiers
+        """
+        t = []
+        if self.parent_tier:
+            for sync_tier in self.parent_tier.get_special_child_tiers():
+                t.append(sync_tier)
+            for special_parent_tier in self.parent_tier.get_special_parent_tiers():
+                t.append(special_parent_tier)
+            t.append(self.parent_tier)
+            t.extend(self.parent_tier.get_sync_tiers())
+        for child in self.child_tiers.all():
+            for sync_tier in child.get_special_child_tiers():
+                t.append(sync_tier)
+            for special_parent_tier in child.get_special_parent_tiers():
+                t.append(special_parent_tier)
+            t.append(child)
+            t.extend(child.get_child_tiers())
         return t
 
 
@@ -196,13 +221,9 @@ class Sound(models.Model):
                 # Update the annotations in the sync tiers
                 parent_related_annotations = Annotation.objects.filter(sound=self, start_time=new_annotation.start_time,
                                                                        end_time=new_annotation.end_time)
-                if tier.parent_tier:
-                    parent_related_annotations = parent_related_annotations.filter(tier=tier.parent_tier).all()
-                    for rel in parent_related_annotations:
-                        self.update_annotation_vals(rel, a, user)
-                for child in tier.child_tiers.all():
-                    parent_related_annotations = parent_related_annotations.filter(tier=child).all()
-                    for rel in parent_related_annotations:
+                for sync_tier in tier.get_sync_tiers():
+                    sync_related_annotations = parent_related_annotations.filter(tier=sync_tier).all()
+                    for rel in sync_related_annotations:
                         self.update_annotation_vals(rel, a, user)
 
                 # Update the annotations in the special parent tier and the corresponding special parent tiers
@@ -253,11 +274,9 @@ class Sound(models.Model):
             else:
                 new_annotation = Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
                                                            tier=tier, name=a['annotation'], user=user)
-                if tier.parent_tier:
-                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'],
-                                              tier=tier.parent_tier, user=user)
-                for child in tier.get_child_tiers():
-                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'], tier=child,
+
+                for sync in tier.get_sync_tiers():
+                    Annotation.objects.create(sound=self, start_time=a['start'], end_time=a['end'], tier=sync,
                                               user=user)
 
                 for child in tier.get_special_child_tiers():
