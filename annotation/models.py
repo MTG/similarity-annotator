@@ -234,14 +234,14 @@ class Sound(models.Model):
                     parent_end_time_annotations = Annotation.objects.filter(sound=self,
                                                                             end_time=new_annotation.end_time,
                                                                             tier=sync_tier)
-                    for rel in parent_start_time_annotations:
-                        a_copy = a.copy()
-                        a_copy['start'] = rel.start_time
-                        self.update_annotation_vals(rel, a, user)
                     for rel in parent_end_time_annotations:
                         a_copy = a.copy()
+                        a_copy['start'] = rel.start_time
+                        self.update_annotation_vals(rel, a_copy, user)
+                    for rel in parent_start_time_annotations:
+                        a_copy = a.copy()
                         a_copy['end'] = rel.end_time
-                        self.update_annotation_vals(rel, a, user)
+                        self.update_annotation_vals(rel, a_copy, user)
 
                 # Update the annotations in the special parent tier and the corresponding special parent tiers
                 for special_parent_tier in tier.get_special_parent_tiers():
