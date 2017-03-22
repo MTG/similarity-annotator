@@ -82,7 +82,7 @@ class Tier(models.Model):
             for special_parent_tier in self.parent_tier.get_special_parent_tiers():
                 t.append(special_parent_tier)
             t.append(self.parent_tier)
-            t.extend(self.parent_tier.get_sync_tiers())
+            t.extend(self.parent_tier.get_sync_parent())
         return t
 
     def get_sync_childs(self):
