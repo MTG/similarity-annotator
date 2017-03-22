@@ -315,14 +315,6 @@ class Sound(models.Model):
                 # Delete annotation in the parent tier and child
                 Annotation.objects.filter(sound=self, start_time=a.start_time, end_time=a.end_time, name=a.name).delete()
 
-        # create annotations in child tiers
-        if tier.child_tiers.all():
-            for child_tier in tier.child_tiers.all():
-                if Annotation.objects.filter(sound=self, tier=child_tier).count() == 0:
-                    for k in added.keys():
-                        Annotation.objects.create(start_time=added[k]['start'], end_time=added[k]['end'], sound=self,
-                                                  tier=child_tier, user=user)
-
         # update annotation_state of sound
         num_ref_annotations = Annotation.objects.filter(sound=self.exercise.reference_sound, tier=tier).count()
         added_annotations = Annotation.objects.filter(sound=self, tier=tier)
