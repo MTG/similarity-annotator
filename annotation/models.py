@@ -234,14 +234,14 @@ class Sound(models.Model):
                     parent_end_time_annotations = Annotation.objects.filter(sound=self,
                                                                             end_time=new_annotation.end_time,
                                                                             tier=sync_tier)
-                    for rel in parent_start_time_annotations:
-                        a_copy = a.copy()
-                        a_copy['start'] = rel.start_time
-                        self.update_annotation_vals(rel, a, user)
                     for rel in parent_end_time_annotations:
                         a_copy = a.copy()
+                        a_copy['start'] = rel.start_time
+                        self.update_annotation_vals(rel, a_copy, user)
+                    for rel in parent_start_time_annotations:
+                        a_copy = a.copy()
                         a_copy['end'] = rel.end_time
-                        self.update_annotation_vals(rel, a, user)
+                        self.update_annotation_vals(rel, a_copy, user)
 
                 # Update the annotations in the special parent tier and the corresponding special parent tiers
                 for special_parent_tier in tier.get_special_parent_tiers():
@@ -314,14 +314,6 @@ class Sound(models.Model):
             if a.id not in added:
                 # Delete annotation in the parent tier and child
                 Annotation.objects.filter(sound=self, start_time=a.start_time, end_time=a.end_time, name=a.name).delete()
-
-        # create annotations in child tiers
-        if tier.child_tiers.all():
-            for child_tier in tier.child_tiers.all():
-                if Annotation.objects.filter(sound=self, tier=child_tier).count() == 0:
-                    for k in added.keys():
-                        Annotation.objects.create(start_time=added[k]['start'], end_time=added[k]['end'], sound=self,
-                                                  tier=child_tier, user=user)
 
         # update annotation_state of sound
         num_ref_annotations = Annotation.objects.filter(sound=self.exercise.reference_sound, tier=tier).count()
