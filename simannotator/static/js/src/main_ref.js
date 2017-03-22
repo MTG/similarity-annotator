@@ -168,6 +168,7 @@ UrbanEars.prototype = {
         start: section.start,
         end: section.end,
         id: section.id,
+        resize: pointAn,
         annotation: section.annotation,
         similarity: section.similarity
       }; 
