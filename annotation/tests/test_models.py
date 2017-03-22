@@ -47,7 +47,7 @@ class TierModelTests(TestCase):
         child_tier_1_1 = Tier.objects.create(name='tier_4', exercise=self.exercise, parent_tier=self.tier_1)
         child_tier_2_1 = Tier.objects.create(name='tier_5', exercise=self.exercise, parent_tier=child_tier_1_1)
 
-        list_of_child_tiers = self.tier_1.get_child_tiers()
+        list_of_child_tiers = self.tier_1.get_sync_tiers()
 
         self.assertTrue(child_tier_1 in list_of_child_tiers)
         self.assertTrue(child_tier_2 in list_of_child_tiers)
