@@ -20,17 +20,6 @@ class TierAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'data_set', 'exercise', 'entire_sound')
     list_display_links = ('name',)
 
-    def get_form(self, request, obj=None, **kwargs):
-        if obj:
-            self.tier_id = obj.id
-        return super(TierAdmin, self).get_form(request, obj, **kwargs)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "parent_tier":
-            tier = Tier.objects.get(pk=self.tier_id)
-            kwargs["queryset"] = tier.exercise.tiers
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
     @staticmethod
     def data_set(obj):
         return obj.exercise.data_set
