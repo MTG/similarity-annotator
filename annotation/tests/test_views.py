@@ -46,7 +46,7 @@ class ExerciseListViewTests(TestCase):
 
     def test_exercises_list_data_set_id(self):
         response = self.test_client.get(reverse('exercise_list', kwargs={'dataset_id': self.data_set.id}))
-        self.assertEqual(response.context['dataset_id'], str(self.data_set.id))
+        self.assertEqual(response.context['data_set'], self.data_set)
 
 
 class DataSetListViewTests(TestCase):
@@ -68,7 +68,14 @@ class DataSetListViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue('accounts/login' in response.url)
 
-    def test_data_set_list(self):
+    def test_data_set_list_no_user(self):
+        response = self.test_client.get(reverse('data_set_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(self.data_set in response.context['data_sets_list'])
+
+    def test_data_set_list_user(self):
+        self.data_set.users.add(self.user)
+        self.data_set.save()
         response = self.test_client.get(reverse('data_set_list'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.data_set in response.context['data_sets_list'])
@@ -218,8 +225,7 @@ class SoundDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['sound'], self.sound)
         self.assertEqual(response.context['tier'], self.tier)
-        # the current tier shouldn't be in other tiers list
-        self.assertFalse(self.tier in response.context['other_tiers'])
+        self.assertTrue(self.tier in response.context['other_tiers'])
         tier_2 = Tier.objects.create(name='tier_2', exercise=self.exercise)
         response = self.test_client.get(reverse('sound_detail', kwargs={'exercise_id': self.exercise.id,
                                                                         'tier_id': self.tier.id,
@@ -325,7 +331,7 @@ class DownloadAnnotationsViewTests(TestCase):
     def test_download_annotations(self):
         annotation_similarity = AnnotationSimilarity.objects.create(reference=self.reference_annotation,
                                                                     similar_sound=self.annotation,
-                                                                    similarity_measure=10, user=self.user)
+                                                                    similarity={'value': 10}, user=self.user)
         response = self.test_client.get(reverse('download-annotations', kwargs={'sound_id': self.sound.id}))
 
         self.assertEqual(response.json()[self.tier.name][0]['start_time'], self.annotation.start_time)
@@ -333,7 +339,7 @@ class DownloadAnnotationsViewTests(TestCase):
         self.assertEqual(response.json()[self.tier.name][0]['ref_start_time'],
                          self.reference_annotation.start_time)
         self.assertEqual(response.json()[self.tier.name][0]['ref_end_time'], self.reference_annotation.end_time)
-        self.assertEqual(response.json()[self.tier.name][0]['value'], annotation_similarity.similarity_measure)
+        self.assertEqual(response.json()[self.tier.name][0]['similarity'], annotation_similarity.similarity)
 
 
 

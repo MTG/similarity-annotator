@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse
 
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
 from .forms import TierForm
@@ -15,7 +16,7 @@ from .forms import TierForm
 
 @login_required
 def data_set_list(request):
-    data_sets_list = DataSet.objects.all()
+    data_sets_list = request.user.datasets.all()
     context = {'data_sets_list': data_sets_list}
     return render(request, 'annotationapp/data_sets_list.html', context)
 
@@ -46,20 +47,113 @@ def exercise_list(request, dataset_id):
 
 
 @login_required
-def tier_list(request, exercise_id, sound_id):
+def tier_delete(request, exercise_id, tier_id, sound_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+    tier = exercise.tiers.get(id=tier_id)
+    if request.method == 'POST':
+        tier.delete()
+        return redirect(reverse('tier_list', kwargs={
+            'exercise_id': exercise_id,
+            'sound_id': sound_id
+            }))
+    context = {'exercise': exercise, 'tier': tier, 'sound_id': sound_id}
+    return render(request, 'annotationapp/tier_delete.html', context)
+
+
+@login_required
+@csrf_exempt
+def check_tiers_ajax(request, exercise_id):
+    if request.method == 'POST':
+        point = request.POST.get('point')
+        parent = request.POST.get('parent', None)
+        sync = request.POST.get('sync', None)
+
+        exercise = Exercise.objects.get(id=exercise_id)
+        tiers_list = exercise.tiers
+        parent_list = exercise.tiers
+        if point == 'true':
+            parent_list = parent_list.exclude(point_annotations=False)
+            tiers_list = tiers_list.exclude(point_annotations=False)
+        if parent:
+            tiers_list = tiers_list.exclude(id=parent)
+        if sync:
+            parent_list = parent_list.exclude(id=sync)
+
+        ret = {
+            'sync_tiers': list(tiers_list.values_list('id', 'name')),
+            'parent_tiers': list(parent_list.values_list('id', 'name'))
+            }
+        return JsonResponse(ret)
+
+
+@login_required
+def tier_edit(request, exercise_id, tier_id, sound_id):
     exercise = Exercise.objects.get(id=exercise_id)
     tiers_list = exercise.tiers.all()
+    tier = tiers_list.get(id=tier_id)
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            parent_tier_id = request.POST['parent_tier']
+            if parent_tier_id:
+                parent_tier = Tier.objects.get(id=parent_tier_id)
+                tier.parent_tier = parent_tier
+            else:
+                tier.parent_tier = None
+
+            special_parent_tier_id = request.POST['special_parent_tier']
+            if special_parent_tier_id:
+                special_aprent_tier = Tier.objects.get(id=special_parent_tier_id)
+                tier.special_parent_tier = special_aprent_tier
+            else:
+                tier.special_parent_tier = None
+
+            tier.name = tier_name
+            tier.exercise = exercise
+            tier.similarity_keys = tier_form.cleaned_data['dimensions']
+
+            # if point_annotations attribute is changed, delete previous annotations
+            if ('point_annotations' in request.POST) != tier.point_annotations:
+                tier.annotations.all().delete()
+            if 'point_annotations' in request.POST:
+                tier.point_annotations = True
+            else:
+                tier.point_annotations = False
+            tier.save()
+            return redirect(reverse('tier_list', kwargs={
+                'exercise_id': exercise_id,
+                'sound_id': sound_id
+                }))
+    else:
+        tiers_list_ids = tiers_list.values_list('id')
+        tier_form = TierForm(instance=tier, parent_tier_ids=tiers_list_ids)
+    context = {'exercise': exercise, 'tier': tier, 'form': tier_form}
+    return render(request, 'annotationapp/tier_creation.html', context)
+
+
+@login_required
+def tier_list(request, exercise_id, sound_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+    tiers_list = exercise.tiers.all().order_by('created_at')
     if request.method == 'POST':
         tier_form = TierForm(request.POST)
         if tier_form.is_valid():
             tier_name = request.POST['name']
             exercise = Exercise.objects.get(id=exercise_id)
             parent_tier_id = request.POST['parent_tier']
+            parent_tier = None
+
             if parent_tier_id:
                 parent_tier = Tier.objects.get(id=parent_tier_id)
-                Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
-            else:
-                Tier.objects.create(name=tier_name, exercise=exercise)
+
+            tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+            tier.similarity_keys = tier_form.cleaned_data['dimensions']
+
+            if 'point_annotations' in request.POST:
+                tier.point_annotations = True
+
+            tier.save()
     else:
         tiers_list_ids = tiers_list.values_list('id')
         tier_form = TierForm(parent_tier_ids=tiers_list_ids)
@@ -131,7 +225,7 @@ def sound_detail(request, exercise_id, sound_id, tier_id):
         sound.save()
         return redirect('/' + exercise_id + '/sound_list')
     tier = get_object_or_404(Tier, id=tier_id)
-    other_tiers = sound.exercise.tiers.all().exclude(id=tier_id)
+    other_tiers = sound.exercise.tiers.all().order_by('created_at')
     context = {'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/sound_detail.html', context)
 
@@ -150,7 +244,7 @@ def ref_sound_detail(request, exercise_id, sound_id, tier_id):
     sound = get_object_or_404(Sound, id=sound_id)
 
     tier = Tier.objects.get(id=tier_id)
-    other_tiers = sound.exercise.tiers.all()
+    other_tiers = sound.exercise.tiers.all().order_by('created_at')
     context = {'form': tier_form, 'sound': sound, 'tier': tier, 'other_tiers': other_tiers, 'exercise_id': exercise_id}
     return render(request, 'annotationapp/ref_sound_annotation.html', context)
 
@@ -175,6 +269,7 @@ def annotation_action(request, sound_id, tier_id):
                 "feedback": "none",
                 "visualization": "waveform",
                 "similaritySegment": ["yes", "no"],
+                "similarityKeys": tier.similarity_keys,
                 "annotationTags": list(tags),
                 "alwaysShowTags": False
             }
@@ -197,4 +292,35 @@ def download_annotations(request, sound_id):
 
     ret = sound.get_annotations_as_dict()
     return JsonResponse(ret)
+
+
+@login_required
+def tier_creation(request, exercise_id, sound_id):
+    exercise = Exercise.objects.get(id=exercise_id)
+    tiers_list = exercise.tiers.all()
+    if request.method == 'POST':
+        tier_form = TierForm(request.POST)
+        if tier_form.is_valid():
+            tier_name = request.POST['name']
+            exercise = Exercise.objects.get(id=exercise_id)
+            parent_tier_id = request.POST['parent_tier']
+            if parent_tier_id:
+                parent_tier = Tier.objects.get(id=parent_tier_id)
+                tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
+            else:
+                tier = Tier.objects.create(name=tier_name, exercise=exercise)
+            special_parent_tier_id = request.POST['special_parent_tier']
+            if special_parent_tier_id:
+                special_parent_tier = Tier.objects.get(id=special_parent_tier_id)
+                tier.special_parent_tier = special_parent_tier
+            if 'point_annotations' in request.POST:
+                tier.point_annotations = True
+            tier.similarity_keys = tier_form.cleaned_data['dimensions']
+            tier.save()
+            return redirect('/' + exercise_id + '/' + sound_id + '/tiers_list')
+    else:
+        tiers_list_ids = tiers_list.values_list('id')
+        tier_form = TierForm(parent_tier_ids=tiers_list_ids)
+    context = {'form': tier_form, 'exercise': exercise, 'create': True}
+    return render(request, 'annotationapp/tier_creation.html', context)
 

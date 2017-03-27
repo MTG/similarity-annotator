@@ -27,6 +27,51 @@ class Command(BaseCommand):
         parser.add_argument('force_annotations', type=bool, nargs='?', default=False,
                             help='force re-upload annotations')
 
+    @staticmethod
+    def create_tiers(tiers_data, exercise):
+        for tier_name, tier_data in tiers_data.items():
+            point_annotations = False
+            if 'point_annotations' in tier_data:
+                point_annotations = True
+            try:
+                tier = Tier.objects.get(name=tier_name, exercise=exercise)
+            except ObjectDoesNotExist:
+                if 'parent_tier' in tier_data or 'special_parent_tier' in tier_data:
+                    tier = Tier.objects.create(name=tier_name, exercise=exercise, point_annotations=point_annotations)
+                    if 'parent_tier' in tier_data:
+                        try:
+                            parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
+                        except ObjectDoesNotExist:
+                            parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise,
+                                                              point_annotations=point_annotations)
+                        tier.parent_tier = parent_tier
+                    if 'special_parent_tier' in tier_data:
+                        try:
+                            special_parent_tier = Tier.objects.get(name=tier_data['special_parent_tier'],
+                                                                   exercise=exercise)
+                        except ObjectDoesNotExist:
+                            special_parent_tier = Tier.objects.create(name=tier_data['special_parent_tier'],
+                                                                      exercise=exercise,
+                                                                      point_annotations=point_annotations)
+                        tier.special_parent_tier = special_parent_tier
+                    tier.save()
+                else:
+                    tier = Tier.objects.create(name=tier_name, exercise=exercise, point_annotations=point_annotations)
+                if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
+                    tier.entire_sound = True
+                if 'similarity_dimensions' in tier_data:
+                    tier.similarity_keys = tier_data['similarity_dimensions']
+                tier.save()
+                print("Created tier %s in exercise %s" % (tier.name, exercise.name))
+            # CREATE TAGS IF DEFINED IN THE RUBRIC FILE
+            if 'rubric' in tier_data:
+                for tag_data in tier_data['rubric']['ratings']:
+                    tag, created = Tag.objects.get_or_create(name=tag_data)
+                    if created:
+                        print("Created tag: %s" % tag.name)
+                    if tier not in tag.tiers.all():
+                        tag.tiers.add(tier)
+
     def handle(self, *args, **options):
         dataset_path = options['path']
         dataset_name = options['dataset']
@@ -46,7 +91,7 @@ class Command(BaseCommand):
             # CREATE EXERCISE
 
             try:
-                exercise = Exercise.objects.get(exercise_id=exercise_id)
+                exercise = Exercise.objects.get(exercise_id=exercise_id, data_set=data_set)
             except ObjectDoesNotExist:
                 exercise = Exercise.objects.create(name=exercise_name, data_set=data_set, exercise_id=exercise_id)
                 annotation.utils.create_exercise_directory(dataset_name, exercise_name)
@@ -54,36 +99,15 @@ class Command(BaseCommand):
             # CREATE TIERS
             # check if there is a rubric file to create the tiers and labels
 
-            rubric_file_path = os.path.join(dataset_path, 'rubric.json')
-            if os.path.exists(rubric_file_path):
-                rubric_data = json.load(open(rubric_file_path))
-                for tier_name, tier_data in rubric_data.items():
-                    try:
-                        tier = Tier.objects.get(name=tier_name, exercise=exercise)
-                    except ObjectDoesNotExist:
-                        if 'parent_tier' in tier_data:
-                            try:
-                                parent_tier = Tier.objects.get(name=tier_data['parent_tier'], exercise=exercise)
-                            except ObjectDoesNotExist:
-                                parent_tier = Tier.objects.create(name=tier_data['parent_tier'], exercise=exercise)
-                            tier = Tier.objects.create(name=tier_name, exercise=exercise, parent_tier=parent_tier)
-                        else:
-                            tier = Tier.objects.create(name=tier_name, exercise=exercise)
-                        if tier_name.find('Overall') != -1 or tier_name.find('entire') != -1:
-                            tier.entire_sound = True
-                            tier.save()
-                        print("Created tier %s in exercise %s" % (tier.name, exercise.name))
+            # # Riyaz tier creation definition
+            # rubric_file_path = os.path.join(dataset_path, 'rubric.json')
+            # if os.path.exists(rubric_file_path):
+            #     rubric_data = json.load(open(rubric_file_path))
+            #     self.create_tiers(rubric_data, exercise)
 
-                    # CREATE TAGS IF DEFINED IN THE RUBRIC FILE
-                    if 'rubric' in tier_data:
-                        for tag_data in tier_data['rubric']['ratings']:
-                            tag, created = Tag.objects.get_or_create(name=tag_data)
-                            if created:
-                                print("Created tag: %s" % tag.name)
-                            if tier not in tag.tiers.all():
-                                tag.tiers.add(tier)
-                    else:
-                        print("NO RUBRIC IN FILE")
+            # Other tier creation definition
+            if 'tiers' in exercise_description:
+                self.create_tiers(exercise_description['tiers'], exercise)
 
             else:
                 # create initial tier "whole sound"
@@ -111,8 +135,9 @@ class Command(BaseCommand):
                 reference_sound_filename = os.path.basename(reference_sound_file_relative_path)
 
                 # copy the sound into media
-                annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
-                                                       reference_sound_filename)
+                reference_sound_filename = annotation.utils.copy_sound_into_media(source_path, dataset_name,
+                                                                                  exercise_name,
+                                                                                  reference_sound_filename)
 
                 reference_sound = annotation.utils.get_or_create_sound_object(exercise, reference_sound_filename,
                                                                               source_path)
@@ -140,7 +165,8 @@ class Command(BaseCommand):
                     sound_filename = os.path.basename(sound_file_relative_path)
 
                     # copy the sound into media
-                    annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name, sound_filename)
+                    sound_filename = annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
+                                                                            sound_filename)
 
                     sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path)
 

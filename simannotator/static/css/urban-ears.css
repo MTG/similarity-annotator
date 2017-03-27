@@ -220,7 +220,7 @@
 }
 
 .current_region, .current_region_ref {
-  z-index: 5000 !important;
+  z-index: 9000 !important;
   border: 2px solid rgba(0, 177, 185, 0.40);
 }
 

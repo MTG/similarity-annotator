@@ -123,6 +123,7 @@ if deploy_env == 'prod':
         ALLOWED_HOSTS.append(allowed_host)
 else:
     debug = True
+    ALLOWED_HOSTS = ['simannotator-test.mtg.upf.edu']
 
 default_url = 'postgres://postgres@db/postgres'
 DATABASE_URL_ENV_NAME = 'DATABASE_URL'

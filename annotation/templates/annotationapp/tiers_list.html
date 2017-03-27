@@ -1,27 +1,43 @@
 {% extends 'annotationapp/annotationapp_base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<script type="text/javascript" src="/static/js/lib/jquery-2.2.3.min.js"></script>
+<style>.icn {width: 20px;} .highlight-tier {background-color: #ddd; border-radius: 4px;}</style>
+<script>
+$( document ).ready(function() {
+  $('.show-parent').mouseover(function(){
+    $(".tier-" + $( this ).data('parent')).addClass('highlight-tier');
+  }).mouseout(function() {
+    $(".tier-" + $( this ).data('parent')).removeClass('highlight-tier');
+  });
+})
+</script>
+{% endblock %}
 
 {% block title %} <a href="/{{ exercise.data_set.id }}/">
     {{ exercise.data_set.name }} </a> : <a href="/{{ exercise.id }}/sound_list/"> {{ exercise.name }} </a>: {{ sound.filename }}: list of tiers {% endblock %}
 
 {% block links %}
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <h5>Create new tier:</h5>
-            <p>{{ form.name }} </p>
-            <h5>Select parent tier if desired:</h5>
-            <p>{{ form.parent_tier }} </p>
-        <button type="submit" class="btn btn-info">Create</button>
-        </form>
+    <input type="button" onclick="location.href='/{{ exercise.id }}/{{ sound.id }}/tier_creation/';" value="Create a tier" />
 {% endblock %}
 
 {% block content %}
     {% if tiers_list %}
         {% for tier in tiers_list %}
+            <li class="tier-{{ tier.id }}">
             {% if reference_sound %}
-                <li><a href="/{{ exercise.id }}/ref_sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a></li>
+                <a href="/{{ exercise.id }}/ref_sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a>
             {% else %}
-                <li><a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a></li>
+              <a href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ tier.name}}</a>
             {% endif %}
+              {% if tier.special_parent_tier %}
+              <img src="{% static 'img/branch.png'%}" class="show-parent icn" data-parent="{{tier.special_parent_tier.id}}"/>
+              {% endif %}
+              <a href="{% url 'tier_edit' exercise.id tier.id sound.id %}"><img src="{% static 'img/edit.png'%}" class="icn" /></a>
+              <a href="{% url 'tier_delete' exercise.id tier.id sound.id %}"><img src="{% static 'img/delete.png'%}" class="icn"/></a>
+            </li>
+
         {% endfor %}
     {% else %}
         <p>There are no tiers</p>

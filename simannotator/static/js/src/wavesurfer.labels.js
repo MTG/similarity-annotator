@@ -44,13 +44,14 @@ WaveSurfer.Labels = {
         }.bind(this));
 
         // Replace the label container with a empty one when the wavesurfer is redrawn
-        wavesurfer.on('redraw', this.render.bind(this));
+        //wavesurfer.on('redraw', this.render.bind(this));
         // Destory the wrapper when the wavesurfer is destroyed
         wavesurfer.on('destroy', this.destroy.bind(this));
         // Add a label when a region is created
         wavesurfer.on('region-created', this.add.bind(this));
         // Update a label when its region is updated
         wavesurfer.on('region-updated', this.rearrange.bind(this));
+        wavesurfer.on('zoom-end', this.render.bind(this));
     },
 
     // Remove the wrapper element
@@ -101,18 +102,33 @@ WaveSurfer.Labels = {
         this.style(this.labelsElement, {
             height: this.height + 'px',
             width: this.drawer.wrapper.scrollWidth * this.pixelRatio + 'px',
-            left: 0
+            left: 10
         });
+
+        if (this.wavesurfer.regions) {
+            var regions = [];
+
+            for (var id in this.labels) {
+              regions.push(this.labels[id].region.id);
+            }
+            for (var id in this.wavesurfer.regions.list) {
+                if (!(id in regions)) {
+                    this.add(this.wavesurfer.regions.list[id]);
+                }
+            }
+        }
     },
 
+
     updateScroll: function () {
+       // TODO: FIXME
         this.wrapper.scrollLeft = this.drawer.wrapper.scrollLeft;
     },
 
     // Create & append a label element that is associated with the given region
     add: function (region) {
         var label = Object.create(WaveSurfer.Label);
-        label.init(region, this.labelsElement);
+        label.init(region, this.labelsElement, this.wavesurfer);
 
         this.labels[region.id] = label;
 
@@ -126,6 +142,7 @@ WaveSurfer.Labels = {
 
     // Rearrange the labels to reduce overlap
     rearrange: function () {
+        this.updateScroll();
         // First place all label elements in bottom row
         for (var id in this.labels) {
             // 2 px above wavesurfer canvas

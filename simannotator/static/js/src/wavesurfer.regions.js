@@ -144,6 +144,7 @@ WaveSurfer.Region = {
         this.data = params.data || {};
         this.attributes = params.attributes || {};
         this.stick_neighboards= params.stick_neighboards || '';
+        this.point_annotations = params.point_annotations || '';
         this.annotation = params.annotation || '';
         this.manyValues = params.manyValues || '';
         this.similValue = params.similValue || '';
@@ -208,6 +209,9 @@ WaveSurfer.Region = {
         }
         if (null != params.stick_neighboards) {
             this.stick_neighboards = params.stick_neighboards;
+        }
+        if (null != params.point_annotations) {
+            this.point_annotations = params.point_annotations;
         }
 
         this.updateRender();
@@ -369,6 +373,7 @@ WaveSurfer.Region = {
                 cursor: this.resize ? 'col-resize' : 'default',
             });
         }
+        this.wavesurfer.fireEvent('zoom-end');
     },
 
     /* Bind audio events. */

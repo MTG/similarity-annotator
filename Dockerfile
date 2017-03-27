@@ -1,6 +1,8 @@
 FROM python:3.5
 ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update && apt-get install -y libav-tools --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
 RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 && chmod +x /usr/local/bin/dumb-init
 
 RUN mkdir /code

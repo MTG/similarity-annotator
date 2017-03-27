@@ -28,12 +28,21 @@
 </div>
 <div class="row prompt">
     {% for other_tier in other_tiers %}
-        {% if other_tier != tier %}
-            <h5 class="center"><a href="/{{ exercise_id }}/ref_sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
+        {% if other_tier == tier%}
+        <h5 class="center">{{ other_tier.name }}</h5>
+        {% else %}
+        <h5 class="center"><a href="/{{ exercise_id }}/ref_sound_detail/{{ sound.id }}/{{ other_tier.id }}">{{ other_tier.name }}</a></h5>
         {% endif %}
     {% endfor %}
-<div style="width: 100%">
-    <div class="right-align" style="margin-right:35px">
+<div style="width: 100%; text-align: right;">
+    <div class="right-align" style="margin-right:35px; display: inline;">
+    {% if request.GET.enable_spec %}
+      <a href="{% url 'ref_sound_detail' exercise_id sound.id tier.id %}" class="btn">Disable Spectrogram</a>
+    {% else %}
+      <a href="{% url 'ref_sound_detail' exercise_id sound.id tier.id %}?enable_spec=1" class="btn">Enable Spectrogram</a>
+    {% endif %}
+    </div>
+   <div class="right-align" style="margin-right:35px; display: inline;">
         <a href="/{{ exercise_id }}/sound_list" class="btn">Go back to sounds</a>
     </div>
 </div>
@@ -43,13 +52,23 @@
         <div class="labels"></div>
         <div class="audio_visual"></div>
         <div class="play_bar"></div>
-        <div class="hidden_img"></div>
+        <div class="zoom">
+          <span>Zoom: </span>
+            <select id="zoom_ref">
+            <option value="">1x</option>
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+            <option value="8">8x</option>
+          </select>
+        </div>
+
         <div class="creation_stage_container"></div>
         <div class="submit_container"></div>
     </div>    
     <script>
-      var dataUrl = '{% url 'annotation-action' sound.id tier.id %}';
-      var nextUrl = '{{ next_url}}';
-    </script>   
+        var dataUrl = '{% url 'annotation-action' sound.id tier.id %}?enable_spec={{request.GET.enable_spec}}';
+        var nextUrl = '{{ next_url}}';
+        var pointAn = {% if tier.point_annotations %}false{% else %}true{% endif %};
+    </script>
 
 </html>

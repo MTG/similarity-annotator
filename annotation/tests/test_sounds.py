@@ -49,7 +49,8 @@ class CreateSoundTest(TestCase):
         self.assertEqual(self.sound.annotations.count(), 1)
 
         self.assertEqual(self.sound.annotation_state, 'I')
-        annotations = [{'id': 4, 'start': 1, 'end': 2, 'reference': 3,
+
+        annotations = [{'id': 18, 'start': 1, 'end': 2, 'reference': 17,
                         'similarity': 'yes', 'annotation': 'name', 'similValue': 1}]
 
         self.sound.update_annotations(self.tier, annotations, self.user)
@@ -79,15 +80,14 @@ class CreateSoundTest(TestCase):
         exercise_annotations_json = json.loads(exercise_annotations)
 
         # the utils should retrieve a json serialisation
-        self.assertEqual(type(exercise_annotations), str)
+        self.assertTrue(isinstance(exercise_annotations, str))
         # the sounds file names should be in the dictionary
         self.assertTrue(self.sound.filename in exercise_annotations_json.keys())
         self.assertTrue(self.reference_sound.filename in exercise_annotations_json.keys())
         # the tier name should be a key in the sound
         self.assertTrue(self.tier.name in exercise_annotations_json[self.reference_sound.filename].keys())
         # there should be one annotation in the tier of the reference sound
-        self.assertEqual(len(exercise_annotations_json[self.reference_sound.filename][self.tier.name]),
-                1)
+        self.assertEqual(len(exercise_annotations_json[self.reference_sound.filename][self.tier.name]), 1)
         # the annotation should have the attributes defined in here
         self.assertEqual(exercise_annotations_json[self.reference_sound.filename][self.tier.name][0]['start_time'],
                          start_time)
@@ -98,12 +98,12 @@ class CreateSoundTest(TestCase):
         annotation_name_2 = 'test_annotation_2'
         start_time_2 = 10
         end_time_2 = 20
-        similarity_measure = 1
+        similarity_measure = {'value': 1}
         similar_annotation = Annotation.objects.create(name=annotation_name_2, start_time=start_time_2,
                                                        end_time=end_time_2, sound=self.sound, tier=self.tier,
                                                        user=self.user)
         AnnotationSimilarity.objects.create(reference=reference_annotation, similar_sound=similar_annotation,
-                                            similarity_measure=similarity_measure, user=self.user)
+                                            similarity=similarity_measure, user=self.user)
 
         exercise_annotations = annotation.utils.exercise_annotations_to_json(self.exercise.id)
         exercise_annotations_json = json.loads(exercise_annotations)

@@ -15,12 +15,12 @@
  */
 function UrbanEars() {
     this.wavesurfer;
+    this.initialPxPerSec;
     this.playBar;
     this.stages;
     this.workflowBtns;
     this.currentTask;
     this.taskStartTime;
-    this.hiddenImage;
     this.soundReady = false;
     this.refReady = false;
     // Boolean, true if currently sending http post request 
@@ -54,24 +54,32 @@ function UrbanEars() {
         container: '.labels'
     });
 
-    // Create hiddenImage, an image that is slowly revealed to a user as they annotate 
-    // (only for this.currentTask.feedback === 'hiddenImage')
-    this.hiddenImage = new HiddenImg('.hidden_img', 100);
-    this.hiddenImage.create();
-
     // Create the play button and time that appear below the wavesurfer
     this.playBar = new PlayBar(this.wavesurfer, '.play_bar');
     this.playBar.create();
     
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages = new AnnotationStages(this.wavesurfer, this.hiddenImage, null, true);
+    if(pointAn){
+        this.stages = new AnnotationStages(this.wavesurfer, null, true);
+    } else {
+        this.stages = new AnnotationStages(this.wavesurfer, null, false);
+    }
     this.stages.create();
 
     // Create Workflow btns (submit and exit)
     this.workflowBtns = new WorkflowBtns();
     this.workflowBtns.create();
 
+    var my = this;
+    $("#zoom_ref").change(function () {
+      var pxPerSec = my.initialPxPerSec / my.wavesurfer.getDuration();
+      if (this.value) {
+        pxPerSec = pxPerSec * Number(this.value);
+      } 
+      my.wavesurfer.zoom(pxPerSec);
+    });
+ 
     this.addEvents();
 }
 
@@ -93,11 +101,13 @@ UrbanEars.prototype = {
         // Also if the user is suppose to get hidden image feedback, append that component to the page
         this.wavesurfer.on('ready', function () {
            my.loadSegments();
+           my.wavesurfer.zoom(false);
+           my.initialPxPerSec = my.wavesurfer.drawer.wrapper.scrollWidth;
         });
 
     },
 
-        createSegment: function(){
+    createSegment: function(){
       var my = this;
       var currTime = my.wavesurfer.getCurrentTime();
       var segments = my.stages.getAnnotations();
@@ -105,34 +115,50 @@ UrbanEars.prototype = {
       var lastEnd = 0;
       var added = false;
       segments.forEach(function(section){
-          if (added == false && section.start > currTime && lastEnd != parseFloat(section.start)){
-             var region = my.wavesurfer.addRegion({
+          if (added == false && section.start > currTime && lastEnd != section.start){
+            var region = my.wavesurfer.addRegion({
               start: lastEnd,
-              end: parseFloat(section.start),
+              end: section.start,
+              stick_neighboards: true,
             });
-            my.stages2.createRegionSwitchToStageThree(region);
+            my.stagesRef.createRegionSwitchToStageThree(region);
+            added = true;
+          }else if (added == false && section.start < currTime && section.end > currTime) {
+            var region = my.wavesurfer.addRegion({
+              start: currTime,
+              end: section.end,
+              stick_neighboards: true,
+            });
+            my.stages.createRegionSwitchToStageThree(region);
+            var oldSection =  my.wavesurfer.regions.list[section.id];
+            oldSection.end = currTime;
+            oldSection.updateRender();
+            my.wavesurfer.fireEvent('region-updated', oldSection);
             added = true;
           }
-          lastEnd = parseFloat(section.end);
+          lastEnd = section.end;
       });
       if (added === false) {
           if (currTime > lastEnd) {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: currTime,
+                  stick_neighboards: true,
               });
-              my.stages2.createRegionSwitchToStageThree(region);
+              my.stages.createRegionSwitchToStageThree(region);
           }
           else {
               var region = my.wavesurfer.addRegion({
                   start: lastEnd,
                   end: lastEnd + 1,
+                  stick_neighboards: true,
               });
-              my.stages2.createRegionSwitchToStageThree(region);
+              my.stages.createRegionSwitchToStageThree(region);
           }
       }
 
     },
+    
  
     loadSegments: function(){
       var my = this;
@@ -142,6 +168,7 @@ UrbanEars.prototype = {
         start: section.start,
         end: section.end,
         id: section.id,
+        resize: pointAn,
         annotation: section.annotation,
         similarity: section.similarity
       }; 
@@ -193,7 +220,6 @@ UrbanEars.prototype = {
 
             // Update the visualization type and the feedback type and load in the new audio clip
             my.wavesurfer.params.visualization = my.currentTask.visualization; // invisible, spectrogram, waveform
-            my.wavesurfer.params.feedback = my.currentTask.feedback; // hiddenImage, silent, notify, none 
             my.wavesurfer.load(my.currentTask.url);
         };
 
@@ -225,18 +251,25 @@ UrbanEars.prototype = {
                 annotations: this.stages.getAnnotations(),
             };
 
-            if (this.stages.aboveThreshold()) {
-                // If the user is suppose to receive feedback and got enough of the annotations correct
-                // display the city the clip was recorded for 2 seconds and then submit their work
-                var my = this;
-                this.stages.displaySolution();
-                setTimeout(function() {
-                    my.post(content);
-                }, 2000);
-            } else {
-                this.post(content);
-            }
+            this.post(content);
         }
+    },
+
+    createPointSegment: function(upbeat){
+      var currTime = this.wavesurfer.getCurrentTime();
+      var region = this.wavesurfer.addRegion({
+                start: currTime,
+                end: currTime + 0.01,
+                point_annotations: true,
+                drag: false,
+                resize: false,
+      });
+      if (upbeat) {
+        region.annotation = "down_beat";
+      } else {
+        region.annotation = "up_beat";
+      }
+      this.stagesRef.createRegionSwitchToStageThree(region);
     },
 
     // Make POST request, passing back the content data. On success load in the next task
@@ -271,10 +304,20 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-      if(event.keyCode == 'i'.charCodeAt(0)){
-        urbanEars.createSegment();
-      }
+        if (pointAn) {
+            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)) {
+                urbanEars.createSegment();
+            }
+        } else {
+            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'd'.charCodeAt(0)) {
+                urbanEars.createPointSegment(false);
+            }
+            if (document.activeElement.className != 'annotation_inp' && event.keyCode == 'u'.charCodeAt(0)) {
+                urbanEars.createPointSegment(true);
+            }
+        }
     }
+
     // Load the first audio annotation task
     urbanEars.loadNextTask();
 }

@@ -86,7 +86,7 @@ function UrbanEars() {
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stagesRef = new AnnotationStages(this.wavesurferRef);
+    this.stagesRef = new AnnotationStages(this.wavesurferRef, null, false);
     this.stagesRef.create();
 
     // Create Workflow btns (submit and exit)
@@ -96,7 +96,11 @@ function UrbanEars() {
 
     // Create the annotation stages that appear below the wavesurfer. The stages contain tags 
     // the users use to label a region in the audio clip
-    this.stages = new AnnotationStages(this.wavesurfer, null, this.wavesurferRef);
+    if(pointAn){
+        this.stages = new AnnotationStages(this.wavesurfer, this.wavesurferRef);
+    } else {
+        this.stages = new AnnotationStages(this.wavesurfer, this.wavesurferRef, false);
+    }
     this.stages.create();
 
     // Create Workflow btns (submit and exit)
@@ -263,6 +267,22 @@ UrbanEars.prototype = {
       }
 
     },
+    createPointSegment: function(upbeat){
+      var currTime = this.wavesurfer.getCurrentTime();
+      var region = this.wavesurfer.addRegion({
+                start: currTime, 
+                end: currTime + 0.01,
+                point_annotations: true,
+                drag: true,
+                resize: pointAn,
+      });
+      if (upbeat) {
+        region.annotation = "down_beat";
+      } else {
+        region.annotation = "up_beat";
+      }
+      this.stagesRef.createRegionSwitchToStageThree(region);
+    },
     loadSegments: function(){
       var my = this;
       if (this.refReady && this.soundReady){
@@ -289,6 +309,7 @@ UrbanEars.prototype = {
             start: section.start,
             end: section.end,
             id: section.id,
+            resize: pointAn,
             annotation: section.annotation,
             similValue: section.similValue,
             similarity: section.similarity,
@@ -327,13 +348,15 @@ UrbanEars.prototype = {
 
             // Update the different tags the user can use to annotate, also update the solutions to the
             // annotation task if the user is suppose to recieve feedback
-            var similaritySegment= my.currentTask.similaritySegment;
+            var similaritySegment = my.currentTask.similaritySegment;
+            var similarityKeys = my.currentTask.similarityKeys;
             var annotationTags = my.currentTask.annotationTags;
             var recordingIndex = my.currentTask.recordingIndex || 1;
             var numRecordings = my.currentTask.numRecordings || 1;
             var alwaysShowTags = my.currentTask.alwaysShowTags;
             my.stages.reset(
                 similaritySegment,
+                similarityKeys,
                 annotationTags,
                 alwaysShowTags
             );
@@ -417,9 +440,20 @@ function main() {
     // Create all the components
     var urbanEars = new UrbanEars();
     document.onkeypress = function(event) {
-      if(document.activeElement.className != 'annotation_inp' && event.keyCode == 'i'.charCodeAt(0)){
-        urbanEars.createSegment();
-      }
+        if (document.activeElement.className != 'annotation_inp' && document.activeElement.className != 'simil-val-inp') {
+            if (pointAn) {
+                if (event.keyCode == 'i'.charCodeAt(0)) {
+                    urbanEars.createSegment();
+                }
+            } else {
+                if (event.keyCode == 'd'.charCodeAt(0)) {
+                    urbanEars.createPointSegment(false);
+                }
+                if (event.keyCode == 'u'.charCodeAt(0)) {
+                    urbanEars.createPointSegment(true);
+                }
+            }
+        }
     }
 
     // Load the first audio annotation task

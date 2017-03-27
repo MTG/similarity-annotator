@@ -11,18 +11,22 @@ class DataSetAdmin(admin.ModelAdmin):
 
 
 class ExerciseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'data_set')
     list_display_links = ('name', )
     list_filter = ('id', 'name')
 
 
 class TierAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'exercise', 'entire_sound')
+    list_display = ('id', 'name', 'data_set', 'exercise', 'entire_sound')
     list_display_links = ('name',)
+
+    @staticmethod
+    def data_set(obj):
+        return obj.exercise.data_set
 
 
 class SoundAdmin(admin.ModelAdmin):
-    list_display = ('filename', 'exercise', 'is_discarded', 'sound_tier_list_url')
+    list_display = ('filename', 'data_set', 'exercise', 'is_discarded', 'sound_tier_list_url')
     list_display_links = ('filename',)
     list_filter = ('exercise', 'is_discarded', )
     search_fields = ['filename']
@@ -32,9 +36,14 @@ class SoundAdmin(admin.ModelAdmin):
         return '<a href="/%s/%s/tiers_list/">%s</a>' % (obj.exercise.id, obj.id, url_name_to_show)
     sound_tier_list_url.allow_tags = True
 
+    @staticmethod
+    def data_set(obj):
+        return obj.exercise.data_set
+
 
 class AnnotationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'sound', 'tier', 'exercise', 'start_time', 'user', 'created_at', 'updated_at')
+    list_display = ('id', 'name', 'sound', 'tier', 'exercise', 'start_time', 'end_time', 'user', 'created_at',
+                    'updated_at')
     list_display_links = ('id', 'name', )
     list_filter = ('sound', )
 
@@ -44,7 +53,7 @@ class AnnotationAdmin(admin.ModelAdmin):
 
 
 class AnnotationSimilarityAdmin(admin.ModelAdmin):
-    list_display = ('id', 'reference', 'similar_sound', 'similarity_measure', 'user', 'created_at', 'updated_at')
+    list_display = ('id', 'reference', 'similar_sound', 'similarity', 'user', 'created_at', 'updated_at')
     list_display_links = ('id', )
 
 
