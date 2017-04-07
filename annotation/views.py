@@ -1,14 +1,17 @@
 import os
 import json
 import datetime
+import zipfile
+import shutil
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
 from .forms import TierForm
@@ -323,4 +326,53 @@ def tier_creation(request, exercise_id, sound_id):
         tier_form = TierForm(parent_tier_ids=tiers_list_ids)
     context = {'form': tier_form, 'exercise': exercise, 'create': True}
     return render(request, 'annotationapp/tier_creation.html', context)
+
+
+def download_data_set_annotations(request, data_set_id):
+    """
+    Download all the annotations of a data set
+    Args:
+        data_set_id: id of the dataset
+
+    Returns:
+        zip file containing a .json file for each sound in the data set containing the annotations
+    """
+
+    data_set = DataSet.objects.get(id=data_set_id)
+
+    try:
+        sounds = Sound.objects.filter(exercise__data_set=data_set)
+    except ObjectDoesNotExist:
+        return None
+
+    # make directory for intermediate json files
+    tmp_directory = os.path.join(settings.TEMP_ROOT, data_set.name + '_annotations')
+    os.mkdir(tmp_directory)
+
+    # create json files
+    for sound in sounds:
+        annotations = sound.get_annotations_as_dict()
+        annotations_file_path = os.path.join(tmp_directory, os.path.splitext(sound.filename)[0] + '.json')
+        with open(annotations_file_path, 'w') as fp:
+            json.dump(annotations, fp)
+
+    # create
+    zip_file_path = tmp_directory + '.zip'
+    zip_file = zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED)
+    for annotation_file in os.listdir(tmp_directory):
+        annotation_file_path = os.path.join(tmp_directory, annotation_file)
+        zip_file.write(annotation_file_path, os.path.basename(annotation_file_path))
+    zip_file.close()
+
+    # remove json files
+    shutil.rmtree(tmp_directory)
+    
+    response = HttpResponse(open(zip_file_path, 'rb'), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(zip_file_path)
+    return response
+
+
+
+
+
 

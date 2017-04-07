@@ -25,6 +25,12 @@
         <li><b>{{ total_annotation_similarities }}</b> annotations</li>
     </ul>
 
+    <div>
+        <button>
+        <a href="/{{ data_set.id }}/download_annotations/">Download annotations</a>
+        </button>
+    </div>
+
 {% endblock %}
 
 {% block logout %}
