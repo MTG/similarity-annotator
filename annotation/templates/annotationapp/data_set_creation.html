@@ -1,0 +1,21 @@
+{% extends 'annotationapp/annotationapp_base.html' %}
+{% block title %} Data set creation {% endblock %}
+
+{% block content %}
+    <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div>
+            {{ forms.data_set }}
+        </div>
+        <div>
+            {{ forms.file }}
+        </div>
+    <button type="submit" class="btn btn-info"> Create</button>
+    </form>
+{% endblock %}
+
+{% block logout %}
+    <button>
+    <a href="/accounts/logout">logout</a>
+    </button>
+{% endblock %}

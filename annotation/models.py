@@ -113,7 +113,7 @@ class Sound(models.Model):
     )
     filename = models.CharField(max_length=200)
     original_filename = models.CharField(max_length=200, default=None)
-    exercise = models.ForeignKey(Exercise, related_name='sounds')
+    exercise = models.ForeignKey(Exercise, null=True, related_name='sounds')
     has_annotations = models.BooleanField(default=False)
     is_discarded = models.BooleanField(default=False)
     annotation_state = models.CharField(max_length=2, choices=ANNOTATION_CHOICES, default='E')

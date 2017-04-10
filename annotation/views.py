@@ -12,9 +12,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
-from .forms import TierForm
+from .forms import TierForm, UploadFileForm, DataSetForm
 
 
 @login_required
@@ -370,6 +372,46 @@ def download_data_set_annotations(request, data_set_id):
     response = HttpResponse(open(zip_file_path, 'rb'), content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(zip_file_path)
     return response
+
+
+@login_required
+def create_data_set(request):
+    """
+    Create a new data set an upload some sounds to it
+    Args:
+        request:
+
+    Returns:
+
+    """
+    if request.method == 'POST':
+        sounds_form = UploadFileForm(files=request.FILES)
+        data_set_form = DataSetForm(request.POST)
+        if data_set_form.is_valid() and sounds_form.is_valid():
+            # create data set
+            data_set_name = request.POST['name']
+            data_set = DataSet.objects.create(name=data_set_name)
+            data_set.users.add(request.user)
+
+            # create sounds
+            # TODO: make sound.exercise null=True, store sounds not depending on exercise name
+            exercise_name = 'No exercise'
+            exercise = Exercise.objects.create(name=exercise_name, data_set=data_set)
+            for audio_file in request.FILES.getlist('audiofile'):
+                filename = audio_file.name
+                default_storage.save(os.path.join(data_set.name, exercise_name, filename),
+                                     ContentFile(audio_file.read()))
+                Sound.objects.create(filename=filename, exercise=exercise, original_filename=filename)
+
+            return redirect('/')
+
+    else:
+        sounds_form = UploadFileForm()
+        data_set_form = DataSetForm()
+    forms = {'file': sounds_form, 'data_set': data_set_form}
+
+    context = {'forms': forms}
+    return render(request, 'annotationapp/data_set_creation.html', context)
 
 
 

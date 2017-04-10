@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^download_annotations/(?P<sound_id>[0-9]+)$', views.download_annotations, name='download-annotations'),
     url(r'^(?P<exercise_id>[0-9]+)/(?P<sound_id>[0-9]+)/tier_creation/$', views.tier_creation, name='tier_creation'),
     url(r'^(?P<data_set_id>[0-9]+)/download_annotations/$', views.download_data_set_annotations,
-        name='download_annotations')
+        name='download_annotations'),
+    url(r'^data_set_creation/', views.create_data_set, name='data_set_creation')
 ]

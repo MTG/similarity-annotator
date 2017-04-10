@@ -1,6 +1,9 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from django.conf import settings
+from multiupload.fields import MultiFileField
 
-from .models import Tier
+from .models import Tier, DataSet
 
 
 class TierForm(forms.ModelForm):
@@ -46,3 +49,19 @@ class TierForm(forms.ModelForm):
             self._errors['invalid_dimensions'] = "You should provide at least one dimension"
             False
 
+
+class UploadFileForm(forms.Form):
+    def validate_audio_file(audiofileslist):
+        for audiofile in audiofileslist:
+            content_type = audiofile.content_type
+            if not content_type.startswith("audio"):
+                raise ValidationError("%(file_name)s is not an audio file") % {'file_name': audiofile.name}
+        return audiofileslist
+
+    audiofile = MultiFileField(min_num=1, max_num=100, validators=[validate_audio_file])
+
+
+class DataSetForm(forms.ModelForm):
+    class Meta:
+        model = DataSet
+        fields = ['name']
