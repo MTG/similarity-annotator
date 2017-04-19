@@ -105,6 +105,10 @@ class Tier(models.Model):
         return t
 
 
+class TierSync(models.Model):
+    tiers = models.ManyToManyField(Tier, 'sync_tiers')
+
+
 class Sound(models.Model):
     ANNOTATION_CHOICES = (
             ('E', 'empty'),
