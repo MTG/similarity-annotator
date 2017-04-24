@@ -136,7 +136,6 @@ TEMP_ROOT = "/tmp"
 
 STATIC_ROOT = "/static"
 
-GEARMAN_JOB_SERVERS = ["gearman:4730"]
 
 # in case some development settings are used
 if os.path.isfile(os.path.join(os.getcwd(), 'simannotator/development_settings.py')):
