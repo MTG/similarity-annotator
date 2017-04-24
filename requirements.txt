@@ -1,10 +1,10 @@
-Django==1.10.2
-django-extensions==1.7.4
-dj-database-url==0.4.1
-prompt-toolkit==1.0.8
-psycopg2==2.6.2
-ipython==5.1.0
-uwsgi==2.0.14
+Django==1.11
+django-extensions==1.7.8
+dj-database-url==0.4.2
+prompt-toolkit==1.0.14
+psycopg2==2.7.1
+ipython==6.0.0
+uwsgi==2.0.15
 coverage==4.0.3
 pydub==0.18.0
 
