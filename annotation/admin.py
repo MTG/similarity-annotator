@@ -26,10 +26,10 @@ class TierAdmin(admin.ModelAdmin):
 
 
 class SoundAdmin(admin.ModelAdmin):
-    list_display = ('filename', 'data_set', 'exercise', 'is_discarded', 'sound_tier_list_url')
+    list_display = ('id', 'filename', 'data_set', 'exercise', 'is_discarded', 'sound_tier_list_url')
     list_display_links = ('filename',)
     list_filter = ('exercise', 'is_discarded', )
-    search_fields = ['filename']
+    search_fields = ['id', 'filename']
 
     def sound_tier_list_url(self, obj):
         url_name_to_show = os.path.splitext(obj.filename)[0]
