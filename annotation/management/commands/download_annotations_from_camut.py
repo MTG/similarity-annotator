@@ -35,4 +35,4 @@ class Command(BaseCommand):
                     with open(annotation_file_path, 'w') as outfile:
                         json.dump(annotations, outfile)
                 except Exception as e:
-                    print(e.message)
+                    print(e)
