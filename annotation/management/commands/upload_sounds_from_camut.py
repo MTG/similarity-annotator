@@ -100,10 +100,10 @@ class Command(BaseCommand):
             # check if there is a rubric file to create the tiers and labels
 
             # # Riyaz tier creation definition
-            # rubric_file_path = os.path.join(dataset_path, 'rubric.json')
-            # if os.path.exists(rubric_file_path):
-            #     rubric_data = json.load(open(rubric_file_path))
-            #     self.create_tiers(rubric_data, exercise)
+            rubric_file_path = os.path.join(dataset_path, 'rubric.json')
+            if os.path.exists(rubric_file_path):
+                rubric_data = json.load(open(rubric_file_path))
+                self.create_tiers(rubric_data, exercise)
 
             # Other tier creation definition
             if 'tiers' in exercise_description:
