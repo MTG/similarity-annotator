@@ -2,7 +2,7 @@ import os
 import json
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
-from annotation.models import DataSet, Exercise, Tier, Tag
+from annotation.models import DataSet, Exercise, Tier, Tag, Annotation, User
 import annotation.utils
 
 
@@ -26,6 +26,8 @@ class Command(BaseCommand):
 
         parser.add_argument('force_annotations', type=bool, nargs='?', default=False,
                             help='force re-upload annotations')
+        parser.add_argument('create_segments', type=str, default=False,
+                            help='create segments for all sounds with specific start/end times')
 
     @staticmethod
     def create_tiers(tiers_data, exercise):
@@ -77,12 +79,8 @@ class Command(BaseCommand):
         dataset_name = options['dataset']
         username = options['user']
 
-        # check if data set exists
-        try:
-            data_set = DataSet.objects.get(name=dataset_name)
-        except ObjectDoesNotExist:
-            print("This data set doesn't exist in the web, please provide an existing one or create it")
-            return 0
+        data_set, _ = DataSet.objects.get_or_create(name=dataset_name)
+
         description_file_path = os.path.join(dataset_path, options['description'])
         descriptions = json.load(open(description_file_path))
         for exercise_id, exercise_description in descriptions.items():
@@ -104,11 +102,6 @@ class Command(BaseCommand):
             if os.path.exists(rubric_file_path):
                 rubric_data = json.load(open(rubric_file_path))
                 self.create_tiers(rubric_data, exercise)
-
-            # Other tier creation definition
-            if 'tiers' in exercise_description:
-                self.create_tiers(exercise_description['tiers'], exercise)
-
             else:
                 # create initial tier "whole sound"
                 Tier.objects.create(name="entire sound", exercise=exercise, entire_sound=True)
@@ -153,6 +146,15 @@ class Command(BaseCommand):
                     if not reference_sound.annotations.all():
                         annotation.utils.create_annotations(reference_sound_annotations_file_path, reference_sound,
                                                             username, True)
+                # Create annotations for reference sound according to parameter
+                if options['create_segments']:
+                    start_time, end_time = [int(i) for i in str(options['create_segments'])]
+                    user = User.objects.get(username=username)
+                    for tier in exercise.tiers.all():
+                        Annotation.objects.create(name="",
+                                                  start_time=start_time,
+                                                  end_time=end_time, sound=reference_sound, tier=tier,
+                                                  user=user)
             except KeyError:
                 print("The exercise %s does not have reference sound" % exercise_name)
 
@@ -178,6 +180,16 @@ class Command(BaseCommand):
                             sound.annotations.all().delete()
                         if not sound.annotations.all():
                             annotation.utils.create_annotations(sound_annotations_file_path, sound, username, False)
+
+                    # Create annotations for each sound according to parameter
+                    if options['create_segments']:
+                        start_time, end_time = [int(i) for i in str(options['create_segments'])]
+                        user = User.objects.get(username=username)
+                        for tier in exercise.tiers.all():
+                            Annotation.objects.create(name="",
+                                                      start_time=start_time,
+                                                      end_time=end_time, sound=sound, tier=tier,
+                                                      user=user)
                 except Exception as e:
                     print("Error while creating sounds and annotations from files: %s" % e)
 
