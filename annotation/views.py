@@ -34,18 +34,15 @@ def exercise_list(request, dataset_id):
         filter(annotation_state='C').count()
     current_date = datetime.datetime.today()
     last_week_segments = Annotation.objects.filter(
-        created_at__range=[current_date - datetime.timedelta(days=7), current_date]).count()
-    total_segments = Annotation.objects.all().count()
+        created_at__range=[current_date - datetime.timedelta(days=7), current_date]).filter(
+        sound__exercise__data_set=data_set).count()
     last_week_similarity_annotations = AnnotationSimilarity.objects.filter(
         created_at__range=[current_date - datetime.timedelta(days=7), current_date]).count()
-    total_annotation_similarities = AnnotationSimilarity.objects.all().count()
     context = {'exercises_list': exercises_list, 'data_set': data_set,
                'number_of_completed_sounds': number_of_completed_sounds,
                'number_of_sounds': number_of_sounds,
                'last_week_segments': last_week_segments,
-               'total_segments': total_segments,
-               'last_week_similarity_annotations': last_week_similarity_annotations,
-               'total_annotation_similarities': total_annotation_similarities}
+               'last_week_similarity_annotations': last_week_similarity_annotations}
     return render(request, 'annotationapp/exercises_list.html', context)
 
 
