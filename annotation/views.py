@@ -212,6 +212,7 @@ def sound_list(request, exercise_id):
                 # If page is out of range (e.g. 9999), deliver last page of results.
                 sounds = paginator.page(paginator.num_pages)
             context['sounds_list'] = sounds
+            context['tier'] = exercise.tiers.all()[0]
             if display_filter != 'discarded':
                 context['reference_sound'] = reference_sound
     return render(request, 'annotationapp/sounds_list.html', context)
