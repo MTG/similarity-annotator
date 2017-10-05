@@ -80,6 +80,13 @@ class Command(BaseCommand):
         username = options['user']
 
         data_set, _ = DataSet.objects.get_or_create(name=dataset_name)
+        try:
+            user = User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            print("This user doesn't exist in the database, please sing up or provide an existing username")
+            return 0
+        data_set.users.add(user)
+        data_set.save()
 
         description_file_path = os.path.join(dataset_path, options['description'])
         descriptions = json.load(open(description_file_path))
@@ -149,7 +156,6 @@ class Command(BaseCommand):
                 # Create annotations for reference sound according to parameter
                 if options['create_segments']:
                     start_time, end_time = [int(i) for i in str(options['create_segments'])]
-                    user = User.objects.get(username=username)
                     for tier in exercise.tiers.all():
                         Annotation.objects.create(name="",
                                                   start_time=start_time,
