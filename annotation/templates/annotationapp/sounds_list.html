@@ -13,12 +13,20 @@
     {% endif %}
     <ul class="list-group">
     {% if reference_sound %}
-        <li><a style="color:#425ff4" href="/{{ exercise.id }}/ref_sound_detail/{{ reference_sound.id }}/{{ tier.id}}">{{ reference_sound.filename }}</a> </li>
+        {% if reference_sound.name %}
+            <li><a style="color:#425ff4" href="/{{ exercise.id }}/ref_sound_detail/{{ reference_sound.id }}/{{ tier.id}}">{{ reference_sound.name }}</a> </li>
+        {% else %}
+            <li><a style="color:#425ff4" href="/{{ exercise.id }}/ref_sound_detail/{{ reference_sound.id }}/{{ tier.id}}">{{ reference_sound.name }}</a> </li>
+        {% endif %}
     {% endif %}
     {% if sounds_list %}
         {% for sound in sounds_list %}
         <li>
-            <a style="color:{% if sound.annotation_state == 'E' %}#cc0000{% elif sound.annotation_state == 'I' %}#f4aa42{% else %}#2eb244{%endif%}" href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ sound.filename }}</a></li>
+            {% if sound.name %}
+                <a style="color:{% if sound.annotation_state == 'E' %}#cc0000{% elif sound.annotation_state == 'I' %}#f4aa42{% else %}#2eb244{%endif%}" href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ sound.name }}</a></li>
+            {% else %}
+                <a style="color:{% if sound.annotation_state == 'E' %}#cc0000{% elif sound.annotation_state == 'I' %}#f4aa42{% else %}#2eb244{%endif%}" href="/{{ exercise.id }}/sound_detail/{{ sound.id }}/{{ tier.id }}">{{ sound.filename }}</a></li>
+            {% endif %}
         {% endfor %}
         <div class="pagination">
             {% if sounds_list.has_previous %}

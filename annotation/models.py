@@ -111,6 +111,7 @@ class Sound(models.Model):
             ('I', 'incomplete'),
             ('C', 'complete')
     )
+    name = models.CharField(max_length=100, blank=True, null=True)
     filename = models.CharField(max_length=200)
     original_filename = models.CharField(max_length=200, default=None)
     exercise = models.ForeignKey(Exercise, related_name='sounds')

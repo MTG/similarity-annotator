@@ -24,7 +24,11 @@
 {% endblock %}
 
 <div class="row prompt">
-  <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
+    {% if sound.name %}
+        <h4 class="center">{{ sound.name }} - {{tier.name}}</h4>
+    {% else %}
+        <h4 class="center">{{ sound.filename }} - {{tier.name}}</h4>
+    {% endif %}
 </div>
 <div class="row prompt">
     {% for other_tier in other_tiers %}

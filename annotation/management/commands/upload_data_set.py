@@ -138,9 +138,9 @@ class Command(BaseCommand):
                 reference_sound_filename = annotation.utils.copy_sound_into_media(source_path, dataset_name,
                                                                                   exercise_name,
                                                                                   reference_sound_filename)
-
+                name = "%s %s" % (exercise.name, 'reference')
                 reference_sound = annotation.utils.get_or_create_sound_object(exercise, reference_sound_filename,
-                                                                              source_path)
+                                                                              source_path, name=name)
                 exercise.reference_sound = reference_sound
                 exercise.save()
 
@@ -175,8 +175,11 @@ class Command(BaseCommand):
                     # copy the sound into media
                     sound_filename = annotation.utils.copy_sound_into_media(source_path, dataset_name, exercise_name,
                                                                             sound_filename)
-
-                    sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path)
+                    name = None
+                    if '_id' in sound_description:
+                        name = sound_description['_id']
+                    sound = annotation.utils.get_or_create_sound_object(exercise, sound_filename, source_path,
+                                                                        name=name)
 
                     # CREATE ANNOTATIONS
 

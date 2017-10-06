@@ -72,11 +72,12 @@ def create_exercise_directory(data_set, exercise_name):
     return exercise_files_path
 
 
-def get_or_create_sound_object(exercise, sound_filename, original_filename=None):
+def get_or_create_sound_object(exercise, sound_filename, original_filename=None, name=None):
     try:
         sound = Sound.objects.get(filename=sound_filename, exercise=exercise, original_filename=original_filename)
     except ObjectDoesNotExist:
-        sound = Sound.objects.create(filename=sound_filename, exercise=exercise, original_filename=original_filename)
+        sound = Sound.objects.create(filename=sound_filename, exercise=exercise, original_filename=original_filename,
+                                     name=name)
         print("Created sound %s:%s of exercise %s" % (sound.id, sound_filename, exercise.name))
     return sound
 
