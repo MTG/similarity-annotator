@@ -333,6 +333,8 @@ class Sound(models.Model):
         self.annotation_state = state
         self.save()
 
+        # update complete
+
         return True
 
     @staticmethod
@@ -361,7 +363,7 @@ class Annotation(models.Model):
 
 class AnnotationSimilarity(models.Model):
     reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
-    similar_sound = models.ForeignKey(Annotation, related_name='similarities')
+    similar_sound = models.ForeignKey(Annotation)
     similarity = JSONField(blank=True, null=True, default=dict)
     user = models.ForeignKey(User, related_name='similarity_measures')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -371,3 +373,12 @@ class AnnotationSimilarity(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=200)
     tiers = models.ManyToManyField(Tier)
+
+
+class Complete(models.Model):
+    """
+    This model is used to store if the annotations for a sound are finished according to each user.
+    If on of this objects exist in the database it means the annotations for that sounds are finished for the user.
+    """
+    user = models.ForeignKey(User, related_name='complete')
+    sound = models.ForeignKey(Sound)
