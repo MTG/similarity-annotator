@@ -361,7 +361,7 @@ class Annotation(models.Model):
 
 class AnnotationSimilarity(models.Model):
     reference = models.ForeignKey(Annotation, related_name="%(class)s_related")
-    similar_sound = models.ForeignKey(Annotation)
+    similar_sound = models.ForeignKey(Annotation, related_name='similarities')
     similarity = JSONField(blank=True, null=True, default=dict)
     user = models.ForeignKey(User, related_name='similarity_measures')
     created_at = models.DateTimeField(auto_now_add=True)
