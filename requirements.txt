@@ -1,5 +1,6 @@
 Django==1.11
 django-extensions==1.7.8
+django-debug-toolbar==1.8
 dj-database-url==0.4.2
 prompt-toolkit==1.0.14
 psycopg2==2.7.1
