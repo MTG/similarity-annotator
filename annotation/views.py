@@ -198,7 +198,11 @@ def sound_list(request, exercise_id):
         else:
             reference_sound = exercise.reference_sound
             sounds_list = sounds_list.exclude(id=reference_sound.id)
-            paginator = Paginator(sounds_list, 20)
+
+            sounds_list_plus_data = [{"sound": sound,
+                                      "is_completed": sound.check_if_user_completed_annotations(request.user)}
+                                     for sound in sounds_list]
+            paginator = Paginator(sounds_list_plus_data, 20)
             page = request.GET.get('page')
             try:
                 sounds = paginator.page(page)
@@ -210,6 +214,7 @@ def sound_list(request, exercise_id):
                 sounds = paginator.page(paginator.num_pages)
             context['sounds_list'] = sounds
             context['tier'] = exercise.tiers.all()[0]
+            context['user'] = request.user
             if display_filter != 'discarded':
                 context['reference_sound'] = reference_sound
     return render(request, 'annotationapp/sounds_list.html', context)

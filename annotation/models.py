@@ -333,7 +333,16 @@ class Sound(models.Model):
         self.annotation_state = state
         self.save()
 
-        # update complete
+        # update complete objects
+        user_similarities = AnnotationSimilarity.objects.filter(similar_sound__in=added_annotations).filter(user=user)
+        complete = Complete.objects.filter(sound=self, user=user)
+
+        if not complete:
+            if user_similarities.count() == added_annotations.count():
+                Complete.objects.create(sound=self, user=user)
+        else:
+            if user_similarities.count() < added_annotations.count():
+                complete[0].delete()
 
         return True
 
@@ -345,6 +354,22 @@ class Sound(models.Model):
         if modify_name:
             old_annotation.name = new_annotation['annotation']
         old_annotation.save()
+
+    def check_if_user_completed_annotations(self, user):
+        """
+        Check if a user has completed the annotations for the sound. If this is the case, a Complete object with the
+        user and the sound should exist. Thus, if complete objects for the user are filtered by the sound, an empty
+        query means the user hasn't completed annotations for the sound.
+        Args:
+            user: user object
+
+        Returns:
+            True or False
+
+        """
+        if user.complete.filter(sound=self):
+            return True
+        return False
 
 
 class Annotation(models.Model):
@@ -381,4 +406,4 @@ class Complete(models.Model):
     If on of this objects exist in the database it means the annotations for that sounds are finished for the user.
     """
     user = models.ForeignKey(User, related_name='complete')
-    sound = models.ForeignKey(Sound)
+    sound = models.ForeignKey(Sound, related_name='complete')

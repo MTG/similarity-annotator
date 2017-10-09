@@ -1,7 +1,7 @@
 import os
 
 from django.contrib import admin
-from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, DataSet, Tag
+from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, DataSet, Tag, Complete
 
 
 class DataSetAdmin(admin.ModelAdmin):
@@ -55,6 +55,10 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
+
+class CompleteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'sound', 'user')
+
 admin.site.register(Sound, SoundAdmin)
 admin.site.register(Tier, TierAdmin)
 admin.site.register(Tag, TagAdmin)
@@ -62,6 +66,7 @@ admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Annotation, AnnotationAdmin)
 admin.site.register(AnnotationSimilarity, AnnotationSimilarityAdmin)
 admin.site.register(DataSet, DataSetAdmin)
+admin.site.register(Complete, CompleteAdmin)
 
 
 
