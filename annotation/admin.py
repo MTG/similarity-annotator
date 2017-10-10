@@ -69,7 +69,7 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
         else:
             sound_name = sound.filename
         return '<a href="/%s/sound_detail/%s/%s">%s</a>' % (sound.exercise.id, sound.id,
-                                                           sound.exercise.tiers.all()[0].id, sound_name)
+                                                            sound.exercise.tiers.all()[0].id, sound_name)
     sound.allow_tags = True
 
 
@@ -78,7 +78,17 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class CompleteAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sound', 'user')
+    list_display = ('id', 'sound_link', 'user')
+
+    def sound_link(self, obj):
+        sound = obj.sound
+        if sound.name:
+            sound_name = sound.name
+        else:
+            sound_name = sound.filename
+        return '<a href="/%s/sound_detail/%s/%s">%s</a>' % (sound.exercise.id, sound.id,
+                                                            sound.exercise.tiers.all()[0].id, sound_name)
+    sound_link.allow_tags = True
 
 admin.site.register(Sound, SoundAdmin)
 admin.site.register(Tier, TierAdmin)
