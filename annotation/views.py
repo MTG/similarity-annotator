@@ -13,7 +13,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
+from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag, Complete
 from .forms import TierForm
 
 
@@ -174,17 +174,7 @@ def sound_list(request, exercise_id):
         sounds_list = sounds_list.filter(is_discarded=True)
     else:
         sounds_list = sounds_list.filter(is_discarded=False)
-    paginator = Paginator(sounds_list.all(), 20)
-    page = request.GET.get('page')
-    try:
-        sounds = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        sounds = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        sounds = paginator.page(paginator.num_pages)
-    context = {'display_filter': display_filter, 'exercise': exercise, 'sounds_list': sounds}
+    context = {'display_filter': display_filter, 'exercise': exercise}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
@@ -199,9 +189,11 @@ def sound_list(request, exercise_id):
             reference_sound = exercise.reference_sound
             sounds_list = sounds_list.exclude(id=reference_sound.id)
 
-            sounds_list_plus_data = [{"sound": sound,
-                                      "is_completed": sound.check_if_user_completed_annotations(request.user)}
-                                     for sound in sounds_list]
+            completes = Complete.objects.filter(sound__in=sounds_list, user=request.user)
+
+            completed_sounds = {complete.sound_id: True for complete in completes}
+            sounds_list_plus_data = [{"sound": sound, "is_completed": completed_sounds.get(sound.id, False)} for sound
+                                     in sounds_list]
             paginator = Paginator(sounds_list_plus_data, 20)
             page = request.GET.get('page')
             try:
