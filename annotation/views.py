@@ -174,17 +174,7 @@ def sound_list(request, exercise_id):
         sounds_list = sounds_list.filter(is_discarded=True)
     else:
         sounds_list = sounds_list.filter(is_discarded=False)
-    paginator = Paginator(sounds_list.all(), 20)
-    page = request.GET.get('page')
-    try:
-        sounds = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        sounds = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        sounds = paginator.page(paginator.num_pages)
-    context = {'display_filter': display_filter, 'exercise': exercise, 'sounds_list': sounds}
+    context = {'display_filter': display_filter, 'exercise': exercise}
     if exercise is Http404:
         return render(request, exercise)
     if request.method == 'POST':
