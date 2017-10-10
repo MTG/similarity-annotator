@@ -13,7 +13,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag
+from .models import AnnotationSimilarity, Annotation, Exercise, Sound, Tier, DataSet, Tag, Complete
 from .forms import TierForm
 
 
@@ -199,9 +199,11 @@ def sound_list(request, exercise_id):
             reference_sound = exercise.reference_sound
             sounds_list = sounds_list.exclude(id=reference_sound.id)
 
-            sounds_list_plus_data = [{"sound": sound,
-                                      "is_completed": sound.check_if_user_completed_annotations(request.user)}
-                                     for sound in sounds_list]
+            completes = Complete.objects.filter(sound__in=sounds_list, user=request.user)
+
+            completed_sounds = {complete.sound_id: True for complete in completes}
+            sounds_list_plus_data = [{"sound": sound, "is_completed": completed_sounds.get(sound.id, False)} for sound
+                                     in sounds_list]
             paginator = Paginator(sounds_list_plus_data, 20)
             page = request.GET.get('page')
             try:
