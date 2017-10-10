@@ -1,5 +1,3 @@
-import os
-
 from django.contrib import admin
 from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, DataSet, Tag, Complete
 
@@ -26,7 +24,7 @@ class TierAdmin(admin.ModelAdmin):
 
 
 class SoundAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'filename', 'data_set', 'exercise', 'is_discarded')
+    list_display = ('id', 'name', 'filename', 'data_set', 'exercise', 'is_reference', 'is_discarded')
     list_display_links = ('filename',)
     list_filter = ('exercise', 'is_discarded', )
     search_fields = ['id', 'filename']
@@ -34,6 +32,10 @@ class SoundAdmin(admin.ModelAdmin):
     @staticmethod
     def data_set(obj):
         return obj.exercise.data_set
+
+    def is_reference(self, obj):
+        return obj.exercise.reference_sound == obj
+    is_reference.boolean = True
 
 
 class AnnotationAdmin(admin.ModelAdmin):
