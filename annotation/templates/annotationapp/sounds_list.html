@@ -16,7 +16,7 @@
         {% if reference_sound.name %}
             <li><a style="color:#425ff4" href="/{{ exercise.id }}/ref_sound_detail/{{ reference_sound.id }}/{{ tier.id}}">{{ reference_sound.name }}</a> </li>
         {% else %}
-            <li><a style="color:#425ff4" href="/{{ exercise.id }}/ref_sound_detail/{{ reference_sound.id }}/{{ tier.id}}">{{ reference_sound.name }}</a> </li>
+            <li><a style="color:#425ff4" href="/{{ exercise.id }}/ref_sound_detail/{{ reference_sound.id }}/{{ tier.id}}">{{ reference_sound.filename }}</a> </li>
         {% endif %}
     {% endif %}
     {% if sounds_list %}
