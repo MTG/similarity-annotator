@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 
 from .models import Sound, Tier, Exercise, Annotation, AnnotationSimilarity, DataSet, Tag, Complete
 
@@ -51,9 +52,16 @@ class AnnotationAdmin(admin.ModelAdmin):
 
 
 class AnnotationSimilarityAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sound', 'similarity_value', 'user', 'created_at', 'updated_at')
+    list_display = ('id', 'annotation', 'sound', 'exercise', 'similarity_value', 'user', 'created_at', 'updated_at')
     list_display_links = ('id', )
     search_fields = ['user__username']
+
+    def annotation(self, obj):
+        annotation = obj.similar_sound
+        url = reverse('admin:%s_%s_change' % ('annotation', 'annotation'), args=(annotation.id,))
+        return '<a href="%s">%s</a>' % (url, annotation.id)
+
+    annotation.allow_tags = True
 
     @staticmethod
     def similarity_value(obj):
@@ -70,6 +78,12 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
             sound_name = sound.filename
         return '<a href="/%s/sound_detail/%s/%s">%s</a>' % (sound.exercise.id, sound.id,
                                                             sound.exercise.tiers.all()[0].id, sound_name)
+
+    @staticmethod
+    def exercise(obj):
+        exercise = obj.similar_sound.sound.exercise
+        return exercise.name
+
     sound.allow_tags = True
 
 
