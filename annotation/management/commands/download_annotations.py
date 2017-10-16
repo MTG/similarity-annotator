@@ -30,8 +30,10 @@ class Command(BaseCommand):
             if sound != sound.exercise.reference_sound:
                 try:
                     # take the original filename as the destination in which to download the file
-                    annotation_file_path = os.path.splitext(sound.original_filename)[0] + '.json'
+                    annotation_file_path = os.path.splitext(sound.original_filename.replace('import', 'export'))[0]\
+                                           + '.json'
                     annotations = sound.get_annotations_as_dict()
+                    os.makedirs(os.path.dirname(annotation_file_path), exist_ok=True)
                     with open(annotation_file_path, 'w') as outfile:
                         json.dump(annotations, outfile)
                 except Exception as e:

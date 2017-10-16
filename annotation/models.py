@@ -130,9 +130,9 @@ class Sound(models.Model):
             ret[tier.name] = []
             for i in annotations.all():
                 if i.annotationsimilarity_set.all():
-                    similarities = []
+                    similarities = {}
                     for s in i.annotationsimilarity_set.all():
-                        similarities.append(float(s.similarity['value']))
+                        similarities[s.user.username] = (float(s.similarity['value']))
                     ret[tier.name].append({
                         'ref_start_time': float(s.reference.start_time),
                         'start_time': float(i.start_time),
