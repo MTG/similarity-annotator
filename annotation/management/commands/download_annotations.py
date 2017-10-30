@@ -24,7 +24,8 @@ class Command(BaseCommand):
             print("this data set does not exists in the database")
             return 0
 
-        for sound in Sound.objects.filter(exercise__in=Exercise.objects.filter(data_set__name=data_set_name)):
+        for sound in Sound.objects.filter(exercise__in=Exercise.objects.filter(data_set__name=data_set_name)).\
+                filter(is_discarded=False):
             print("SOUND: %s %s" % (sound.id, sound.filename))
             # only download annotations for sound that are not the reference of the exercise
             if sound != sound.exercise.reference_sound:
