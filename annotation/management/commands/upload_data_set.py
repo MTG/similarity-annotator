@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         parser.add_argument('force_annotations', type=bool, nargs='?', default=False,
                             help='force re-upload annotations')
-        parser.add_argument('create_segments', type=str, default=False,
+        parser.add_argument('--create_segments', type=str, default=False,
                             help='create segments for all sounds with specific start/end times')
 
     @staticmethod
