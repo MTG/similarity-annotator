@@ -2,7 +2,9 @@ import os
 import json
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from annotation.models import Exercise, Sound, DataSet
+
 
 
 class Command(BaseCommand):
@@ -30,9 +32,10 @@ class Command(BaseCommand):
             # only download annotations for sound that are not the reference of the exercise
             if sound != sound.exercise.reference_sound:
                 try:
-                    # remove two first directories from original_filename name and add /export
-                    export_path_list = ['/export', sound.exercise.data_set.name] + \
-                                       sound.original_filename.split(os.sep)[2:]
+                    export_directory = [settings.EXPORT_PATH]
+                    if sound.exercise.data_set.name not in sound.original_filename:
+                        export_directory.append(sound.exercise.data_set.name)
+                    export_path_list = export_directory + sound.original_filename.split(os.sep)[2:]
                     export_path = "/".join(export_path_list)
                     # change file extension to .json
                     annotation_file_path = os.path.splitext(export_path)[0] + '.json'

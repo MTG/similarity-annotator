@@ -136,6 +136,8 @@ TEMP_ROOT = "/tmp"
 
 STATIC_ROOT = "/static"
 
+EXPORT_PATH = "/export"
+IMPORT_PATH = "/import"
 
 # in case some development settings are used
 if os.path.isfile(os.path.join(os.getcwd(), 'simannotator/development_settings.py')):
