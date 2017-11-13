@@ -31,7 +31,8 @@ class Command(BaseCommand):
             if sound != sound.exercise.reference_sound:
                 try:
                     # remove two first directories from original_filename name and add /export
-                    export_path_list = ['/export'] + sound.original_filename.split(os.sep)[2:]
+                    export_path_list = ['/export', sound.exercise.data_set.name] + \
+                                       sound.original_filename.split(os.sep)[2:]
                     export_path = "/".join(export_path_list)
                     # change file extension to .json
                     annotation_file_path = os.path.splitext(export_path)[0] + '.json'
