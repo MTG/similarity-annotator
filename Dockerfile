@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y libav-tools --no-install-recommends && 
 RUN mkdir /code
 WORKDIR /code
 ADD requirements.txt /code/
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 ADD . /code/
 
