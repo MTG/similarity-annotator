@@ -41,14 +41,12 @@ def exercise_annotations_to_json(exercise_id):
                     annotation_similarity = AnnotationSimilarity.objects.get(similar_sound=annotation)
                     similarity = {'reference_annotation_start_time': annotation_similarity.reference.start_time,
                                   'reference_annotation_end_time': annotation_similarity.reference.end_time,
-                                  'similarity': annotation_similarity.similarity
-                                  }
+                                  'similarity': annotation_similarity.similarity}
                 except ObjectDoesNotExist:
                     similarity = None
                 annotation_dict = {'start_time': annotation.start_time,
                                    'end_time': annotation.end_time,
-                                   'similarity': similarity
-                                   }
+                                   'similarity': similarity}
                 annotations.append(annotation_dict)
 
             tiers[tier.name] = annotations
@@ -147,4 +145,3 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
                         return 0
     except FileNotFoundError:
         print("The file %s doesn't exist" % annotations_file_path)
-

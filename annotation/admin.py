@@ -76,8 +76,7 @@ class AnnotationSimilarityAdmin(admin.ModelAdmin):
     def similarity_value(obj):
         if 'value' in obj.similarity:
             return obj.similarity['value']
-        else:
-            return obj.similarity
+        return None
 
     def sound(self, obj):
         sound = obj.similar_sound.sound
@@ -123,6 +122,3 @@ admin.site.register(Annotation, AnnotationAdmin)
 admin.site.register(AnnotationSimilarity, AnnotationSimilarityAdmin)
 admin.site.register(DataSet, DataSetAdmin)
 admin.site.register(Complete, CompleteAdmin)
-
-
-

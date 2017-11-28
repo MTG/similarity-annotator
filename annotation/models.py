@@ -107,9 +107,9 @@ class Tier(models.Model):
 
 class Sound(models.Model):
     ANNOTATION_CHOICES = (
-            ('E', 'empty'),
-            ('I', 'incomplete'),
-            ('C', 'complete')
+        ('E', 'empty'),
+        ('I', 'incomplete'),
+        ('C', 'complete')
     )
     name = models.CharField(max_length=100, blank=True, null=True)
     filename = models.CharField(max_length=200)
@@ -316,7 +316,8 @@ class Sound(models.Model):
         for a in old_annotations.all():
             if a.id not in added:
                 # Delete annotation in the parent tier and child
-                Annotation.objects.filter(sound=self, start_time=a.start_time, end_time=a.end_time, name=a.name).delete()
+                Annotation.objects.filter(sound=self, start_time=a.start_time,
+                                          end_time=a.end_time, name=a.name).delete()
 
         # update annotation_state of sound
         num_ref_annotations = Annotation.objects.filter(sound=self.exercise.reference_sound, tier=tier).count()

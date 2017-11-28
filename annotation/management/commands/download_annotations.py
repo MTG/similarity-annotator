@@ -6,7 +6,6 @@ from django.conf import settings
 from annotation.models import Exercise, Sound, DataSet
 
 
-
 class Command(BaseCommand):
     """
     Download annotations in the CAMUT file system. It will download one annotations file per sound in the CAMUT format

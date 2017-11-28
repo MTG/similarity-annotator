@@ -34,8 +34,8 @@ def exercise_list(request, dataset_id):
         filter(annotation_state='C').count()
     current_date = datetime.datetime.today()
     last_week_segments = Annotation.objects.filter(
-        created_at__range=[current_date - datetime.timedelta(days=7), current_date]).filter(
-        sound__exercise__data_set=data_set).count()
+        created_at__range=[current_date - datetime.timedelta(days=7),
+                           current_date]).filter(sound__exercise__data_set=data_set).count()
     last_week_similarity_annotations = AnnotationSimilarity.objects.filter(
         created_at__range=[current_date - datetime.timedelta(days=7), current_date]).count()
     context = {'exercises_list': exercises_list, 'data_set': data_set,
@@ -116,10 +116,7 @@ def tier_edit(request, exercise_id, tier_id, sound_id):
             # if point_annotations attribute is changed, delete previous annotations
             if ('point_annotations' in request.POST) != tier.point_annotations:
                 tier.annotations.all().delete()
-            if 'point_annotations' in request.POST:
-                tier.point_annotations = True
-            else:
-                tier.point_annotations = False
+            tier.point_annotations = 'point_annotations' in request.POST
             tier.save()
             return redirect(reverse('tier_list', kwargs={
                 'exercise_id': exercise_id,
@@ -361,13 +358,7 @@ def download_data_set_annotations(request, data_set_id):
 
     # remove json files
     shutil.rmtree(tmp_directory)
-    
+
     response = HttpResponse(open(zip_file_path, 'rb'), content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(zip_file_path)
     return response
-
-
-
-
-
-

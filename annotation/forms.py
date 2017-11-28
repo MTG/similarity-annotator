@@ -14,7 +14,7 @@ class TierForm(forms.ModelForm):
                    'parent_tier': forms.Select(attrs={'class': 'form-control', 'style': 'width: 8em;',
                                                       'placeholder': 'parent_tier'}),
                    'special_parent_tier': forms.Select(attrs={'class': 'form-control', 'style': 'width: 8em;',
-                                                       'placeholder': 'special_parent_tier'}),
+                                                              'placeholder': 'special_parent_tier'}),
                    'point_annotations': forms.CheckboxInput()}
 
     def __init__(self, *args, **kwargs):
@@ -31,8 +31,7 @@ class TierForm(forms.ModelForm):
     def clean_dimensions(self):
         if self.cleaned_data['dimensions']:
             return [s for s in self.cleaned_data['dimensions'].split(',')]
-        else:
-            return None
+        return None
 
     def is_valid(self):
         valid = super(TierForm, self).is_valid()
@@ -44,5 +43,4 @@ class TierForm(forms.ModelForm):
             return True
         else:
             self._errors['invalid_dimensions'] = "You should provide at least one dimension"
-            False
-
+        return False
