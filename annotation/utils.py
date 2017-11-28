@@ -135,25 +135,12 @@ def create_annotations(annotations_file_path, sound, username, reference=False):
                         print("Created annotation %s on reference sound %s" % (annotation_data["label"],
                                                                                sound.filename))
                 else:
-                    # retrieve reference sound of the exercise and the corresponding Annotation
-                    reference_sound_of_the_exercise = sound.exercise.reference_sound
                     try:
-                        reference_sound_annotation = Annotation.objects.get(sound=reference_sound_of_the_exercise,
-                                                                            tier=tier,
-                                                                            start_time=annotation_data["ref_start_time"],
-                                                                            end_time=annotation_data["ref_end_time"])
                         # create annotation on similar sound with same reference annotation label
-                        annotation = Annotation.objects.create(name=reference_sound_annotation.name,
-                                                               start_time=annotation_data["start_time"],
-                                                               end_time=annotation_data["end_time"], sound=sound,
-                                                               tier=tier, user=user)
-                        # create annotation similarity with both annotations
-                        annotation_similarity = AnnotationSimilarity.objects.create(
-                            reference=reference_sound_annotation, similar_sound=annotation,
-                            similarity=annotation_data["value"], user=user)
-                        print("Created AnnotationSimilarity %s from on sound %s in exercise %s" %
-                              (annotation_similarity.id, sound.filename, sound.exercise.name))
-
+                        Annotation.objects.create(name='', start_time=annotation_data["start_time"],
+                                                  end_time=annotation_data["end_time"], sound=sound,
+                                                  tier=tier, user=user)
+                        print("Created annotation on sound %s" % sound.filename)
                     except ObjectDoesNotExist:
                         print("There is no reference sound annotation in tier %s for file %s" %
                               (tier_name, annotations_file_path))
