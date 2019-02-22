@@ -8,4 +8,5 @@ ipython==7.3.0
 uwsgi==2.0.18
 coverage==4.5.2
 pydub==0.18.0
+raven==6.10.0
 

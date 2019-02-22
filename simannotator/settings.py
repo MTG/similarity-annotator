@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'raven.contrib.django.raven_compat',
 ]
 
 MIDDLEWARE = [
@@ -115,12 +116,18 @@ STATIC_URL = '/static/'
 
 deploy_env = os.environ.get('DEPLOY_ENV')
 allowed_host = os.environ.get('DJANGO_ALLOWED_HOST')
+raven_dsn = os.environ.get('SIM_RAVEN_DSN')
 import dj_database_url
 if deploy_env == 'prod':
     debug = False
     ALLOWED_HOSTS = ['localhost', 'asplab-web1', 'asplab-web1.s.upf.edu', 'simannotator.mtg.upf.edu']
     if allowed_host:
         ALLOWED_HOSTS.append(allowed_host)
+
+    RAVEN_CONFIG = {
+        'dsn': raven_dsn,
+    }
+
 else:
     debug = True
     ALLOWED_HOSTS = ['simannotator-test.mtg.upf.edu']
